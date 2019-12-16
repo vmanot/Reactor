@@ -15,6 +15,7 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject, Subs
     let lock = OSUnfairLock()
     
     public enum Output {
+        case started
         case inactivity
         case activity(Progress?)
         case success(Success)
@@ -44,9 +45,9 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject, Subs
         }
     }
     
-    public let publisher: TaskPublisher<Success, Error>
-    
+    private var startTask: ((Task<Success, Error>) -> Void)?
     private var subscriber: AnySubscriber<Output, Failure>!
+    
     private var _status: Status = .idle
     
     public var status: Status {
@@ -62,16 +63,27 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject, Subs
             }
         }
     }
-    
-    public init<S: Subscriber>(
-        publisher: TaskPublisher<Success, Error>,
+
+    public required init<S: Subscriber>(
+        start: @escaping (Task<Success, Error>) -> (),
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
-        self.publisher = publisher
+        self.startTask = start
         self.subscriber = .init(subscriber)
     }
     
+    public convenience init<S: Subscriber>(
+        publisher: TaskPublisher<Success, Error>,
+        subscriber: S
+    ) where S.Input == Output, S.Failure == Failure {
+        self.init(start: publisher.body, subscriber: subscriber)
+    }
+    
     public func request(_ demand: Subscribers.Demand) {
+        start()
+    }
+    
+    deinit {
         
     }
 }
@@ -82,7 +94,10 @@ extension Task {
             status = .running
         }
         
-        publisher.body(self)
+        self.startTask?(self)
+        self.startTask = nil
+        
+        _ = subscriber.receive(.started)
     }
     
     public func inactivity() {

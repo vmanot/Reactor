@@ -14,7 +14,7 @@ public struct Reactors: DynamicProperty {
     }
 }
 
-public struct ViewReactorsAccessView<Content: View>: View {
+public struct ViewReactorsView<Content: View>: View {
     @Reactors() private var reactors
     
     public var content: (ViewReactors) -> Content
@@ -93,7 +93,7 @@ extension View {
 
 extension View {
     public func onAppear(dispatch action: ViewReactorAction) -> some View {
-        ViewReactorsAccessView { reactors in
+        ViewReactorsView { reactors in
             self.onAppear {
                 reactors.dispatch(action)
             }

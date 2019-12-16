@@ -6,69 +6,44 @@ import CombineX
 import SwiftUIX
 
 public protocol opaque_ViewReactor {
-    func opaque_dispatch(_ action: ViewReactorAction) -> Void?
+    func opaque_dispatch(_ action: ViewReactorAction) -> Task<Void, Error>?
 }
 
 extension opaque_ViewReactor where Self: ViewReactor {
-    public func opaque_dispatch(_ action: ViewReactorAction) -> Void? {
+    public func opaque_dispatch(_ action: ViewReactorAction) -> Task<Void, Error>? {
         (action as? Action).map(dispatch)
     }
 }
 
 public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
-    associatedtype Mutation
     associatedtype Action
-    associatedtype Error: Swift.Error = Never
+    associatedtype Event
+    
+    typealias ActionTaskPublisher = ViewReactorTaskPublisher<Self>
     
     var cancellables: Cancellables { get }
     
-    func mutate(action: Action) -> TaskPublisher<Mutation, Error>
-    func reduce(mutation: Mutation)
-    func dispatch(_ action: Action)
+    func mutate(action: Action) -> ActionTaskPublisher
+    func reduce(event: Event)
+    
+    func dispatcher(for action: Action) -> ViewReactorActionDispatcher<Self>
+    @discardableResult
+    func dispatch(_ action: Action) -> Task<Void, Error>
 }
 
 public protocol InitiableViewReactor: ViewReactor {
     init()
 }
 
-// MARK: - Action -
+// MARK: - Implementation -
 
 extension ViewReactor {
-    public func dispatch(_ action: Action) {
-        let subscriber = TaskSubscriber<Mutation, Error>()
-        
-        mutate(action: action).receive(subscriber: subscriber)
-        
-        if let task = subscriber.task {
-            let cancellable = AnyCancellable(task)
-            
-            subscriber.onReceive = { input in
-                switch input {
-                    case .inactivity:
-                        fatalError()
-                    case .activity(_):
-                        fatalError()
-                    case .success(let value):
-                        DispatchQueue.main.async {
-                            self.reduce(mutation: value)
-                    }
-                }
-            }
-            
-            subscriber.onComplete = { [weak cancellables] completion in
-                cancellables?.remove(cancellable)
-                
-                switch completion {
-                    case .finished:
-                        break
-                    case .failure(_):
-                        fatalError()
-                }
-            }
-            
-            cancellables.insert(cancellable)
-            
-            task.start()
-        }
+    public func dispatcher(for action: Action) -> ViewReactorActionDispatcher<Self> {
+        ViewReactorActionDispatcher(reactor: self, action: action)
+    }
+    
+    @discardableResult
+    public func dispatch(_ action: Action) -> Task<Void, Error> {
+        dispatcher(for: action).dispatch()
     }
 }
