@@ -23,7 +23,7 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
     
     var cancellables: Cancellables { get }
     
-    func mutate(action: Action) -> ActionTaskPublisher
+    func task(action: Action) -> ActionTaskPublisher
     func reduce(event: Event)
     
     func dispatcher(for action: Action) -> ViewReactorActionDispatcher<Self>

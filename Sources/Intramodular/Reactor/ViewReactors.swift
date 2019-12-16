@@ -5,15 +5,6 @@
 import CombineX
 import SwiftUIX
 
-@propertyWrapper
-public struct Reactors: DynamicProperty {
-    @Environment(\.viewReactors) public private(set) var wrappedValue
-    
-    public init() {
-        
-    }
-}
-
 public struct ViewReactorsView<Content: View>: View {
     @Reactors() private var reactors
     

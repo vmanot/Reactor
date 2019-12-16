@@ -16,8 +16,7 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject, Subs
     
     public enum Output {
         case started
-        case inactivity
-        case activity(Progress?)
+        case progress(Progress?)
         case success(Success)
     }
     
@@ -29,10 +28,9 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject, Subs
     public enum Status {
         case idle
         case running
-        case inactive
-        case active(Progress?)
-        case success(Success)
+        case progress(Progress?)
         case canceled
+        case success(Success)
         case failure(Error)
         
         public var isEnded: Bool {
@@ -63,7 +61,7 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject, Subs
             }
         }
     }
-
+    
     public required init<S: Subscriber>(
         start: @escaping (Task<Success, Error>) -> (),
         subscriber: S
@@ -80,19 +78,7 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject, Subs
     }
     
     public func request(_ demand: Subscribers.Demand) {
-        start()
-    }
-    
-    deinit {
-        
-    }
-}
-
-extension Task {
-    public func start() {
-        do {
-            status = .running
-        }
+        status = .running
         
         self.startTask?(self)
         self.startTask = nil
@@ -100,48 +86,42 @@ extension Task {
         _ = subscriber.receive(.started)
     }
     
-    public func inactivity() {
-        do {
-            status = .inactive
-        }
-        
-        _ = subscriber.receive(.inactivity)
+    @discardableResult
+    private func send(_ input: Output) -> Subscribers.Demand {
+        subscriber.receive(input)
     }
     
-    public func activity(_ progress: Progress?) {
-        do {
-            status = .active(progress)
-        }
-        
-        _ = subscriber.receive(.activity(progress))
-    }
-    
-    public func succeed(with value: Success) {
-        do {
-            status = .success(value)
-        }
-        
-        _ = subscriber.receive(.success(value))
-        
-        subscriber.receive(completion: .finished)
-        subscriber = nil
-    }
-    
-    public func fail(with value: Error) {
-        do {
-            status = .failure(value)
-        }
-        
-        subscriber.receive(completion: .failure(.failure(value)))
-        subscriber = nil
-    }
-    
-    public func cancel() {
+    private func send(completion: Subscribers.Completion<Failure>) {
         guard !status.isEnded else {
             return
         }
         
-        subscriber.receive(completion: .failure(.canceled))
+        subscriber.receive(completion: completion)
         subscriber = nil
+    }
+}
+
+extension Task {
+    public func progress(_ progress: Progress?) {
+        status = .progress(progress)
+        
+        send(.progress(progress))
+    }
+    
+    public func succeed(with value: Success) {
+        status = .success(value)
+        
+        send(.success(value))
+        send(completion: .finished)
+    }
+    
+    public func fail(with value: Error) {
+        status = .failure(value)
+        
+        send(completion: .failure(.canceled))
+    }
+    
+    public func cancel() {
+        send(completion: .failure(.canceled))
     }
 }

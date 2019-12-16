@@ -5,7 +5,7 @@
 import CombineX
 import SwiftUIX
 
-public final class OpaqueTaskLookup: ObservableObject {    
+public final class OpaqueTaskLookup: ObservableObject {
     @Published public var value: [AnyHashable: OpaqueTask] = [:]
     
     public init() {
