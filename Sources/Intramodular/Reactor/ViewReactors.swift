@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-import CombineX
+import Merge
 import SwiftUIX
 
 public struct ViewReactorsView<Content: View>: View {

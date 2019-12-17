@@ -15,7 +15,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "git@github.com:vmanot/API.git", .branch("master")),
-        .package(url: "git@github.com:vmanot/CombineX.git", .branch("master")),
+        .package(url: "git@github.com:vmanot/Merge.git", .branch("master")),
         .package(url: "git@github.com:vmanot/SwiftUIX.git", .branch("master")),
     ],
     targets: [
@@ -23,7 +23,7 @@ let package = Package(
             name: "Reduce",
             dependencies: [
                 "API",
-                "CombineX",
+                "Merge",
                 "SwiftUIX"
             ],
             path: "Sources"

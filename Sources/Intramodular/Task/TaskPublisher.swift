@@ -2,7 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-import CombineX
+import Merge
 import SwiftUIX
 
 open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
