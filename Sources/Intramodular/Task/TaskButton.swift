@@ -5,48 +5,66 @@
 import Merge
 import SwiftUIX
 
-public enum TaskButtonState {
-    case inactive
-    case active
-    case success
-    case failure
-}
-
+/// An interactive control representing a `Task<Success, Error>`.
 public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
-    @EnvironmentObject var taskLookup: OpaqueTaskLookup
-    
-    var taskName: AnyHashable?
-    
-    @State var state: TaskButtonState = .active
-    
     private let completion: (Result<Success, Error>) -> ()
-    private let label: (TaskButtonState) -> Label
+    private let label: (Task<Success, Error>.Status) -> Label
     
-    @State var _task: Task<Success, Error>?
+    private var makeTask: () -> Task<Success, Error>? = { nil }
+    private var taskRenewsOnEnd: Bool = false
     
-    public var task: Task<Success, Error> {
-        if let taskName = taskName, let task = taskLookup[taskName] as? Task<Success, Error> {
-            return task
-        } else {
-            return _task!
-        }
-    }
+    @EnvironmentObject var taskManager: TaskManager
+    
+    @State var taskName: TaskName?
+    @State var taskRenewalSubscription: AnyCancellable?
+    
+    @OptionalObservedObject var currentTask: Task<Success, Error>?
     
     public var body: some View {
         Button(action: trigger) {
-            label(state)
+            label(currentTask?.status ?? .idle)
         }
     }
     
     public init(
         completion: @escaping (Result<Success, Error>) -> (),
-        @ViewBuilder label: @escaping (TaskButtonState) -> Label
+        @ViewBuilder label: @escaping (Task<Success, Error>.Status) -> Label
     ) {
         self.completion = completion
         self.label = label
     }
     
-    public func trigger() {
+    private func trigger() {
+        guard !(currentTask?.status.isEnded ?? false) else {
+            return
+        }
         
+        acquireTaskIfNecessary()
+    }
+    
+    private func acquireTaskIfNecessary() {
+        guard currentTask == nil else {
+            return
+        }
+        
+        guard let taskName = taskName, let task = taskManager[taskName] else {
+            self.taskName = self.taskName ?? .init(UUID())
+            
+            let task = makeTask()
+            
+            taskManager[self.taskName!] = task
+            
+            return currentTask = task
+        }
+        
+        currentTask = task as? Task<Success, Error>
+        
+        if taskRenewsOnEnd {
+            taskRenewalSubscription = currentTask?
+                .objectWillChange
+                .filter({ $0.isEnded })
+                .mapTo(nil)
+                .assign(to: \.currentTask, on: self)
+        }
     }
 }

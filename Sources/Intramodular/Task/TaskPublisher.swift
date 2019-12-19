@@ -5,24 +5,33 @@
 import Merge
 import SwiftUIX
 
-open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
+open class TaskPublisher<Success, Error: Swift.Error, Artifact>: Publisher {
     public typealias Output = Task<Success, Error>.Output
     public typealias Failure = Task<Success, Error>.Failure
     
-    let body: (Task<Success, Error>) -> ()
+    let body: (Task<Success, Error>) -> Artifact
     
-    public init(_ body: @escaping (Task<Success, Error>) -> ()) {
+    public init(_ body: @escaping (Task<Success, Error>) -> Artifact) {
         self.body = body
     }
     
-    public func receive<S: Subscriber>(
+    open func receive<S: Subscriber>(
         subscriber: S
-    ) where S.Input == Task<Success, Error>.Output, S.Failure == Failure {
+    ) where S.Input == Output, S.Failure == Failure {
         subscriber.receive(subscription: Task(publisher: self, subscriber: subscriber))
+    }
+    
+    open func handleArtifact<S: Subscriber>(
+        artifact: Artifact,
+        subscriber: S
+    ) where S.Input == Output, S.Failure == Failure {
+        let subscriber = subscriber as! TaskSubscriber<Success, Error, Artifact>
+        
+        subscriber.receive(artifact: artifact)
     }
 }
 
-extension TaskPublisher {
+extension TaskPublisher where Artifact == Void {
     public convenience init(_ attemptToFulfill: @escaping (@escaping
         (Result<Success, Error>) -> ()) -> Void) {
         self.init { (task: Task<Success, Error>) in
@@ -45,7 +54,7 @@ extension TaskPublisher {
             
             task.cancellables.insert(cancellable)
             
-            _cancellable.innerCancellable = .init(attemptToFulfill { result in
+            _cancellable.set(attemptToFulfill { result in
                 switch result {
                     case .success(let value):
                         task.succeed(with: value)
@@ -70,7 +79,7 @@ extension TaskPublisher {
         }
     }
     
-    public static func just(_ result: Result<Success, Error>) -> TaskPublisher {
+    open class func just(_ result: Result<Success, Error>) -> TaskPublisher {
         return .init { attemptToFulfill in
             attemptToFulfill(result)
         }
@@ -80,7 +89,7 @@ extension TaskPublisher {
 // MARK: - Helpers -
 
 extension Publisher {
-    public func eraseToTaskPublisher() -> TaskPublisher<Output, Failure> {
+    public func eraseToTaskPublisher() -> TaskPublisher<Output, Failure, Void> {
         return .init(self)
     }
 }

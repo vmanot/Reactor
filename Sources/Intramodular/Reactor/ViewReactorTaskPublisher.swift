@@ -5,30 +5,9 @@
 import Merge
 import SwiftUIX
 
-public final class ViewReactorTaskPublisher<R: ViewReactor>: Publisher {
+public final class ViewReactorTaskPublisher<R: ViewReactor>: TaskPublisher<Void, Error, AnyPublisher<R.Event, Error>> {
     public typealias Output = Task<Void, Error>.Output
     public typealias Failure = Task<Void, Error>.Failure
-    
-    public typealias Body = (Task<Void, Error>) -> AnyPublisher<R.Event, Error>
-    
-    private let body: Body
-    
-    required init(_ body: @escaping Body) {
-        self.body = body
-    }
-    
-    public func receive<S: Subscriber>(subscriber: S) where S.Input == Output, S.Failure == Failure {
-        guard let subscriber = subscriber as? ViewReactorTaskSubscriber<R> else {
-            fatalError()
-        }
-        
-        subscriber.receive(
-            subscription: Task(
-                start: { task in subscriber.receive(publisher: self.body(task)) },
-                subscriber: subscriber
-            )
-        )
-    }
 }
 
 // MARK: - Extensions -

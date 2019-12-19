@@ -5,10 +5,7 @@
 import Merge
 import SwiftUIX
 
-public class ViewReactorTaskSubscriber<R: ViewReactor>: Subscriber {
-    public typealias Input = Task<Void, Error>.Output
-    public typealias Failure = Task<Void, Error>.Failure
-    
+public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Error, AnyPublisher<R.Event, Error>> {
     public var subscription: Task<Void, Error>!
     public var eventSubscriber: ViewReactorEventSubscriber<R>?
     
@@ -25,21 +22,19 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: Subscriber {
         self.receiveCompletion = receiveCompletion
     }
     
-    public func receive(publisher: AnyPublisher<R.Event, Error>) {
+    override public func receive(artifact: AnyPublisher<R.Event, Error>) {
         let eventSubscriber = ViewReactorEventSubscriber<R>(parent: self)
         
-        publisher.receive(subscriber: eventSubscriber)
+        artifact.receive(subscriber: eventSubscriber)
         
         self.eventSubscriber = eventSubscriber
     }
     
-    public func receive(subscription: Subscription) {
-        self.subscription = .some(subscription as! Task)
-        
+    override public func receive(task: Task<Void, Error>) {
         subscription.request(.unlimited)
     }
     
-    public func receive(_ input: Input) -> Subscribers.Demand {
+    override public func receive(_ input: Input) -> Subscribers.Demand {
         receiveTaskOutput?(input)
         
         return .unlimited
@@ -51,7 +46,7 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: Subscriber {
         return .unlimited
     }
     
-    public func receive(completion: Subscribers.Completion<Failure>) {
+    override public func receive(completion: Subscribers.Completion<Failure>) {
         defer {
             eventSubscriber = nil
         }

@@ -5,26 +5,27 @@
 import Merge
 import SwiftUIX
 
-open class TaskSubscriber<Success, Error: Swift.Error>: Subscriber {
+open class TaskSubscriber<Success, Error: Swift.Error, Artifact>: Subscriber {
     public typealias Input = Task<Success, Error>.Output
     public typealias Failure = Task<Success, Error>.Failure
-    
-    public var task: Task<Success, Error>?
-    
-    public var onReceive: ((Input) -> Void)?
-    public var onComplete: ((Subscribers.Completion<Failure>) -> Void)?
-    
-    public func receive(subscription: Subscription) {
-        task = .some(subscription as! Task)
+        
+    open func receive(artifact: Artifact) {
+        
     }
     
-    public func receive(_ input: Input) -> Subscribers.Demand {
-        onReceive?(input)
+    public final func receive(subscription: Subscription) {
+        receive(task: subscription as! Task)
+    }
+    
+    open func receive(task: Task<Success, Error>) {
         
+    }
+    
+    open func receive(_ input: Input) -> Subscribers.Demand {
         return .unlimited
     }
     
-    public func receive(completion: Subscribers.Completion<Failure>) {
-        onComplete?(completion)
+    open func receive(completion: Subscribers.Completion<Failure>) {
+        
     }
 }

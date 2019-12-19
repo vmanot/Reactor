@@ -5,14 +5,14 @@
 import Merge
 import SwiftUIX
 
-public final class OpaqueTaskLookup: ObservableObject {
-    @Published public var value: [AnyHashable: OpaqueTask] = [:]
+public final class TaskManager: ObservableObject {
+    @Published public var value: [TaskName: OpaqueTask] = [:]
     
     public init() {
         
     }
     
-    public subscript(_ taskName: AnyHashable) -> OpaqueTask? {
+    public subscript(_ taskName: TaskName) -> OpaqueTask? {
         get {
             value[taskName]
         } set {

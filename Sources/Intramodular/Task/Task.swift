@@ -9,39 +9,11 @@ open class OpaqueTask {
     
 }
 
-open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject, Subscription {
+open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {    
+    private let lock = OSUnfairLock()
+    
     public let cancellables = Cancellables()
-    
-    let lock = OSUnfairLock()
-    
-    public enum Output {
-        case started
-        case progress(Progress?)
-        case success(Success)
-    }
-    
-    public enum Failure: Swift.Error {
-        case canceled
-        case failure(Error)
-    }
-    
-    public enum Status {
-        case idle
-        case running
-        case progress(Progress?)
-        case canceled
-        case success(Success)
-        case failure(Error)
-        
-        public var isEnded: Bool {
-            switch self {
-                case .success, .canceled, .failure:
-                    return true
-                default:
-                    return false
-            }
-        }
-    }
+    public let objectWillChange = PassthroughSubject<Status, Never>()
     
     private var startTask: ((Task<Success, Error>) -> Void)?
     private var subscriber: AnySubscriber<Output, Failure>!
@@ -55,7 +27,7 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject, Subs
             }
         } set {
             lock.synchronize {
-                objectWillChange.send()
+                objectWillChange.send(newValue)
                 
                 _status = newValue
             }
@@ -70,30 +42,56 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject, Subs
         self.subscriber = .init(subscriber)
     }
     
-    public convenience init<S: Subscriber>(
-        publisher: TaskPublisher<Success, Error>,
+    public convenience init<S: Subscriber, Artifact>(
+        publisher: TaskPublisher<Success, Error, Artifact>,
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
-        self.init(start: publisher.body, subscriber: subscriber)
+        self.init(
+            start: {
+                publisher.handleArtifact(
+                    artifact: publisher.body($0),
+                    subscriber: subscriber
+                )
+        },
+            subscriber: subscriber
+        )
     }
-    
+}
+
+extension Task: Subscription {
     public func request(_ demand: Subscribers.Demand) {
-        status = .running
+        guard demand != .none else {
+            return
+        }
         
-        self.startTask?(self)
-        self.startTask = nil
+        startTask?(self)
+        startTask = nil
         
-        _ = subscriber.receive(.started)
+        send(.started)
     }
     
     @discardableResult
     private func send(_ input: Output) -> Subscribers.Demand {
-        subscriber.receive(input)
+        status = .init(input)
+        
+        return subscriber.receive(input)
+    }
+    
+    private func send(completion input: Output) {
+        send(input)
+        send(completion: .finished)
     }
     
     private func send(completion: Subscribers.Completion<Failure>) {
         guard !status.isEnded else {
             return
+        }
+        
+        switch completion {
+            case .finished:
+                break
+            case .failure(let failure):
+                status = .init(failure)
         }
         
         subscriber.receive(completion: completion)
@@ -103,22 +101,15 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject, Subs
 
 extension Task {
     public func progress(_ progress: Progress?) {
-        status = .progress(progress)
-        
         send(.progress(progress))
     }
     
     public func succeed(with value: Success) {
-        status = .success(value)
-        
-        send(.success(value))
-        send(completion: .finished)
+        send(completion: .success(value))
     }
     
-    public func fail(with value: Error) {
-        status = .failure(value)
-        
-        send(completion: .failure(.canceled))
+    public func fail(with error: Error) {
+        send(completion: .failure(.error(error)))
     }
     
     public func cancel() {
