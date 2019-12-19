@@ -20,15 +20,6 @@ open class TaskPublisher<Success, Error: Swift.Error, Artifact>: Publisher {
     ) where S.Input == Output, S.Failure == Failure {
         subscriber.receive(subscription: Task(publisher: self, subscriber: subscriber))
     }
-    
-    open func handleArtifact<S: Subscriber>(
-        artifact: Artifact,
-        subscriber: S
-    ) where S.Input == Output, S.Failure == Failure {
-        let subscriber = subscriber as! TaskSubscriber<Success, Error, Artifact>
-        
-        subscriber.receive(artifact: artifact)
-    }
 }
 
 extension TaskPublisher where Artifact == Void {

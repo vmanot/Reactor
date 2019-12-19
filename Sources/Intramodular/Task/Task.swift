@@ -9,7 +9,7 @@ open class OpaqueTask {
     
 }
 
-open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {    
+open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
     private let lock = OSUnfairLock()
     
     public let cancellables = Cancellables()
@@ -48,11 +48,9 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
     ) where S.Input == Output, S.Failure == Failure {
         self.init(
             start: {
-                publisher.handleArtifact(
-                    artifact: publisher.body($0),
-                    subscriber: subscriber
-                )
-        },
+                (subscriber as! TaskSubscriber<Success, Error, Artifact>)
+                    .receive(artifact: publisher.body($0))
+            },
             subscriber: subscriber
         )
     }
