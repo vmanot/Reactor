@@ -5,7 +5,7 @@
 import Merge
 import SwiftUIX
 
-open class OpaqueTask {
+open class OpaqueTask: CustomCombineIdentifierConvertible {
     
 }
 
@@ -47,10 +47,7 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
         self.init(
-            start: {
-                (subscriber as! TaskSubscriber<Success, Error, Artifact>)
-                    .receive(artifact: publisher.body($0))
-            },
+            start: { (subscriber as! TaskSubscriber<Success, Error, Artifact>).receive(artifact: publisher.body($0)) },
             subscriber: subscriber
         )
     }

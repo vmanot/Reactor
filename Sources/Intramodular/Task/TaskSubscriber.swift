@@ -9,15 +9,21 @@ open class TaskSubscriber<Success, Error: Swift.Error, Artifact>: Subscriber {
     public typealias Input = Task<Success, Error>.Output
     public typealias Failure = Task<Success, Error>.Failure
         
+    public internal(set) var subscription: Task<Success, Error>?
+    
     open func receive(artifact: Artifact) {
         
     }
     
     public final func receive(subscription: Subscription) {
-        receive(task: subscription as! Task)
+        let subscription = subscription as! Task<Success, Error>
+        
+        self.subscription = subscription
+        
+        receive(subscription: subscription)
     }
     
-    open func receive(task: Task<Success, Error>) {
+    open func receive(subscription: Task<Success, Error>) {
         
     }
     

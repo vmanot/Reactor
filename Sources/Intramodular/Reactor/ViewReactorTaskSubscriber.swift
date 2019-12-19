@@ -6,12 +6,10 @@ import Merge
 import SwiftUIX
 
 public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Error, AnyPublisher<R.Event, Error>> {
-    public var subscription: Task<Void, Error>!
-    public var eventSubscriber: ViewReactorEventSubscriber<R>?
-    
-    public var receiveEvent: ((R.Event) -> Void)?
-    public var receiveTaskOutput: ((Task<Void, Error>.Output) -> Void)?
-    public var receiveCompletion: ((Subscribers.Completion<Failure>) -> Void)?
+    private var eventSubscriber: ViewReactorEventSubscriber<R>?
+    private var receiveEvent: ((R.Event) -> Void)?
+    private var receiveTaskOutput: ((Task<Void, Error>.Output) -> Void)?
+    private var receiveCompletion: ((Subscribers.Completion<Failure>) -> Void)?
     
     public init(
         receiveEvent: @escaping (R.Event) -> Void,
@@ -30,7 +28,7 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
         self.eventSubscriber = eventSubscriber
     }
     
-    override public func receive(task: Task<Void, Error>) {
+    override public func receive(subscription: Task<Void, Error>) {
         subscription.request(.unlimited)
     }
     

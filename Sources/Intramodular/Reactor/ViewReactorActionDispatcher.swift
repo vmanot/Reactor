@@ -12,24 +12,19 @@ public struct ViewReactorActionDispatcher<R: ViewReactor> {
     public let reactor: R
     public let action: R.Action
     
-    public var cancellables: Cancellables {
-        return reactor.cancellables
-    }
-    
-    public func reduce(event: R.Event) {
-        DispatchQueue.main.async {
-            self.reactor.reduce(event: event)
-        }
-    }
-    
     public func dispatch() -> Task<Void, Error> {
+        let cancellables = reactor.cancellables
         let _cancellable = SingleAssignmentCancellable()
         let cancellable = AnyCancellable(_cancellable)
         
         cancellables.insert(cancellable)
         
         let subscriber = ViewReactorTaskSubscriber<R>(
-            receiveEvent: reduce(event:),
+            receiveEvent: { event in
+                DispatchQueue.main.async {
+                    self.reactor.reduce(event: event)
+                }
+            },
             receiveCompletion: { [weak cancellables] completion in
                 cancellables?.remove(cancellable)
                 
@@ -46,6 +41,6 @@ public struct ViewReactorActionDispatcher<R: ViewReactor> {
             .task(action: action)
             .receive(subscriber: subscriber)
         
-        return subscriber.subscription
+        return subscriber.subscription!
     }
 }
