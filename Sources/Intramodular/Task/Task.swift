@@ -9,6 +9,7 @@ open class OpaqueTask: CustomCombineIdentifierConvertible {
     
 }
 
+/// An opinionated definition of a task.
 open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
     private let lock = OSUnfairLock()
     
@@ -95,18 +96,22 @@ extension Task: Subscription {
 }
 
 extension Task {
+    /// Publish task progress.
     public func progress(_ progress: Progress?) {
         send(.progress(progress))
     }
     
+    /// Publish task success.
     public func succeed(with value: Success) {
         send(completion: .success(value))
     }
     
+    /// Publish task failure.
     public func fail(with error: Error) {
         send(completion: .failure(.error(error)))
     }
     
+    /// Publish task cancellation.
     public func cancel() {
         send(completion: .failure(.canceled))
     }
