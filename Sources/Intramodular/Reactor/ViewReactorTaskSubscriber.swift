@@ -5,6 +5,7 @@
 import Merge
 import SwiftUIX
 
+/// A subscriber that attaches to a `ViewReactorTaskPublisher`.
 public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Error, AnyPublisher<R.Event, Error>> {
     private var eventSubscriber: ViewReactorEventSubscriber<R>?
     private var receiveEvent: ((R.Event) -> Void)?
