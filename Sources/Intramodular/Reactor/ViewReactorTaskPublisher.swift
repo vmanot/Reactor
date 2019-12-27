@@ -47,4 +47,8 @@ extension ViewReactorTaskPublisher {
             }
         }
     }
+    
+    public static func empty() -> ViewReactorTaskPublisher {
+        just(nil)
+    }
 }
