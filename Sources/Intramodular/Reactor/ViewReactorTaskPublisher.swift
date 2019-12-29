@@ -52,3 +52,15 @@ extension ViewReactorTaskPublisher {
         just(nil)
     }
 }
+
+// MARK: - Helpers -
+
+extension Publisher {
+    public func eraseToTaskPublisher<R: ViewReactor>() -> ViewReactorTaskPublisher<R> where Output == R.Event, Failure == Never {
+        return .init({ self })
+    }
+
+    public func eraseToTaskPublisher<R: ViewReactor>() -> ViewReactorTaskPublisher<R> where Output == R.Event, Failure == Error {
+        return .init({ self })
+    }
+}
