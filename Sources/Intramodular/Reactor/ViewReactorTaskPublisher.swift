@@ -13,6 +13,16 @@ public final class ViewReactorTaskPublisher<R: ViewReactor>: TaskPublisher<Void,
 // MARK: - Extensions -
 
 extension ViewReactorTaskPublisher {
+    public convenience init(action: @escaping () -> ()) {
+        self.init {
+            Future<Void, Error>({ attemptToFulfill in
+                action()
+                attemptToFulfill(.success(()))
+            })
+            .flatMap({ Empty() })
+        }
+    }
+    
     public convenience init(_ body: @escaping () -> AnyPublisher<R.Event, Error>) {
         self.init { _ in body() }
     }
