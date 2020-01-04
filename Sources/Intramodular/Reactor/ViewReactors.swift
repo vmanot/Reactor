@@ -48,7 +48,7 @@ public struct ViewReactors {
         value[ObjectIdentifier(R.self)]?() as? R
     }
     
-    public func dispatch(_ action: ViewReactorAction) {
+    public func dispatch(_ action: opaque_ViewReactorAction) {
         value.values.forEach({ _ = $0().opaque_dispatch(action) })
     }
 }
@@ -83,11 +83,17 @@ extension View {
 }
 
 extension View {
-    public func onAppear(dispatch action: ViewReactorAction) -> some View {
+    public func onAppear(dispatch action: opaque_ViewReactorAction) -> some View {
         ViewReactorsView { reactors in
             self.onAppear {
                 reactors.dispatch(action)
             }
+        }
+    }
+    
+    public func onAppear<R: ViewReactor>(dispatch action: R.Action, in reactor: R) -> some View {
+        onAppear {
+            reactor.dispatch(action)
         }
     }
 }

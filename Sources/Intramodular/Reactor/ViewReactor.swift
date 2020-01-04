@@ -6,22 +6,24 @@ import Merge
 import SwiftUIX
 
 public protocol opaque_ViewReactor {
-    func opaque_dispatch(_ action: ViewReactorAction) -> Task<Void, Error>?
+    func opaque_dispatch(_ action: opaque_ViewReactorAction) -> Task<Void, Error>?
 }
 
 extension opaque_ViewReactor where Self: ViewReactor {
-    public func opaque_dispatch(_ action: ViewReactorAction) -> Task<Void, Error>? {
+    public func opaque_dispatch(_ action: opaque_ViewReactorAction) -> Task<Void, Error>? {
         (action as? Action).map(dispatch)
     }
 }
 
 public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
-    associatedtype Action
+    associatedtype Action: ViewReactorAction where Action.Reactor == Self
     associatedtype Event
+    
+    associatedtype ViewNames: Hashable = Never
     
     typealias ActionTaskPublisher = ViewReactorTaskPublisher<Self>
     
-    var cancellables: Cancellables { get }
+    var environment: ViewReactorEnvironment { get }
     
     func task(action: Action) -> ActionTaskPublisher
     func reduce(event: Event)
@@ -45,5 +47,13 @@ extension ViewReactor {
     @discardableResult
     public func dispatch(_ action: Action) -> Task<Void, Error> {
         dispatcher(for: action).dispatch()
+    }
+}
+
+// MARK: - Extensions -
+
+extension ViewReactor {
+    public var cancellables: Cancellables {
+        environment.cancellables
     }
 }
