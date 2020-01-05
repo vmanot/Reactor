@@ -16,17 +16,15 @@ public protocol ViewReactorAction: opaque_ViewReactorAction {
 /// A control which dispatches a reactor action when triggered.
 public struct ReactorActionDispatchButton<Action: ViewReactorAction, Label: View>: View {
     private let label: Label
-    private let action: Action
-    private let reactor: Action.Reactor
+    private let action: () -> ()
     
     public init(action: Action, reactor: Action.Reactor, label: () -> Label) {
-        self.action = action
-        self.reactor = reactor
+        self.action = { reactor.dispatch(action) }
         self.label = label()
     }
     
     public var body: some View {
-        Button(action: { self.reactor.dispatch(self.action) }, label: { label })
+        Button(action: action, label: { label })
     }
 }
 
