@@ -23,6 +23,16 @@ extension ViewReactorTaskPublisher {
         }
     }
     
+    public convenience init(_ body: @escaping (Task<Void, Error>) -> Void) {
+        self.init { task -> AnyPublisher<R.Event, Error> in
+            body(task)
+            
+            return Empty(completeImmediately: false)
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+        }
+    }
+    
     public convenience init(_ body: @escaping () -> AnyPublisher<R.Event, Error>) {
         self.init { _ in body() }
     }
