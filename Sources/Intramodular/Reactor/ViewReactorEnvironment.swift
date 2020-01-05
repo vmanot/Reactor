@@ -5,7 +5,7 @@
 import Merge
 import SwiftUIX
 
-public struct ViewReactorEnvironment {
+public struct ViewReactorEnvironment: DynamicProperty {
     public let cancellables = Cancellables()
     
     @Reactors() public var reactors
@@ -14,7 +14,14 @@ public struct ViewReactorEnvironment {
     public init() {
         
     }
+    
+    public mutating func update() {
+        _reactors.update()
+        _dynamicViewPresenter.update()
+    }
 }
+
+// MARK: - Extensions -
 
 extension ViewReactorEnvironment {
     public subscript<R: ViewReactor>(_ reactorType: R.Type) -> R? {
@@ -23,6 +30,15 @@ extension ViewReactorEnvironment {
 }
 
 // MARK: - Helpers -
+
+@propertyWrapper
+public struct ReactorEnvironment: DynamicProperty {
+    public private(set) var wrappedValue = ViewReactorEnvironment()
+    
+    public init() {
+        
+    }
+}
 
 extension ViewReactor {
     public func dismiss(viewNamed name: ViewNames) {
