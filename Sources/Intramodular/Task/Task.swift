@@ -46,7 +46,13 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
             start: { (subscriber as! TaskSubscriber<Success, Error, Artifact>).receive(artifact: publisher.body($0)) }
         )
         
-        subscribe(subscriber)
+        let subject = PassthroughSubject<Output, Failure>()
+        
+        subject.handleEvents(
+            receiveSubscription: { _ in subscriber.receive(subscription: self) },
+            receiveOutput: { _ = subscriber.receive($0) },
+            receiveCompletion: { subscriber.receive(completion: $0) }
+        ).subscribe(storeIn: cancellables)
     }
 }
 
@@ -109,7 +115,7 @@ extension Task {
 extension Task: Publisher {
     open func receive<S: Subscriber>(
         subscriber: S
-    ) where S.Input == Output, S.Failure == Failure {
+    ) where S.Input == Output, S.Failure == Failure {        
         objectWillChange
             .prefixUntil(after: { $0.isTerminal })
             .setFailureType(to: Failure.self)

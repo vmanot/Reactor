@@ -22,13 +22,6 @@ open class TaskPublisher<Success, Error: Swift.Error, Artifact>: Publisher {
     }
 }
 
-/*extension TaskPublisher {
-    public func map<T>(_ transform: @escaping (Success) -> T) -> TaskPublisher<T, Error, Artifact> {
-        .init { task in
-            self.body()
-        }
-    }
-}*/
 extension TaskPublisher where Artifact == Void {
     public convenience init(_ attemptToFulfill: @escaping (@escaping
         (Result<Success, Error>) -> ()) -> Void) {
