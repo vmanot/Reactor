@@ -25,7 +25,7 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
     
     var environment: ViewReactorEnvironment { get }
     
-    func task(action: Action) -> ActionTaskPublisher
+    func taskPublisher(for action: Action) -> ActionTaskPublisher
     func reduce(event: Event)
     
     func dispatcher(for action: Action) -> ViewReactorActionDispatcher<Self>
@@ -55,5 +55,9 @@ extension ViewReactor {
 extension ViewReactor {
     public var cancellables: Cancellables {
         environment.cancellables
+    }
+    
+    public var reactors: ViewReactors {
+        environment.reactors
     }
 }

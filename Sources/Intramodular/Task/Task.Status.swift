@@ -37,12 +37,33 @@ extension Task {
         case success(Success)
         case error(Error)
         
-        public var isEnded: Bool {
+        public var isIdle: Bool {
+            if case .idle = self {
+                return true
+            } else {
+                return false
+            }
+        }
+        
+        public var isTerminal: Bool {
             switch self {
                 case .success, .canceled, .error:
                     return true
                 default:
                     return false
+            }
+        }
+        
+        public var output: Task.Output? {
+            switch self {
+                case .started:
+                    return .started
+                case .progress(let progress):
+                    return .progress(progress)
+                case .success(let success):
+                    return .success(success)
+                default:
+                    return nil
             }
         }
         
@@ -57,12 +78,40 @@ extension Task {
             }
         }
         
+        public var failure: Task.Failure? {
+            switch self {
+                case .canceled:
+                    return .canceled
+                case .error(let error):
+                    return .error(error)
+                default:
+                    return nil
+            }
+        }
+
         public init(_ failure: Task.Failure) {
             switch failure {
                 case .canceled:
                     self = .canceled
                 case .error(let error):
                     self = .error(error)
+            }
+        }
+        
+        public func map<T>(_ transform: (Success) -> T) -> Task<T, Error>.Status {
+            switch self {
+                case .idle:
+                    return .idle
+                case .started:
+                    return .started
+                case .progress(let progress):
+                    return .progress(progress)
+                case .canceled:
+                    return .canceled
+                case .success(let success):
+                    return .success(transform(success))
+                case .error(let error):
+                    return .error(error)
             }
         }
     }

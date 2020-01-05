@@ -17,7 +17,6 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
     public let objectWillChange = PassthroughSubject<Status, Never>()
     
     private var startTask: ((Task<Success, Error>) -> Void)?
-    private var subscriber: AnySubscriber<Output, Failure>!
     
     private var _status: Status = .idle
     
@@ -35,12 +34,8 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
         }
     }
     
-    public required init<S: Subscriber>(
-        start: @escaping (Task<Success, Error>) -> (),
-        subscriber: S
-    ) where S.Input == Output, S.Failure == Failure {
+    public required init(start: @escaping (Task<Success, Error>) -> ()) {
         self.startTask = start
-        self.subscriber = .init(subscriber)
     }
     
     public convenience init<S: Subscriber, Artifact>(
@@ -48,50 +43,10 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
         self.init(
-            start: { (subscriber as! TaskSubscriber<Success, Error, Artifact>).receive(artifact: publisher.body($0)) },
-            subscriber: subscriber
+            start: { (subscriber as! TaskSubscriber<Success, Error, Artifact>).receive(artifact: publisher.body($0)) }
         )
-    }
-}
-
-extension Task: Subscription {
-    public func request(_ demand: Subscribers.Demand) {
-        guard demand != .none else {
-            return
-        }
         
-        startTask?(self)
-        startTask = nil
-        
-        send(.started)
-    }
-    
-    @discardableResult
-    private func send(_ input: Output) -> Subscribers.Demand {
-        status = .init(input)
-        
-        return subscriber.receive(input)
-    }
-    
-    private func send(completion input: Output) {
-        send(input)
-        send(completion: .finished)
-    }
-    
-    private func send(completion: Subscribers.Completion<Failure>) {
-        guard !status.isEnded else {
-            return
-        }
-        
-        switch completion {
-            case .finished:
-                break
-            case .failure(let failure):
-                status = .init(failure)
-        }
-        
-        subscriber.receive(completion: completion)
-        subscriber = nil
+        subscribe(subscriber)
     }
 }
 
@@ -103,7 +58,7 @@ extension Task {
     
     /// Publish task success.
     public func succeed(with value: Success) {
-        send(completion: .success(value))
+        send(.success(value))
     }
     
     /// Publish task failure.
@@ -114,5 +69,104 @@ extension Task {
     /// Publish task cancellation.
     public func cancel() {
         send(completion: .failure(.canceled))
+    }
+    
+    public func receive(_ status: Status) {
+        switch status {
+            case .idle:
+                fatalError() // FIXME
+            case .started:
+                request(.max(1))
+            case .progress(let progress):
+                self.progress(progress)
+            case .canceled:
+                cancel()
+            case .success(let success):
+                succeed(with: success)
+            case .error(let error):
+                fail(with: error)
+        }
+    }
+}
+
+// MARK: - Extensions -
+
+extension Task {
+    public func map<T>(_ transform: @escaping (Success) -> T) -> Task<T, Error> {
+        let result = Task<T, Error>(start: { _ in self.startTask?(self) })
+        
+        objectWillChange.handleOutput {
+            result.receive($0.map(transform))
+        }
+        .subscribe(storeIn: cancellables)
+        
+        return result
+    }
+}
+
+// MARK: - Protocol Implementations -
+
+extension Task: Publisher {
+    open func receive<S: Subscriber>(
+        subscriber: S
+    ) where S.Input == Output, S.Failure == Failure {
+        objectWillChange
+            .prefixUntil(after: { $0.isTerminal })
+            .setFailureType(to: Failure.self)
+            .flatMap({ status -> AnyPublisher<Output, Failure> in
+                if let output = status.output {
+                    return Just(output)
+                        .setFailureType(to: Failure.self)
+                        .eraseToAnyPublisher()
+                } else {
+                    return Fail<Output, Failure>(error: status.failure!)
+                        .eraseToAnyPublisher()
+                }
+            }).receive(subscriber: subscriber)
+    }
+}
+
+extension Task: Subject {
+    public func send(_ value: Output) {
+        status = .init(value)
+    }
+    
+    public func send(completion: Subscribers.Completion<Failure>) {
+        lock.synchronize {
+            switch completion {
+                case .finished: do {
+                    if !_status.isTerminal {
+                        fatalError()
+                    }
+                }
+                case .failure(let failure):
+                    _status = .init(failure)
+            }
+            
+            objectWillChange.send(_status)
+        }
+    }
+    
+    public func send(subscription: Subscription) {
+        subscription.request(.unlimited)
+    }
+}
+
+extension Task: Subscription {
+    public func request(_ demand: Subscribers.Demand) {
+        guard demand != .none else {
+            return
+        }
+        
+        lock.synchronize {
+            if !_status.isIdle {
+                startTask?(self)
+                startTask = nil
+            }
+            
+            _status = .started
+            
+            objectWillChange.send(.started)
+        }
     }
 }

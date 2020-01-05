@@ -38,7 +38,7 @@ public struct ViewReactorActionDispatcher<R: ViewReactor> {
         )
         
         reactor
-            .task(action: action)
+            .taskPublisher(for: action)
             .receive(subscriber: subscriber)
         
         return subscriber.subscription!

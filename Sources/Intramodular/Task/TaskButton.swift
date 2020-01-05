@@ -35,7 +35,7 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     }
     
     private func trigger() {
-        guard !(currentTask?.status.isEnded ?? false) else {
+        guard !(currentTask?.status.isTerminal ?? false) else {
             return
         }
         
@@ -62,7 +62,7 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
         if taskRenewsOnEnd {
             taskRenewalSubscription = currentTask?
                 .objectWillChange
-                .filter({ $0.isEnded })
+                .filter({ $0.isTerminal })
                 .mapTo(nil)
                 .assign(to: \.currentTask, on: self)
         }
