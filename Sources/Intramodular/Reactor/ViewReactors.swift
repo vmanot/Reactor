@@ -63,25 +63,6 @@ extension EnvironmentValues {
     }
 }
 
-public struct ReactorInjector<R: ViewReactor>: ViewModifier {
-    @Reactors() var reactors
-    
-    public let reactor: () -> R
-    
-    public func body(content: Content) -> some View {
-        content
-            .environment(\.viewReactors, reactors.inserting(reactor))
-    }
-}
-
-extension View {
-    public func injectReactor<R: ViewReactor>(
-        _ reactor: @autoclosure @escaping () -> R
-    ) -> some View {
-        modifier(ReactorInjector(reactor: reactor))
-    }
-}
-
 extension View {
     public func onAppear(dispatch action: opaque_ViewReactorAction) -> some View {
         ViewReactorsView { reactors in
