@@ -115,7 +115,7 @@ extension Task {
 extension Task: Publisher {
     open func receive<S: Subscriber>(
         subscriber: S
-    ) where S.Input == Output, S.Failure == Failure {        
+    ) where S.Input == Output, S.Failure == Failure {
         objectWillChange
             .prefixUntil(after: { $0.isTerminal })
             .setFailureType(to: Failure.self)
