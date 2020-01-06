@@ -11,7 +11,7 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     private let completion: (Result<Success, Error>) -> ()
     private let label: (Task<Success, Error>.Status) -> Label
     
-    private var taskRenewsOnEnd: Bool = false
+    private var repeatable: Bool = true
     
     @Environment(\.taskName) var taskName
     @Environment(\.taskButtonStyle) var taskButtonStyle
@@ -64,9 +64,9 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
         self.completion = completion
         self.label = { _ in _label }
     }
-
+    
     private func trigger() {
-        guard !(currentTask?.status.isTerminal ?? false) else {
+        if !repeatable && currentTask != nil {
             return
         }
         
@@ -74,24 +74,10 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     }
     
     private func acquireTaskIfNecessary() {
-        guard currentTask == nil else {
-            return
-        }
-        
-        let currentTask: Task<Success, Error>?
-        
         if let taskName = taskName, let taskManager = taskManager, let task = taskManager[taskName] as? Task<Success, Error> {
             currentTask = task
         } else {
             currentTask = action()
-        }
-        
-        if taskRenewsOnEnd {
-            taskRenewalSubscription = currentTask?
-                .objectWillChange
-                .filter({ $0.isTerminal })
-                .mapTo(nil)
-                .assign(to: \.currentTask, on: self)
         }
     }
 }

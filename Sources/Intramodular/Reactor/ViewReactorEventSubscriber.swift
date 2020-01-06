@@ -29,9 +29,9 @@ public class ViewReactorEventSubscriber<R: ViewReactor>: Subscriber {
     public func receive(completion: Subscribers.Completion<Failure>) {
         switch completion {
             case .finished:
-                parent.subscription?.succeed(with: ())
+                parent.subscription!.succeed(with: ())
             case .failure(let error):
-                parent.subscription?.fail(with: error)
+                parent.subscription!.fail(with: error)
         }
     }
     

@@ -15,21 +15,9 @@ public final class ViewReactorTaskPublisher<R: ViewReactor>: TaskPublisher<Void,
 extension ViewReactorTaskPublisher {
     public convenience init(action: @escaping () -> ()) {
         self.init {
-            Future<Void, Error>({ attemptToFulfill in
-                action()
-                attemptToFulfill(.success(()))
-            })
-            .flatMap({ Empty() })
-        }
-    }
-    
-    public convenience init(_ body: @escaping (Task<Void, Error>) -> Void) {
-        self.init { task -> AnyPublisher<R.Event, Error> in
-            body(task)
-            
-            return Empty(completeImmediately: false)
+            Deferred(createPublisher: { Just(action()) })
                 .setFailureType(to: Error.self)
-                .eraseToAnyPublisher()
+                .mapToEmpty()
         }
     }
     
@@ -79,7 +67,7 @@ extension Publisher {
     public func eraseToTaskPublisher<R: ViewReactor>() -> ViewReactorTaskPublisher<R> where Output == R.Event, Failure == Never {
         return .init({ self })
     }
-
+    
     public func eraseToTaskPublisher<R: ViewReactor>() -> ViewReactorTaskPublisher<R> where Output == R.Event, Failure == Error {
         return .init({ self })
     }

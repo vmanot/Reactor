@@ -43,16 +43,17 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
         self.init(
-            start: { (subscriber as! TaskSubscriber<Success, Error, Artifact>).receive(artifact: publisher.body($0)) }
+            start: { task in
+                task.handleEvents(
+                    receiveSubscription: { _ in subscriber.receive(subscription: task) },
+                    receiveOutput: { _ = subscriber.receive($0) },
+                    receiveCompletion: { subscriber.receive(completion: $0) }
+                ).subscribe(storeIn: task.cancellables)
+
+                (subscriber as! TaskSubscriber<Success, Error, Artifact>)
+                    .receive(artifact: publisher.body(task))
+            }
         )
-        
-        let subject = PassthroughSubject<Output, Failure>()
-        
-        subject.handleEvents(
-            receiveSubscription: { _ in subscriber.receive(subscription: self) },
-            receiveOutput: { _ = subscriber.receive($0) },
-            receiveCompletion: { subscriber.receive(completion: $0) }
-        ).subscribe(storeIn: cancellables)
     }
 }
 
@@ -134,11 +135,25 @@ extension Task: Publisher {
 
 extension Task: Subject {
     public func send(_ value: Output) {
-        status = .init(value)
+        lock.withCriticalScope {
+            if value.isTerminal && _status.isIdle {
+                objectWillChange.send(.started)
+            }
+            
+            objectWillChange.send(_status)
+            
+            _status = .init(value)
+        }
     }
     
     public func send(completion: Subscribers.Completion<Failure>) {
         lock.withCriticalScope {
+            if _status.isIdle {
+                fatalError()
+            }
+            
+            objectWillChange.send(_status)
+            
             switch completion {
                 case .finished: do {
                     if !_status.isTerminal {
@@ -148,8 +163,6 @@ extension Task: Subject {
                 case .failure(let failure):
                     _status = .init(failure)
             }
-            
-            objectWillChange.send(_status)
         }
     }
     

@@ -15,7 +15,9 @@ public struct ViewReactorActionDispatcher<R: ViewReactor> {
     public func dispatch() -> Task<Void, Error> {
         let cancellables = reactor.cancellables
         let _cancellable = SingleAssignmentCancellable()
-        let cancellable = AnyCancellable(_cancellable)
+        let _retainCancellable = SingleAssignmentCancellable()
+        
+        let cancellable = AnyCancellable(_cancellable.concatenate(with: _retainCancellable))
         
         cancellables.insert(cancellable)
         
@@ -38,6 +40,8 @@ public struct ViewReactorActionDispatcher<R: ViewReactor> {
                 }
             }
         )
+        
+        _retainCancellable.set(CancellableRetain(subscriber))
         
         reactor
             .taskPublisher(for: action)
