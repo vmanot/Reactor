@@ -6,7 +6,9 @@ import Merge
 import SwiftUIX
 
 open class OpaqueTask: CustomCombineIdentifierConvertible {
-    
+    public init() {
+        
+    }
 }
 
 /// An opinionated definition of a task.
@@ -15,8 +17,6 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
     
     public let cancellables = Cancellables()
     public let objectWillChange = PassthroughSubject<Status, Never>()
-    
-    private var startTask: ((Task<Success, Error>) -> Void)?
     
     private var _status: Status = .idle
     
@@ -33,31 +33,14 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
             }
         }
     }
-    
-    public required init(start: @escaping (Task<Success, Error>) -> ()) {
-        self.startTask = start
-    }
-    
-    public convenience init<S: Subscriber, Artifact>(
-        publisher: TaskPublisher<Success, Error, Artifact>,
-        subscriber: S
-    ) where S.Input == Output, S.Failure == Failure {
-        self.init(
-            start: { task in
-                task.handleEvents(
-                    receiveSubscription: { _ in subscriber.receive(subscription: task) },
-                    receiveOutput: { _ = subscriber.receive($0) },
-                    receiveCompletion: { subscriber.receive(completion: $0) }
-                ).subscribe(storeIn: task.cancellables)
-
-                (subscriber as! TaskSubscriber<Success, Error, Artifact>)
-                    .receive(artifact: publisher.body(task))
-            }
-        )
-    }
 }
 
 extension Task {
+    /// Publish task start.
+    public func start() {
+        send(.started)
+    }
+    
     /// Publish task progress.
     public func progress(_ progress: Progress?) {
         send(.progress(progress))
@@ -70,12 +53,12 @@ extension Task {
     
     /// Publish task failure.
     public func fail(with error: Error) {
-        send(completion: .failure(.error(error)))
+        send(.error(error))
     }
     
     /// Publish task cancellation.
     public func cancel() {
-        send(completion: .failure(.canceled))
+        send(.canceled)
     }
     
     public func receive(_ status: Status) {
@@ -93,21 +76,6 @@ extension Task {
             case .error(let error):
                 fail(with: error)
         }
-    }
-}
-
-// MARK: - Extensions -
-
-extension Task {
-    public func map<T>(_ transform: @escaping (Success) -> T) -> Task<T, Error> {
-        let result = Task<T, Error>(start: { _ in self.startTask?(self) })
-        
-        objectWillChange.handleOutput {
-            result.receive($0.map(transform))
-        }
-        .subscribe(storeIn: cancellables)
-        
-        return result
     }
 }
 
@@ -135,15 +103,11 @@ extension Task: Publisher {
 
 extension Task: Subject {
     public func send(_ value: Output) {
-        lock.withCriticalScope {
-            if value.isTerminal && _status.isIdle {
-                objectWillChange.send(.started)
-            }
-            
-            objectWillChange.send(_status)
-            
-            _status = .init(value)
-        }
+        status = .init(value)
+    }
+    
+    public func send(_ failure: Failure) {
+        send(completion: .failure(failure))
     }
     
     public func send(completion: Subscribers.Completion<Failure>) {
@@ -152,8 +116,6 @@ extension Task: Subject {
                 fatalError()
             }
             
-            objectWillChange.send(_status)
-            
             switch completion {
                 case .finished: do {
                     if !_status.isTerminal {
@@ -161,6 +123,8 @@ extension Task: Subject {
                     }
                 }
                 case .failure(let failure):
+                    objectWillChange.send(.init(failure))
+                    
                     _status = .init(failure)
             }
         }
@@ -177,9 +141,21 @@ extension Task: Subscription {
             return
         }
         
-        startTask?(self)
-        startTask = nil
+        start()
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension Task {
+    public func map<T>(_ transform: @escaping (Success) -> T) -> Task<T, Error> {
+        let result = Task<T, Error>()
         
-        status = .started
+        objectWillChange.handleOutput {
+            result.receive($0.map(transform))
+        }
+        .subscribe(storeIn: cancellables)
+        
+        return result
     }
 }

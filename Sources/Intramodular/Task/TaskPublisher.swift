@@ -18,7 +18,11 @@ open class TaskPublisher<Success, Error: Swift.Error, Artifact>: Publisher {
     open func receive<S: Subscriber>(
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
-        subscriber.receive(subscription: Task(publisher: self, subscriber: subscriber))
+        let task = Task<Success, Error>()
+        
+        subscriber.receive(subscription: task)
+        
+        (subscriber as? TaskSubscriber<Success, Error, Artifact>)?.receive(artifact: body(task))
     }
 }
 

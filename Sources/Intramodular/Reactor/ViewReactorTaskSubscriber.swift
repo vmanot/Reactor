@@ -65,7 +65,6 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
         do {
             taskManager?[taskName] = nil
             
-            subscription = nil
             receiveEvent = nil
             receiveTaskOutput = nil
             receiveCompletion = nil
