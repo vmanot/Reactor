@@ -13,11 +13,11 @@ struct OSUnfairAtomic<Value> {
     
     var wrappedValue: Value {
         get {
-            lock.synchronize {
+            lock.withCriticalScope {
                 _wrappedValue
             }
         } set {
-            lock.synchronize {
+            lock.withCriticalScope {
                 _wrappedValue = newValue
             }
         }

@@ -20,6 +20,8 @@ public struct ViewReactorActionDispatcher<R: ViewReactor> {
         cancellables.insert(cancellable)
         
         let subscriber = ViewReactorTaskSubscriber<R>(
+            taskManager: reactor.environment.taskManager,
+            taskName: .init(action),
             receiveEvent: { event in
                 DispatchQueue.main.async {
                     self.reactor.reduce(event: event)

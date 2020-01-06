@@ -6,7 +6,9 @@ import Merge
 import SwiftUIX
 
 public final class TaskManager: ObservableObject {
-    @Published public var value: [TaskName: OpaqueTask] = [:]
+    private var queue = DispatchQueue(label: "Reduce.TaskManager")
+    
+    @Published private var value: [TaskName: OpaqueTask] = [:]
     
     public init() {
         
@@ -14,9 +16,13 @@ public final class TaskManager: ObservableObject {
     
     public subscript(_ taskName: TaskName) -> OpaqueTask? {
         get {
-            value[taskName]
+            queue.sync {
+                value[taskName]
+            }
         } set {
-            value[taskName] = newValue
+            queue.sync {
+                self.value[taskName] = newValue
+            }
         }
     }
 }

@@ -19,7 +19,7 @@ final class OSUnfairLock {
         base.deallocate()
     }
         
-    func synchronize<Result>(_ body: () -> Result) -> Result {
+    func withCriticalScope<Result>(_ body: () -> Result) -> Result {
         os_unfair_lock_lock(base)
 
         defer {

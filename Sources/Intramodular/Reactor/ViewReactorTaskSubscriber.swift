@@ -7,15 +7,23 @@ import SwiftUIX
 
 /// A subscriber that attaches to a `ViewReactorTaskPublisher`.
 public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Error, AnyPublisher<R.Event, Error>> {
+    private var taskManager: TaskManager?
+    private var taskName: TaskName
+    
     private var eventSubscriber: ViewReactorEventSubscriber<R>?
     private var receiveEvent: ((R.Event) -> Void)?
     private var receiveTaskOutput: ((Task<Void, Error>.Output) -> Void)?
     private var receiveCompletion: ((Subscribers.Completion<Failure>) -> Void)?
     
     public init(
+        taskManager: TaskManager?,
+        taskName: TaskName,
         receiveEvent: @escaping (R.Event) -> Void,
         receiveCompletion: @escaping (Subscribers.Completion<Failure>) -> Void
     ) {
+        self.taskManager = taskManager
+        self.taskName = taskName
+        
         self.receiveEvent = receiveEvent
         self.receiveTaskOutput = { _ in }
         self.receiveCompletion = receiveCompletion
@@ -31,6 +39,8 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
     
     override public func receive(subscription: Task<Void, Error>) {
         subscription.request(.unlimited)
+        
+        taskManager?[taskName] = subscription
     }
     
     override public func receive(_ input: Input) -> Subscribers.Demand {
@@ -53,6 +63,8 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
         receiveCompletion?(completion)
         
         do {
+            taskManager?[taskName] = nil
+            
             subscription = nil
             receiveEvent = nil
             receiveTaskOutput = nil

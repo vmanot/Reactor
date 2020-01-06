@@ -22,11 +22,11 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
     
     public var status: Status {
         get {
-            lock.synchronize {
+            lock.withCriticalScope {
                 _status
             }
         } set {
-            lock.synchronize {
+            lock.withCriticalScope {
                 objectWillChange.send(newValue)
                 
                 _status = newValue
@@ -138,7 +138,7 @@ extension Task: Subject {
     }
     
     public func send(completion: Subscribers.Completion<Failure>) {
-        lock.synchronize {
+        lock.withCriticalScope {
             switch completion {
                 case .finished: do {
                     if !_status.isTerminal {
@@ -160,19 +160,13 @@ extension Task: Subject {
 
 extension Task: Subscription {
     public func request(_ demand: Subscribers.Demand) {
-        guard demand != .none else {
+        guard demand != .none, status.isIdle else {
             return
         }
         
-        lock.synchronize {
-            if !_status.isIdle {
-                startTask?(self)
-                startTask = nil
-            }
-            
-            _status = .started
-            
-            objectWillChange.send(.started)
-        }
+        startTask?(self)
+        startTask = nil
+        
+        status = .started
     }
 }

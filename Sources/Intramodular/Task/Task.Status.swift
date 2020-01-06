@@ -45,6 +45,17 @@ extension Task {
             }
         }
         
+        public var isActive: Bool {
+            switch self {
+                case .started:
+                    return true
+                case .progress:
+                    return true
+                default:
+                    return false
+            }
+        }
+
         public var isTerminal: Bool {
             switch self {
                 case .success, .canceled, .error:
@@ -88,7 +99,7 @@ extension Task {
                     return nil
             }
         }
-
+        
         public init(_ failure: Task.Failure) {
             switch failure {
                 case .canceled:

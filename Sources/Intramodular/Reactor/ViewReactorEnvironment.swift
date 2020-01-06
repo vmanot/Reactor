@@ -9,15 +9,11 @@ public struct ViewReactorEnvironment: DynamicProperty {
     public let cancellables = Cancellables()
     
     @Reactors() public var reactors
+    @OptionalEnvironmentObject var taskManager: TaskManager?
     @Environment(\.dynamicViewPresenter) public var dynamicViewPresenter
     
     public init() {
         
-    }
-    
-    public mutating func update() {
-        _reactors.update()
-        _dynamicViewPresenter.update()
     }
 }
 
@@ -43,7 +39,7 @@ public struct ReactorEnvironment: DynamicProperty {
 extension ViewReactor {
     public func present<V: View>(
         _ view: V,
-        onDismiss: (() -> Void)?,
+        onDismiss: (() -> Void)? = nil,
         style: ModalViewPresentationStyle
     ) {
         environment.dynamicViewPresenter?.present(
@@ -52,7 +48,7 @@ extension ViewReactor {
             style: style
         )
     }
-
+    
     public func dismiss(viewNamed name: ViewNames) {
         environment.dynamicViewPresenter?.dismiss(viewNamed: name)
     }
