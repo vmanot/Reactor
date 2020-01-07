@@ -24,19 +24,14 @@ public struct ViewReactorActionDispatcher<R: ViewReactor> {
         let subscriber = ViewReactorTaskSubscriber<R>(
             taskManager: reactor.environment.taskManager,
             taskName: .init(action),
-            receiveEvent: { event in
-                DispatchQueue.main.async {
-                    self.reactor.reduce(event: event)
-                }
-            },
             receiveCompletion: { [weak cancellables] completion in
                 cancellables?.remove(cancellable)
                 
                 switch completion {
                     case .finished:
                         break
-                    case .failure(_):
-                        fatalError()
+                    case .failure(let error):
+                        print("FAILURE \(error)")
                 }
             }
         )

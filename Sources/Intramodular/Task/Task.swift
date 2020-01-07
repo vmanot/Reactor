@@ -33,6 +33,10 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
             }
         }
     }
+    
+    deinit {
+        
+    }
 }
 
 extension Task {

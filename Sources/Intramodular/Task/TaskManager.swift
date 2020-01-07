@@ -21,7 +21,9 @@ public final class TaskManager: ObservableObject {
             }
         } set {
             queue.sync {
-                self.value[taskName] = newValue
+                DispatchQueue.main.async {
+                    self.value[taskName] = newValue
+                }
             }
         }
     }

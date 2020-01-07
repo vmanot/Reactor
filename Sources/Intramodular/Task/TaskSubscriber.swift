@@ -6,16 +6,11 @@ import Merge
 import SwiftUIX
 
 /// A subscriber that attaches to a `TaskPublisher`.
-open class TaskSubscriber<Success, Error: Swift.Error, Artifact>: Subscriber {
+open class TaskSubscriber<Success, Error: Swift.Error>: Subscriber {
     public typealias Input = Task<Success, Error>.Output
     public typealias Failure = Task<Success, Error>.Failure
-        
-    public internal(set) var subscription: Task<Success, Error>?
     
-    /// Receives the artifact produced by task publisher's body.
-    open func receive(artifact: Artifact) {
-        
-    }
+    public internal(set) var subscription: Task<Success, Error>?
     
     public final func receive(subscription: Subscription) {
         let subscription = subscription as! Task<Success, Error>
@@ -26,7 +21,7 @@ open class TaskSubscriber<Success, Error: Swift.Error, Artifact>: Subscriber {
             receiveOutput: { _ = self.receive($0) },
             receiveCompletion: { self.receive(completion: $0) }
         ).subscribe(storeIn: subscription.cancellables)
-
+        
         receive(subscription: subscription)
     }
     

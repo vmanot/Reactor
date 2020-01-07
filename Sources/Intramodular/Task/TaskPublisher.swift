@@ -5,28 +5,28 @@
 import Merge
 import SwiftUIX
 
-open class TaskPublisher<Success, Error: Swift.Error, Artifact>: Publisher {
+open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
     public typealias Output = Task<Success, Error>.Output
     public typealias Failure = Task<Success, Error>.Failure
     
-    let body: (Task<Success, Error>) -> Artifact
+    let body: (Task<Success, Error>) -> AnyCancellable
     
-    public init(_ body: @escaping (Task<Success, Error>) -> Artifact) {
+    public required init(_ body: @escaping (Task<Success, Error>) -> AnyCancellable) {
         self.body = body
     }
-    
+        
     open func receive<S: Subscriber>(
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
         let task = Task<Success, Error>()
         
-        subscriber.receive(subscription: task)
+        task.cancellables.insert(body(task))
         
-        (subscriber as? TaskSubscriber<Success, Error, Artifact>)?.receive(artifact: body(task))
+        subscriber.receive(subscription: task)
     }
 }
 
-extension TaskPublisher where Artifact == Void {
+extension TaskPublisher {
     public convenience init(_ attemptToFulfill: @escaping (@escaping
         (Result<Success, Error>) -> ()) -> Void) {
         self.init { (task: Task<Success, Error>) in
@@ -38,6 +38,8 @@ extension TaskPublisher where Artifact == Void {
                         task.fail(with: value)
                 }
             }
+            
+            return .init(EmptyCancellable())
         }
     }
     
@@ -59,6 +61,8 @@ extension TaskPublisher where Artifact == Void {
                 
                 task.cancellables.remove(cancellable)
             })
+            
+            return cancellable
         }
     }
     
@@ -84,7 +88,7 @@ extension TaskPublisher where Artifact == Void {
 // MARK: - Helpers -
 
 extension Publisher {
-    public func eraseToTaskPublisher() -> TaskPublisher<Output, Failure, Void> {
+    public func eraseToTaskPublisher() -> TaskPublisher<Output, Failure> {
         return .init(self)
     }
 }

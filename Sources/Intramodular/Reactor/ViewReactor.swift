@@ -17,7 +17,6 @@ extension opaque_ViewReactor where Self: ViewReactor {
 
 public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
     associatedtype Action: ViewReactorAction where Action.Reactor == Self
-    associatedtype Event
     
     associatedtype ViewNames: Hashable = Never
     
@@ -26,7 +25,6 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
     var environment: ViewReactorEnvironment { get }
     
     func taskPublisher(for action: Action) -> ActionTaskPublisher
-    func reduce(event: Event)
     
     func dispatcher(for action: Action) -> ViewReactorActionDispatcher<Self>
     @discardableResult

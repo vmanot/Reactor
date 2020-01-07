@@ -11,6 +11,7 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     private let completion: (Result<Success, Error>) -> ()
     private let label: (Task<Success, Error>.Status) -> Label
     
+    private var interruptible: Bool = true
     private var repeatable: Bool = true
     
     @Environment(\.taskName) var taskName
@@ -74,6 +75,11 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     }
     
     private func acquireTaskIfNecessary() {
+        if interruptible {
+            if let task = action() {
+                return currentTask = task
+            }
+        }
         if let taskName = taskName, let taskManager = taskManager, let task = taskManager[taskName] as? Task<Success, Error> {
             currentTask = task
         } else {
