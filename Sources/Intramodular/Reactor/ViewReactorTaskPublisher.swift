@@ -19,6 +19,12 @@ public final class ViewReactorTaskPublisher<R: ViewReactor>: TaskPublisher<Void,
     }
 }
 
+extension ViewReactorTaskPublisher {
+    public class func error(description: String) -> Self {
+        error(ViewError(description: description))
+    }
+}
+
 // MARK: - Helpers -
 
 extension Publisher {

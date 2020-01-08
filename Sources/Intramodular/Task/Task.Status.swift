@@ -5,6 +5,34 @@
 import Merge
 import SwiftUIX
 
+extension OpaqueTask {
+    public enum StatusDescription {
+        case idle
+        case started
+        case progress(Progress?)
+        case canceled
+        case success
+        case error(Error)
+        
+        public init<Success, Error>(_ status: Task<Success, Error>.Status) {
+            switch status {
+                case .idle:
+                    self = .idle
+                case .started:
+                    self = .started
+                case .progress(let progress):
+                    self = .progress(progress)
+                case .canceled:
+                    self = .canceled
+                case .success:
+                    self = .success
+                case .error(let error):
+                    self = .error(error)
+            }
+        }
+    }
+}
+
 extension Task {
     /// The output of a task.
     public enum Output {
@@ -55,7 +83,7 @@ extension Task {
                     return false
             }
         }
-
+        
         public var isTerminal: Bool {
             switch self {
                 case .success, .canceled, .error:

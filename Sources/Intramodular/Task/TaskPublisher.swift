@@ -20,14 +20,16 @@ open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
     ) where S.Input == Output, S.Failure == Failure {
         let task = Task<Success, Error>()
         
-        task.cancellables.insert(body(task))
+        start(task)
         
         subscriber.receive(subscription: task)
     }
-}
+    
+    open func start(_ task: Task<Success, Error>) {
+        task.cancellables.insert(body(task))
+    }
 
-extension TaskPublisher {
-    public convenience init(_ attemptToFulfill: @escaping (@escaping
+    public required convenience init(_ attemptToFulfill: @escaping (@escaping
         (Result<Success, Error>) -> ()) -> Void) {
         self.init { (task: Task<Success, Error>) in
             attemptToFulfill { result in
@@ -43,10 +45,10 @@ extension TaskPublisher {
         }
     }
     
-    public convenience init(_ attemptToFulfill: @escaping (@escaping
+    public required convenience init(_ attemptToFulfill: @escaping (@escaping
         (Result<Success, Error>) -> ()) -> AnyCancellable) {
         self.init { (task: Task<Success, Error>) in
-            let _cancellable = SingleAssignmentCancellable()
+            let _cancellable = SingleAssignmentAnyCancellable()
             let cancellable = AnyCancellable(_cancellable)
             
             task.cancellables.insert(cancellable)
@@ -66,22 +68,32 @@ extension TaskPublisher {
         }
     }
     
-    public convenience init(_ publisher: AnyPublisher<Success, Error>) {
+    public required convenience init(_ publisher: AnyPublisher<Success, Error>) {
         self.init { attemptToFulfill in
             publisher.sinkResult(attemptToFulfill)
         }
     }
     
-    public convenience init<P: Publisher>(_ publisher: P) where P.Output == Success, P.Failure == Error {
+    public required convenience init<P: Publisher>(_ publisher: P) where P.Output == Success, P.Failure == Error {
         self.init { attemptToFulfill in
             publisher.sinkResult(attemptToFulfill)
         }
     }
-    
-    open class func just(_ result: Result<Success, Error>) -> TaskPublisher {
+}
+
+extension TaskPublisher {
+    open class func just(_ result: Result<Success, Error>) -> Self {
         return .init { attemptToFulfill in
             attemptToFulfill(result)
         }
+    }
+    
+    open class func success(_ success: Success) -> Self {
+        .just(.success(success))
+    }
+    
+    open class func error(_ error: Error) -> Self {
+        .just(.failure(error))
     }
 }
 

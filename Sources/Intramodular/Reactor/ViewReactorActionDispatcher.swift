@@ -13,30 +13,7 @@ public struct ViewReactorActionDispatcher<R: ViewReactor> {
     public let action: R.Action
     
     public func dispatch() -> Task<Void, Error> {
-        let cancellables = reactor.cancellables
-        let _cancellable = SingleAssignmentCancellable()
-        let _retainCancellable = SingleAssignmentCancellable()
-        
-        let cancellable = AnyCancellable(_cancellable.concatenate(with: _retainCancellable))
-        
-        cancellables.insert(cancellable)
-        
-        let subscriber = ViewReactorTaskSubscriber<R>(
-            taskManager: reactor.environment.taskManager,
-            taskName: .init(action),
-            receiveCompletion: { [weak cancellables] completion in
-                cancellables?.remove(cancellable)
-                
-                switch completion {
-                    case .finished:
-                        break
-                    case .failure(let error):
-                        print("FAILURE \(error)")
-                }
-            }
-        )
-        
-        _retainCancellable.set(CancellableRetain(subscriber))
+        let subscriber = ViewReactorTaskSubscriber(reactor: reactor, action: action)
         
         reactor
             .taskPublisher(for: action)

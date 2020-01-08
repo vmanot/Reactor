@@ -34,8 +34,18 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
         }
     }
     
-    deinit {
-        
+    public var statusDescription: StatusDescription {
+        return .init(status)
+    }
+    
+    public var name: TaskName? = nil
+    
+    public init(name: TaskName) {
+        self.name = name
+    }
+    
+    public override init() {
+        self.name = nil
     }
 }
 

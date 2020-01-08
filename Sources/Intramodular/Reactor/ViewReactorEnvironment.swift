@@ -8,12 +8,14 @@ import SwiftUIX
 public struct ViewReactorEnvironment: DynamicProperty {
     public let cancellables = Cancellables()
     
+    @Environment(\.self) var environment
     @Reactors() public var reactors
-    @OptionalEnvironmentObject var taskManager: TaskManager?
+    @OptionalEnvironmentObject var parentTaskManager: TaskManager?
+    @OptionalObservedObject var taskManager: TaskManager?
     @Environment(\.dynamicViewPresenter) public var dynamicViewPresenter
     
     public init() {
-        
+        self.taskManager = .init(parent: parentTaskManager)
     }
 }
 
@@ -45,7 +47,8 @@ extension ViewReactor {
         environment.dynamicViewPresenter?.present(
             view,
             onDismiss: onDismiss,
-            style: style
+            style: style,
+            environment: environment.environment
         )
     }
     

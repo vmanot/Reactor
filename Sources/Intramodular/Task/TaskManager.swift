@@ -6,24 +6,46 @@ import Merge
 import SwiftUIX
 
 public final class TaskManager: ObservableObject {
+    private weak var parent: TaskManager?
+    
     private var queue = DispatchQueue(label: "Reduce.TaskManager")
     
-    @Published private var value: [TaskName: OpaqueTask] = [:]
+    @Published private var taskHistory: [TaskName: [OpaqueTask.StatusDescription]] = [:]
+    @Published private var taskMap: [TaskName: OpaqueTask] = [:]
     
-    public init() {
-        
+    public init(parent: TaskManager? = nil) {
+        self.parent = parent
     }
     
     public subscript(_ taskName: TaskName) -> OpaqueTask? {
         get {
             queue.sync {
-                value[taskName]
+                taskMap[taskName]
             }
-        } set {
-            queue.sync {
-                DispatchQueue.main.async {
-                    self.value[taskName] = newValue
-                }
+        }
+    }
+    
+    public func taskStarted<Success, Error>(_ task: Task<Success, Error>) {
+        guard let taskName = task.name else {
+            return
+        }
+        
+        queue.sync {
+            DispatchQueue.main.async {
+                self.taskMap[taskName] = task
+            }
+        }
+    }
+    
+    public func taskEnded<Success, Error>(_ task: Task<Success, Error>) {
+        guard let taskName = task.name else {
+            return
+        }
+        
+        queue.sync {
+            DispatchQueue.main.async {
+                self.taskHistory[taskName, default: []].append(task.statusDescription)
+                self.taskMap[taskName] = nil
             }
         }
     }
