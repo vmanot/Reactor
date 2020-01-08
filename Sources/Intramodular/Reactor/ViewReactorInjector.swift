@@ -11,7 +11,8 @@ public struct ViewReactorInjector<R: ViewReactor>: ViewModifier {
     public let reactor: () -> R
     
     public func body(content: Content) -> some View {
-        content.environment(\.viewReactors, reactors.inserting(reactor))
+        content
+            .environment(\.viewReactors, reactors.inserting(reactor))
     }
 }
 

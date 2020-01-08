@@ -6,7 +6,7 @@ import Merge
 import SwiftUIX
 
 public struct ViewReactorsView<Content: View>: View {
-    @Reactors() private var reactors
+    @Reactors() private var injectedReactors
     
     public var content: (ViewReactors) -> Content
     
@@ -15,7 +15,7 @@ public struct ViewReactorsView<Content: View>: View {
     }
     
     public var body: some View {
-        content(reactors)
+        content(injectedReactors)
     }
 }
 

@@ -9,9 +9,9 @@ public struct ViewReactorEnvironment: DynamicProperty {
     public let cancellables = Cancellables()
     
     @Environment(\.self) var environment
-    @Reactors() public var reactors
+    @Reactors() public var injectedReactors
     @OptionalEnvironmentObject var parentTaskManager: TaskManager?
-    @OptionalObservedObject var taskManager: TaskManager?
+    @OptionalObservedObject var taskManager: TaskManager!
     @Environment(\.dynamicViewPresenter) public var dynamicViewPresenter
     
     public init() {
@@ -23,7 +23,7 @@ public struct ViewReactorEnvironment: DynamicProperty {
 
 extension ViewReactorEnvironment {
     public subscript<R: ViewReactor>(_ reactorType: R.Type) -> R? {
-        reactors[reactorType]
+        injectedReactors[reactorType]
     }
 }
 

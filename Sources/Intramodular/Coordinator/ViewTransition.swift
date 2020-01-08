@@ -13,14 +13,14 @@ public enum ViewTransition: ViewTransitionContext {
         case notANavigationController
     }
     
-    case present(AnyView)
-    case replacePresented(AnyView)
+    case present(OpaqueView)
+    case replacePresented(OpaqueView)
     case dismiss
     
-    case push(AnyView)
+    case push(OpaqueView)
     case pop
     
-    case set(AnyView, navigatable: Bool = false)
+    case set(OpaqueView, navigatable: Bool = false)
     
     case none
     
@@ -29,27 +29,52 @@ public enum ViewTransition: ViewTransitionContext {
     case dynamic(() -> AnyPublisher<ViewTransitionContext, ViewRouterError>)
 }
 
+extension ViewTransition {
+    public func transformView<V: View>(_ transform: (OpaqueView) -> V) -> ViewTransition {
+        switch self {
+            case .present(let view):
+                return ViewTransition.present(transform(view).eraseToOpaqueView())
+            case .replacePresented(let view):
+                return .replacePresented(with: transform(view).eraseToOpaqueView())
+            case .dismiss:
+                return self
+            case .push(let view):
+                return ViewTransition.push(transform(view).eraseToOpaqueView())
+            case .pop:
+                return self
+            case .set(let view, let navigatable):
+                return .set(transform(view).eraseToOpaqueView(), navigatable: navigatable)
+            case .none:
+                return self
+            case .linear(let transitions):
+                return .linear(transitions.map({ $0.transformView(transform) }))
+            case .dynamic:
+                return self
+        }
+    }
+}
+
 // MARK: - Extensions -
 
 extension ViewTransition {
     public static func present<V: View>(_ view: V) -> ViewTransition {
-        ViewTransition.present(view.eraseToAnyView())
+        ViewTransition.present(view.eraseToOpaqueView())
     }
     
     public static func replacePresented<V: View>(with view: V) -> ViewTransition {
-        ViewTransition.replacePresented(view.eraseToAnyView())
+        ViewTransition.replacePresented(view.eraseToOpaqueView())
     }
     
     public static func push<V: View>(_ view: V) -> ViewTransition {
-        ViewTransition.push(view.eraseToAnyView())
+        ViewTransition.push(view.eraseToOpaqueView())
     }
     
     public static func set<V: View>(_ view: V) -> ViewTransition {
-        ViewTransition.set(view.eraseToAnyView(), navigatable: false)
+        ViewTransition.set(view.eraseToOpaqueView(), navigatable: false)
     }
     
     public static func setNavigatable<V: View>(_ view: V) -> ViewTransition {
-        ViewTransition.set(view.eraseToAnyView(), navigatable: true)
+        ViewTransition.set(view.eraseToOpaqueView(), navigatable: true)
     }
     
     public static func linear(_ transitions: ViewTransition...) -> ViewTransition {
@@ -76,48 +101,14 @@ extension ViewTransition {
     }
     
     public func environmentObject<B: ObservableObject>(_ bindable: B) -> ViewTransition {
-        switch self {
-            case .present(let view):
-                return .present(view.environmentObject(bindable))
-            case .replacePresented(let view):
-                return .replacePresented(with: view.environmentObject(bindable))
-            case .dismiss:
-                return self
-            case .push(let view):
-                return .push(view.environmentObject(bindable))
-            case .pop:
-                return self
-            case .set(let view, let navigatable):
-                return .set(view.environmentObject(bindable).eraseToAnyView(), navigatable: navigatable)
-            case .none:
-                return self
-            case .linear(let transitions):
-                return .linear(transitions.map({ $0.environmentObject(bindable) }))
-            case .dynamic:
-                return self
+        transformView {
+            $0.environmentObject(bindable).name($0.name)
         }
     }
     
     public func environmentObjects(_ bindables: EnvironmentObjects) -> ViewTransition {
-        switch self {
-            case .present(let view):
-                return .present(view.environmentObjects(bindables))
-            case .replacePresented(let view):
-                return .replacePresented(with: view.environmentObjects(bindables))
-            case .dismiss:
-                return self
-            case .push(let view):
-                return .push(view.environmentObjects(bindables))
-            case .pop:
-                return self
-            case .set(let view, let navigatable):
-                return .set(view.environmentObjects(bindables).eraseToAnyView(), navigatable: navigatable)
-            case .none:
-                return self
-            case .linear(let transitions):
-                return .linear(transitions.map({ $0.environmentObjects(bindables) }))
-            case .dynamic:
-                return self
+        transformView {
+            $0.environmentObjects(bindables).name($0.name)
         }
     }
     

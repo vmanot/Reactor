@@ -125,11 +125,7 @@ extension Task: Subject {
     }
     
     public func send(completion: Subscribers.Completion<Failure>) {
-        lock.withCriticalScope {
-            if _status.isIdle {
-                fatalError()
-            }
-            
+        lock.withCriticalScope {            
             switch completion {
                 case .finished: do {
                     if !_status.isTerminal {

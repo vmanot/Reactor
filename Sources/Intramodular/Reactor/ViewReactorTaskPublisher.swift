@@ -14,6 +14,10 @@ public final class ViewReactorTaskPublisher<R: ViewReactor>: TaskPublisher<Void,
             .setFailureType(to: Error.self))
     }
     
+    public convenience init(action: @escaping () throws -> ()) {
+        self.init(Deferred(createPublisher: { Just(()).tryMap { try action() } }))
+    }
+    
     public static func empty() -> ViewReactorTaskPublisher<R> {
         return .init(action: { })
     }

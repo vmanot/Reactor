@@ -17,18 +17,21 @@ extension opaque_ViewReactor where Self: ViewReactor {
 
 public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
     associatedtype Action: ViewReactorAction where Action.Reactor == Self
-    
+    associatedtype Plan: ViewReactorPlan = EmptyViewReactorPlan
+
     associatedtype ViewNames: Hashable = Never
     
     typealias ActionTaskPublisher = ViewReactorTaskPublisher<Self>
-    
+    typealias ActionPlan = ViewReactorActionPlan<Self>
+
     var environment: ViewReactorEnvironment { get }
     
-    func taskPublisher(for action: Action) -> ActionTaskPublisher
-    
-    func dispatcher(for action: Action) -> ViewReactorActionDispatcher<Self>
+    func taskPublisher(for _: Action) -> ActionTaskPublisher
+    func actionPlan(for _: Plan) -> ViewReactorActionPlan<Self>
+
+    func dispatcher(for _: Action) -> ViewReactorActionDispatcher<Self>
     @discardableResult
-    func dispatch(_ action: Action) -> Task<Void, Error>
+    func dispatch(_: Action) -> Task<Void, Error>
 }
 
 public protocol InitiableViewReactor: ViewReactor {
@@ -46,6 +49,15 @@ extension ViewReactor {
     public func dispatch(_ action: Action) -> Task<Void, Error> {
         dispatcher(for: action).dispatch()
     }
+    
+    public func dispatcher(for plan: Plan) -> ViewReactorPlanDispatcher<Self> {
+        ViewReactorPlanDispatcher(reactor: self, plan: plan)
+    }
+    
+    @discardableResult
+    public func dispatch(_ plan: Plan) -> Task<Void, Error> {
+        dispatcher(for: plan).dispatch()
+    }
 }
 
 // MARK: - Extensions -
@@ -55,7 +67,7 @@ extension ViewReactor {
         environment.cancellables
     }
     
-    public var reactors: ViewReactors {
-        environment.reactors
+    public var injectedReactors: ViewReactors {
+        environment.injectedReactors
     }
 }
