@@ -42,7 +42,7 @@ extension ViewReactor {
     public func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)? = nil,
-        style: ModalViewPresentationStyle
+        style: ModalViewPresentationStyle = .automatic
     ) {
         environment.dynamicViewPresenter?.present(
             view,

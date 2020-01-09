@@ -17,7 +17,7 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     @Environment(\.taskInterruptible) var taskInterruptible
     @Environment(\.taskRestartable) var taskRestartable
     
-    @Environment(\.taskButtonStyle) var taskButtonStyle
+    @Environment(\.buttonStyle) var buttonStyle
     
     @OptionalEnvironmentObject var taskManager: TaskManager?
     @OptionalObservedObject var currentTask: Task<Success, Error>?
@@ -43,8 +43,8 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     @State var taskRenewalSubscription: AnyCancellable?
     
     public var body: some View {
-        return Button(action: trigger) {
-            taskButtonStyle.opaque_makeBody(
+        Button(action: trigger) {
+            buttonStyle.opaque_makeBody(
                 configuration: TaskButtonConfiguration(
                     label: label(taskStatus).eraseToAnyView(),
                     isDisabled: taskDisabled,
@@ -54,6 +54,7 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
                 )
             )
         }
+        .disabled(taskDisabled)
     }
     
     public init(

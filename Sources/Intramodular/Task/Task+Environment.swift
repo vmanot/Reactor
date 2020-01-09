@@ -28,17 +28,17 @@ extension EnvironmentValues {
     
     var taskInterruptible: Bool {
         get {
-            self[TaskDisabledEnvironmentKey]
+            self[TaskInterruptibleEnvironmentKey]
         } set {
-            self[TaskDisabledEnvironmentKey] = newValue
+            self[TaskInterruptibleEnvironmentKey] = newValue
         }
     }
     
     var taskRestartable: Bool {
         get {
-            self[TaskDisabledEnvironmentKey]
+            self[TaskRestartableEnvironmentKey]
         } set {
-            self[TaskDisabledEnvironmentKey] = newValue
+            self[TaskRestartableEnvironmentKey] = newValue
         }
     }
 }

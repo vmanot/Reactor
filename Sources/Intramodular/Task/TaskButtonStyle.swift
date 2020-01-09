@@ -30,7 +30,7 @@ fileprivate struct TaskButtonStyleEnvironmentKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    var taskButtonStyle: opaque_TaskButtonStyle {
+    var buttonStyle: opaque_TaskButtonStyle {
         get {
             self[TaskButtonStyleEnvironmentKey]
         } set {
@@ -50,7 +50,7 @@ public struct DefaultTaskButtonStyle: TaskButtonStyle {
 // MARK: - API -
 
 extension View {
-    public func taskButtonStyle<Style: TaskButtonStyle>(_ style: Style) -> some View {
-        environment(\.taskButtonStyle, style)
+    public func buttonStyle<Style: TaskButtonStyle>(_ style: Style) -> some View {
+        environment(\.buttonStyle, style)
     }
 }
