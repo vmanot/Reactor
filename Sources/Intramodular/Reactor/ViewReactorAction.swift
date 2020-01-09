@@ -33,9 +33,9 @@ public struct ReactorActionDispatchButton<Action: ViewReactorAction, Label: View
 }
 
 extension ViewReactor {
-    public func actionButton<Label: View>(
+    public func taskButton<Label: View>(
         for action: Action,
-        label: () -> Label
+        @ViewBuilder label: () -> Label
     ) -> some View {
         ReactorActionDispatchButton(action: action, reactor: self, label: label)
     }

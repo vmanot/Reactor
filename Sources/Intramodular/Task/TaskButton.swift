@@ -11,10 +11,12 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     private let completion: (Result<Success, Error>) -> ()
     private let label: (Task<Success, Error>.Status) -> Label
     
-    private var interruptible: Bool = true
-    private var repeatable: Bool = true
-    
     @Environment(\.taskName) var taskName
+    
+    @Environment(\.taskDisabled) var taskDisabled
+    @Environment(\.taskInterruptible) var taskInterruptible
+    @Environment(\.taskRestartable) var taskRestartable
+    
     @Environment(\.taskButtonStyle) var taskButtonStyle
     
     @OptionalEnvironmentObject var taskManager: TaskManager?
@@ -45,6 +47,9 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
             taskButtonStyle.opaque_makeBody(
                 configuration: TaskButtonConfiguration(
                     label: label(taskStatus).eraseToAnyView(),
+                    isDisabled: taskDisabled,
+                    isInterruptible: taskInterruptible,
+                    isRestartable: taskRestartable,
                     status: taskStatusDescription
                 )
             )
@@ -74,7 +79,7 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     }
     
     private func trigger() {
-        if !repeatable && currentTask != nil {
+        if !taskRestartable && currentTask != nil {
             return
         }
         
@@ -82,7 +87,7 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     }
     
     private func acquireTaskIfNecessary() {
-        if interruptible {
+        if taskInterruptible {
             if let task = action() {
                 return currentTask = task
             }
