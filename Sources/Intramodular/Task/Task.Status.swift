@@ -14,6 +14,15 @@ extension OpaqueTask {
         case success
         case error(Error)
         
+        public var isActive: Bool {
+            switch self {
+                case .started, .progress:
+                    return true
+                default:
+                    return false
+            }
+        }
+        
         public init<Success, Error>(_ status: Task<Success, Error>.Status) {
             switch status {
                 case .idle:

@@ -6,38 +6,48 @@ import Merge
 import SwiftUIX
 
 public protocol opaque_TaskButtonStyle {
-    func opaque_makeBody<S, E: Swift.Error>(configuration: TaskButtonConfiguration<S, E>) -> AnyView? 
-}
-
-extension opaque_TaskButtonStyle where Self: TaskButtonStyle {
-    public func opaque_makeBody<S, E: Swift.Error>(configuration: TaskButtonConfiguration<S, E>) -> AnyView? {
-        guard S.self == Success.self && E.self == Error.self else {
-            return nil
-        }
-        
-        return makeBody(configuration: configuration as! TaskButtonConfiguration<Success, Error>).eraseToAnyView()
-    }
+    func opaque_makeBody(configuration: TaskButtonConfiguration) -> AnyView
 }
 
 public protocol TaskButtonStyle: opaque_TaskButtonStyle {
     associatedtype Body: View
-    associatedtype Success
-    associatedtype Error: Swift.Error
     
-    func makeBody(configuration: TaskButtonConfiguration<Success, Error>) -> Body
+    typealias Configuration = TaskButtonConfiguration
+    
+    func makeBody(configuration: TaskButtonConfiguration) -> Body
 }
 
-// MARK: - Helpers -
+// MARK: - Implementation -
+
+extension opaque_TaskButtonStyle where Self: TaskButtonStyle {
+    public func opaque_makeBody(configuration: TaskButtonConfiguration) -> AnyView {
+        return makeBody(configuration: configuration).eraseToAnyView()
+    }
+}
+
+fileprivate struct TaskButtonStyleEnvironmentKey: EnvironmentKey {
+    static let defaultValue: opaque_TaskButtonStyle = DefaultTaskButtonStyle()
+}
 
 extension EnvironmentValues {
-    var taskButtonStyle: opaque_TaskButtonStyle? {
+    var taskButtonStyle: opaque_TaskButtonStyle {
         get {
-            self[DefaultEnvironmentKey<opaque_TaskButtonStyle>]
+            self[TaskButtonStyleEnvironmentKey]
         } set {
-            self[DefaultEnvironmentKey<opaque_TaskButtonStyle>] = newValue
+            self[TaskButtonStyleEnvironmentKey] = newValue
         }
     }
 }
+
+// MARK: - Auxiliary Implementation -
+
+public struct DefaultTaskButtonStyle: TaskButtonStyle {
+    public func makeBody(configuration: TaskButtonConfiguration) -> some View {
+        return configuration.label
+    }
+}
+
+// MARK: - API -
 
 extension View {
     public func taskButtonStyle<Style: TaskButtonStyle>(_ style: Style) -> some View {

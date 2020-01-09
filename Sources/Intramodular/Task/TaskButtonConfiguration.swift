@@ -5,7 +5,7 @@
 import Merge
 import SwiftUIX
 
-public struct TaskButtonConfiguration<Success, Error: Swift.Error> {
+public struct TaskButtonConfiguration {
     public let label: AnyView
-    public let status: Task<Success, Error>.Status?
+    public let status: OpaqueTask.StatusDescription
 }

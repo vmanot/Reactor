@@ -20,27 +20,34 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     @OptionalEnvironmentObject var taskManager: TaskManager?
     @OptionalObservedObject var currentTask: Task<Success, Error>?
     
+    public var task: Task<Success, Error>? {
+        if let currentTask = currentTask {
+            return currentTask
+        } else if let taskName = taskName, let task = taskManager?[taskName] as? Task<Success, Error> {
+            return task
+        } else {
+            return nil
+        }
+    }
+    
+    public var taskStatus: Task<Success, Error>.Status {
+        return task?.status ?? .idle
+    }
+    
+    public var taskStatusDescription: OpaqueTask.StatusDescription {
+        return task?.statusDescription ?? .idle
+    }
+    
     @State var taskRenewalSubscription: AnyCancellable?
     
     public var body: some View {
-        if let taskButtonStyle = taskButtonStyle {
-            let view = taskButtonStyle.opaque_makeBody(
+        return Button(action: trigger) {
+            taskButtonStyle.opaque_makeBody(
                 configuration: TaskButtonConfiguration(
-                    label: label(currentTask?.status ?? .idle).eraseToAnyView(),
-                    status: currentTask?.status
+                    label: label(taskStatus).eraseToAnyView(),
+                    status: taskStatusDescription
                 )
             )
-            
-            if let view = view {
-                return Button(action: trigger) {
-                    view
-                }
-            }
-        }
-        
-        return Button(action: trigger) {
-            label(currentTask?.status ?? .idle)
-                .eraseToAnyView()
         }
     }
     
