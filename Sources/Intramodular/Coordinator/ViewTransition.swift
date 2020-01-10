@@ -111,11 +111,15 @@ extension ViewTransition {
             $0.environmentObjects(bindables).name($0.name)
         }
     }
-    
+
     public func parentCoordinator<VC: ViewCoordinator>(_ coordinator: VC) -> Self {
         environmentObject(AnyViewCoordinator(coordinator))
     }
-    
+}
+
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
+extension ViewTransition {
     func triggerPublisher<VC: ViewCoordinator>(in controller: UIViewController, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         if case .dynamic(let trigger) = self {
             return trigger()
@@ -314,3 +318,5 @@ extension ViewTransition {
         .eraseToAnyPublisher()
     }
 }
+
+#endif

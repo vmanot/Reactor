@@ -24,6 +24,8 @@ extension Presentable {
 
 // MARK: - Concrete Implementations -
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 extension UIView: Presentable {
     public var presenter: Presentable? {
         return superview
@@ -51,3 +53,5 @@ extension UIViewController: Presentable {
         }
     }
 }
+
+#endif

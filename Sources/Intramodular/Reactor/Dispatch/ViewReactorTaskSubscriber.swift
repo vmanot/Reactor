@@ -49,7 +49,7 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
 
         subscription.request(.unlimited)
         
-        reactor.environment.taskManager?.taskStarted(subscription)
+        reactor.environment.taskPipeline?.taskStarted(subscription)
     }
     
     override public func receive(_ input: Input) -> Subscribers.Demand {
@@ -57,7 +57,7 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
     }
     
     override public func receive(completion: Subscribers.Completion<Failure>) {
-        reactor.environment.taskManager?.taskEnded(subscription!)
+        reactor.environment.taskPipeline?.taskEnded(subscription!)
         
         _cancellable.cancel()
         _cancellable = nil

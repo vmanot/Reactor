@@ -10,7 +10,7 @@ public struct ViewReactorEnvironmentInjector: ViewModifier {
     
     public func body(content: Content) -> some View {
         content
-            .environmentObject(environment().taskManager)
+            .environmentObject(environment().taskPipeline)
     }
 }
 

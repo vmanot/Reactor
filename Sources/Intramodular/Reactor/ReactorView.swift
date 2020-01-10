@@ -25,5 +25,6 @@ extension ReactorView {
         makeBody(reactor: reactor)
             .injectReactorEnvironment(self.reactor.environment)
             .injectReactor(self.reactor)
+            .environmentObjects(reactor.createEnvironment())
     }
 }

@@ -32,6 +32,8 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
     func dispatcher(for _: Action) -> ViewReactorActionDispatcher<Self>
     @discardableResult
     func dispatch(_: Action) -> Task<Void, Error>
+    
+    func createEnvironment() -> EnvironmentObjects
 }
 
 public protocol InitiableViewReactor: ViewReactor {
@@ -41,22 +43,8 @@ public protocol InitiableViewReactor: ViewReactor {
 // MARK: - Implementation -
 
 extension ViewReactor {
-    public func dispatcher(for action: Action) -> ViewReactorActionDispatcher<Self> {
-        ViewReactorActionDispatcher(reactor: self, action: action)
-    }
-    
-    @discardableResult
-    public func dispatch(_ action: Action) -> Task<Void, Error> {
-        dispatcher(for: action).dispatch()
-    }
-    
-    public func dispatcher(for plan: Plan) -> ViewReactorPlanDispatcher<Self> {
-        ViewReactorPlanDispatcher(reactor: self, plan: plan)
-    }
-    
-    @discardableResult
-    public func dispatch(_ plan: Plan) -> Task<Void, Error> {
-        dispatcher(for: plan).dispatch()
+    public func createEnvironment() -> EnvironmentObjects {
+        .init()
     }
 }
 

@@ -28,3 +28,16 @@ public struct ViewReactorActionDispatcher<R: ViewReactor>: Publisher {
         return subscriber.subscription!
     }
 }
+
+// MARK: - Auxiliary Implementation -
+
+extension ViewReactor {
+    public func dispatcher(for action: Action) -> ViewReactorActionDispatcher<Self> {
+        ViewReactorActionDispatcher(reactor: self, action: action)
+    }
+    
+    @discardableResult
+    public func dispatch(_ action: Action) -> Task<Void, Error> {
+        dispatcher(for: action).dispatch()
+    }
+}

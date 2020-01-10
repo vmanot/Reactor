@@ -19,13 +19,13 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
     
     @Environment(\.buttonStyle) var buttonStyle
     
-    @OptionalEnvironmentObject var taskManager: TaskManager?
+    @OptionalEnvironmentObject var taskPipeline: TaskPipeline?
     @OptionalObservedObject var currentTask: Task<Success, Error>?
     
     public var task: Task<Success, Error>? {
         if let currentTask = currentTask {
             return currentTask
-        } else if let taskName = taskName, let task = taskManager?[taskName] as? Task<Success, Error> {
+        } else if let taskName = taskName, let task = taskPipeline?[taskName] as? Task<Success, Error> {
             return task
         } else {
             return nil
@@ -93,7 +93,7 @@ public struct TaskButton<Success, Error: Swift.Error, Label: View>: View {
                 return currentTask = task
             }
         }
-        if let taskName = taskName, let taskManager = taskManager, let task = taskManager[taskName] as? Task<Success, Error> {
+        if let taskName = taskName, let taskPipeline = taskPipeline, let task = taskPipeline[taskName] as? Task<Success, Error> {
             currentTask = task
         } else {
             currentTask = action()

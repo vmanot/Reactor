@@ -5,15 +5,15 @@
 import Merge
 import SwiftUIX
 
-public final class TaskManager: ObservableObject {
-    private weak var parent: TaskManager?
+public final class TaskPipeline: ObservableObject {
+    private weak var parent: TaskPipeline?
     
-    private var queue = DispatchQueue(label: "Reduce.TaskManager")
+    private var queue = DispatchQueue(label: "Reduce.TaskPipeline")
     
     @Published private var taskHistory: [TaskName: [OpaqueTask.StatusDescription]] = [:]
     @Published private var taskMap: [TaskName: OpaqueTask] = [:]
     
-    public init(parent: TaskManager? = nil) {
+    public init(parent: TaskPipeline? = nil) {
         self.parent = parent
     }
     

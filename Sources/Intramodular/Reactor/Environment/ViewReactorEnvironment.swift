@@ -10,12 +10,12 @@ public struct ViewReactorEnvironment: DynamicProperty {
     
     @Environment(\.self) var environment
     @Reactors() public var injectedReactors
-    @OptionalEnvironmentObject var parentTaskManager: TaskManager?
-    @OptionalObservedObject var taskManager: TaskManager!
+    @OptionalEnvironmentObject var parentTaskPipeline: TaskPipeline?
+    @OptionalObservedObject var taskPipeline: TaskPipeline!
     @Environment(\.dynamicViewPresenter) public var dynamicViewPresenter
     
     public init() {
-        self.taskManager = .init(parent: parentTaskManager)
+        self.taskPipeline = .init(parent: parentTaskPipeline)
     }
 }
 
