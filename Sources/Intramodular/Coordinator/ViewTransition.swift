@@ -111,7 +111,7 @@ extension ViewTransition {
             $0.environmentObjects(bindables).name($0.name)
         }
     }
-
+    
     public func parentCoordinator<VC: ViewCoordinator>(_ coordinator: VC) -> Self {
         environmentObject(AnyViewCoordinator(coordinator))
     }
@@ -123,182 +123,31 @@ extension ViewTransition {
     func triggerPublisher<VC: ViewCoordinator>(in controller: UIViewController, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         if case .dynamic(let trigger) = self {
             return trigger()
-        } else if case .linear(let transitions) = self {
-            if transitions.count > 1 {
-                return transitions
-                    .dropFirst()
-                    .reduce(
-                        transitions.first!.triggerPublisher(in: controller, animated: animated, coordinator: coordinator)
-                    ) { publisher, transition in
-                        publisher.flatMap { _ in
-                            transition.triggerPublisher(in: controller, animated: animated, coordinator: coordinator)
-                        }
-                        .eraseToAnyPublisher()
-                }
-            } else if transitions.count == 1 {
-                return transitions.first!.triggerPublisher(in: controller, animated: animated, coordinator: coordinator)
-            } else {
-                return Empty().eraseToAnyPublisher()
-            }
         }
         
+        let transition = self.parentCoordinator(AnyViewCoordinator(coordinator))
+        
         return Future { attemptToFulfill in
-            switch self.parentCoordinator(coordinator) {
-                case .present(let view): do {
-                    (controller.topMostPresentedViewController ?? controller).present(CocoaHostingController(rootView: view), animated: animated) {
-                        attemptToFulfill(.success(self))
-                    }
+            do {
+                try controller.trigger(transition, animated: animated) {
+                    attemptToFulfill(.success(transition))
                 }
-                
-                case .replacePresented(let view): do {
-                    (controller.topMostPresentedViewController ?? controller).dismiss(animated: animated) {
-                        controller.topMostPresentedViewController?.present(CocoaHostingController(rootView: view), animated: animated) {
-                            attemptToFulfill(.success(self))
-                        }
-                    }
-                }
-                
-                case .dismiss: do {
-                    if let presentingViewController = (controller.topMostPresentedViewController ?? controller).presentingViewController {
-                        presentingViewController.dismiss(animated: animated) {
-                            attemptToFulfill(.success(self))
-                        }
-                    } else {
-                        attemptToFulfill(.failure(.transitionError(.nothingToDismiss)))
-                    }
-                }
-                
-                case .push(let view): do {
-                    if let controller = controller as? UINavigationController {
-                        controller.pushViewController(CocoaHostingController(rootView: view), animated: animated) {
-                            attemptToFulfill(.success(self))
-                        }
-                    } else {
-                        attemptToFulfill(.failure(.transitionError(.notANavigationController)))
-                    }
-                }
-                
-                case .pop: do {
-                    if let controller = controller as? UINavigationController {
-                        controller.popViewController(animated: animated) {
-                            attemptToFulfill(.success(self))
-                        }
-                    } else {
-                        attemptToFulfill(.failure(.transitionError(.notANavigationController)))
-                    }
-                }
-                
-                case .set(let view, _): do {
-                    if let controller = controller as? UINavigationController {
-                        controller.setViewControllers([CocoaHostingController(rootView: view)], animated: animated)
-                        
-                        attemptToFulfill(.success(self))
-                    } else {
-                        attemptToFulfill(.failure(.transitionError(.notANavigationController)))
-                    }
-                }
-                
-                case .none: do {
-                    attemptToFulfill(.success(self))
-                }
-                
-                case .linear, .dynamic:
-                    fatalError()
+            } catch {
+                attemptToFulfill(.failure(.init(error)))
             }
         }
         .eraseToAnyPublisher()
     }
     
     func triggerPublisher<VC: ViewCoordinator>(in window: UIWindow, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
+        let transition = parentCoordinator(AnyViewCoordinator(coordinator))
+        
         if case .dynamic(let trigger) = self {
             return trigger()
-        } else if case .linear(let transitions) = self {
-            if transitions.count > 1 {
-                return transitions
-                    .dropFirst()
-                    .reduce(
-                        transitions.first!.triggerPublisher(in: window, animated: animated, coordinator: coordinator)
-                    ) { publisher, transition in
-                        publisher.flatMap { _ in
-                            transition.triggerPublisher(in: window, animated: animated, coordinator: coordinator)
-                        }
-                        .eraseToAnyPublisher()
-                }
-            } else if transitions.count == 1 {
-                return transitions.first!.triggerPublisher(in: window, animated: animated, coordinator: coordinator)
-            } else {
-                return Empty().eraseToAnyPublisher()
-            }
         }
         
         return Future { attemptToFulfill in
-            switch self.parentCoordinator(AnyViewCoordinator(coordinator)) {
-                case .present(let view): do {
-                    if let rootViewController = window.rootViewController {
-                        (rootViewController.topMostPresentedViewController ?? rootViewController).present(CocoaHostingController(rootView: view), animated: animated) {
-                            attemptToFulfill(.success(self))
-                        }
-                    } else {
-                        window.rootViewController = CocoaHostingController(rootView: view)
-                        
-                        attemptToFulfill(.success(self))
-                    }
-                }
-                
-                case .replacePresented(let view): do {
-                    if let rootViewController = window.rootViewController {
-                        (rootViewController.topMostPresentedViewController ?? rootViewController).dismiss(animated: animated) {
-                            rootViewController.topMostPresentedViewController?.present(CocoaHostingController(rootView: view), animated: animated) {
-                                attemptToFulfill(.success(self))
-                            }
-                        }
-                    } else {
-                        window.rootViewController = CocoaHostingController(rootView: view)
-                        
-                        attemptToFulfill(.success(self))
-                    }
-                }
-                
-                case .dismiss: do {
-                    if let rootViewController = window.rootViewController, rootViewController.presentedViewController != nil {
-                        (rootViewController.topMostPresentedViewController ?? rootViewController).dismiss(animated: animated) {
-                            attemptToFulfill(.success(self))
-                        }
-                    } else {
-                        attemptToFulfill(.failure(.transitionError(.nothingToDismiss)))
-                    }
-                }
-                
-                case .push(let view): do {
-                    if let rootViewController = window.rootViewController {
-                        if let rootViewController = rootViewController as? UINavigationController {
-                            rootViewController.pushViewController(CocoaHostingController(rootView: view), animated: animated) {
-                                attemptToFulfill(.success(self))
-                            }
-                        } else {
-                            attemptToFulfill(.failure(.transitionError(.notANavigationController)))
-                        }
-                    } else {
-                        let rootViewController = UINavigationController()
-                        
-                        window.rootViewController = rootViewController
-                        
-                        rootViewController.pushViewController(CocoaHostingController(rootView: view), animated: animated) {
-                            attemptToFulfill(.success(self))
-                        }
-                    }
-                }
-                
-                case .pop: do {
-                    if let rootViewController = window.rootViewController as? UINavigationController {
-                        rootViewController.popViewController(animated: animated) {
-                            attemptToFulfill(.success(self))
-                        }
-                    } else {
-                        attemptToFulfill(.failure(.transitionError(.notANavigationController)))
-                    }
-                }
-                
+            switch transition {
                 case .set(let view, let navigatable): do {
                     if navigatable {
                         window.rootViewController = UINavigationController(rootViewController: CocoaHostingController(rootView: view))
@@ -311,8 +160,16 @@ extension ViewTransition {
                     attemptToFulfill(.success(self))
                 }
                 
-                case .linear, .dynamic:
-                    fatalError()
+                default: do {
+                    do {
+                        try window.rootViewController!
+                            .trigger(self.parentCoordinator(AnyViewCoordinator(coordinator)), animated: animated) {
+                                attemptToFulfill(.success(self))
+                        }
+                    } catch {
+                        attemptToFulfill(.failure(.init(error)))
+                    }
+                }
             }
         }
         .eraseToAnyPublisher()

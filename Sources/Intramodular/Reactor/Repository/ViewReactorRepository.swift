@@ -6,8 +6,14 @@ import Merge
 import SwiftUIX
 
 public protocol ViewReactorRepository: DynamicProperty {
+    
+}
+
+public protocol InitiableViewReactorRepository: ViewReactorRepository {
     init()
 }
+
+// MARK: - API -
 
 @propertyWrapper
 public struct Repository<Base: ViewReactorRepository>: DynamicProperty {
@@ -16,7 +22,9 @@ public struct Repository<Base: ViewReactorRepository>: DynamicProperty {
     public init(wrappedValue: Base) {
         self.wrappedValue = wrappedValue
     }
-    
+}
+
+extension Repository where Base: InitiableViewReactorRepository {
     public init() {
         self.init(wrappedValue: .init())
     }

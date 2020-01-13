@@ -16,6 +16,10 @@ extension UIViewController {
         
         return topController
     }
+    
+    var topMostViewController: UIViewController {
+        topMostPresentedViewController ?? self
+    }
 }
 
 #endif

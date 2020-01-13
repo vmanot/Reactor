@@ -16,7 +16,7 @@ extension opaque_ViewReactor where Self: ViewReactor {
 }
 
 public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
-    associatedtype Action: ViewReactorAction where Action.Reactor == Self
+    associatedtype Action: ViewReactorAction 
     associatedtype Plan: ViewReactorPlan = EmptyViewReactorPlan
 
     associatedtype ViewNames: Hashable = Never
@@ -26,7 +26,7 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
 
     var environment: ViewReactorEnvironment { get }
     
-    func taskPublisher(for _: Action) -> ActionTaskPublisher
+    func task(for _: Action) -> ActionTaskPublisher
     func actionPlan(for _: Plan) -> ViewReactorActionPlan<Self>
 
     func dispatcher(for _: Action) -> ViewReactorActionDispatcher<Self>

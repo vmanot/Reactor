@@ -22,7 +22,7 @@ public struct ViewReactorActionDispatcher<R: ViewReactor>: Publisher {
         let subscriber = ViewReactorTaskSubscriber(reactor: reactor, action: action)
         
         reactor
-            .taskPublisher(for: action)
+            .task(for: action)
             .receive(subscriber: subscriber)
         
         return subscriber.subscription!

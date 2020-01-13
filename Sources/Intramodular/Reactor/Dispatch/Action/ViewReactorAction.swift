@@ -10,17 +10,17 @@ public protocol opaque_ViewReactorAction {
 }
 
 public protocol ViewReactorAction: opaque_ViewReactorAction, Hashable {
-    associatedtype Reactor: ViewReactor where Reactor.Action == Self
+
 }
 
 /// A control which dispatches a reactor action when triggered.
-public struct ReactorActionDispatchButton<Action: ViewReactorAction, Label: View>: View {
-    private let action: Action
+public struct ReactorActionDispatchButton<R: ViewReactor, Label: View>: View {
+    private let action: R.Action
     private let dispatch: () -> Task<Void, Error>
     
     private let label: Label
     
-    public init(action: Action, reactor: Action.Reactor, label: () -> Label) {
+    public init(action: R.Action, reactor: R, label: () -> Label) {
         self.action = action
         self.dispatch = { reactor.dispatch(action) }
         self.label = label()
