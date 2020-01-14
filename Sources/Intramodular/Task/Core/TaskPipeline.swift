@@ -7,9 +7,7 @@ import SwiftUIX
 
 public final class TaskPipeline: ObservableObject {
     private weak var parent: TaskPipeline?
-    
-    private var queue = DispatchQueue(label: "Reduce.TaskPipeline")
-    
+        
     @Published private var taskHistory: [TaskName: [OpaqueTask.StatusDescription]] = [:]
     @Published private var taskMap: [TaskName: OpaqueTask] = [:]
     
@@ -18,8 +16,10 @@ public final class TaskPipeline: ObservableObject {
     }
     
     public subscript(_ taskName: TaskName) -> OpaqueTask? {
-        get {
-            queue.sync {
+        if Thread.isMainThread {
+            return taskMap[taskName]
+        } else {
+            return DispatchQueue.main.sync {
                 taskMap[taskName]
             }
         }
@@ -30,10 +30,8 @@ public final class TaskPipeline: ObservableObject {
             return
         }
         
-        queue.sync {
-            DispatchQueue.main.async {
-                self.taskMap[taskName] = task
-            }
+        DispatchQueue.main.async {
+            self.taskMap[taskName] = task
         }
     }
     
@@ -42,11 +40,9 @@ public final class TaskPipeline: ObservableObject {
             return
         }
         
-        queue.sync {
-            DispatchQueue.main.async {
-                self.taskHistory[taskName, default: []].append(task.statusDescription)
-                self.taskMap[taskName] = nil
-            }
+        DispatchQueue.main.async {
+            self.taskHistory[taskName, default: []].append(task.statusDescription)
+            self.taskMap[taskName] = nil
         }
     }
 }

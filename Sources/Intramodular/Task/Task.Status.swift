@@ -6,13 +6,21 @@ import Merge
 import SwiftUIX
 
 extension OpaqueTask {
-    public enum StatusDescription {
+    public struct OpaqueError: Hashable {
+        public let localizedDescription: String
+        
+        public init(_ error: Error) {
+            self.localizedDescription = error.localizedDescription
+        }
+    }
+    
+    public enum StatusDescription: Hashable {
         case idle
         case started
         case progress(Progress?)
         case canceled
         case success
-        case error(Error)
+        case error(OpaqueError)
         
         public var isActive: Bool {
             switch self {
@@ -36,7 +44,7 @@ extension OpaqueTask {
                 case .success:
                     self = .success
                 case .error(let error):
-                    self = .error(error)
+                    self = .error(.init(error))
             }
         }
     }

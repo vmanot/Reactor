@@ -5,13 +5,15 @@
 import Merge
 import SwiftUIX
 
-public protocol ReactorView: View {
+public protocol ReactorDependentView {
     associatedtype Reactor: ViewReactor
     associatedtype ReactorViewBody: View
     
+    static func makeBody(reactor: Reactor) -> ReactorViewBody
+}
+
+public protocol ReactorView: ReactorDependentView, View {
     var reactor: Reactor { get }
-    
-    func makeBody(reactor: Reactor) -> ReactorViewBody
 }
 
 extension ReactorView {
@@ -22,9 +24,15 @@ extension ReactorView {
 
 extension ReactorView {
     public var body: some View {
-        makeBody(reactor: reactor)
+        Self.makeBody(reactor: reactor)
             .injectReactorEnvironment(self.reactor.environment)
             .injectReactor(self.reactor)
             .environmentObjects(reactor.createEnvironment())
+    }
+}
+
+extension ViewReactor {
+    public func make<V: ReactorDependentView>(_ viewType: V.Type) -> some View where V.Reactor == Self {
+        viewType.makeBody(reactor: self)
     }
 }

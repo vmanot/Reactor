@@ -6,6 +6,10 @@ import Merge
 import SwiftUIX
 
 open class OpaqueTask: CustomCombineIdentifierConvertible {
+    open var statusDescription: StatusDescription {
+        fatalError()
+    }
+    
     public init() {
         
     }
@@ -19,7 +23,7 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
     public let objectWillChange = PassthroughSubject<Status, Never>()
     
     private var _status: Status = .idle
-    
+        
     public var status: Status {
         get {
             lock.withCriticalScope {
@@ -34,7 +38,7 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
         }
     }
     
-    public var statusDescription: StatusDescription {
+    public override var statusDescription: StatusDescription {
         return .init(status)
     }
     

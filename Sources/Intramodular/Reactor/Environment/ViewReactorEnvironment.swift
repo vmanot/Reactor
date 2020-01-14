@@ -56,3 +56,9 @@ extension ViewReactor {
         environment.dynamicViewPresenter?.dismiss(viewNamed: name)
     }
 }
+
+extension ViewReactor {
+    public func status(of action: Action) -> OpaqueTask.StatusDescription? {
+        environment.taskPipeline[.init(action)]?.statusDescription
+    }
+}
