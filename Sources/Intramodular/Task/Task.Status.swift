@@ -50,6 +50,27 @@ extension OpaqueTask {
     }
 }
 
+extension OpaqueTask.StatusDescription {
+    public enum _Comparison {
+        case active
+    }
+}
+
+
+public func == (
+    lhs: OpaqueTask.StatusDescription?,
+    rhs: OpaqueTask.StatusDescription._Comparison
+) -> Bool {
+    if let lhs = lhs {
+        switch rhs {
+            case .active:
+                return lhs.isActive
+        }
+    } else {
+        return false
+    }
+}
+
 extension Task {
     /// The output of a task.
     public enum Output {
