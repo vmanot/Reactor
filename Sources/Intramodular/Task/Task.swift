@@ -23,7 +23,7 @@ open class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
     public let objectWillChange = PassthroughSubject<Status, Never>()
     
     private var _status: Status = .idle
-        
+    
     public var status: Status {
         get {
             lock.withCriticalScope {
@@ -97,6 +97,16 @@ extension Task {
     }
 }
 
+// MARK: - Extensions -
+
+extension Task {
+    public func eraseToSimplePublisher() -> AnyPublisher<Success, Error> {
+        self.compactMap({ Task.Status($0).successValue })
+            .mapError({ Task.Status($0).errorValue! })
+            .eraseToAnyPublisher()
+    }
+}
+
 // MARK: - Protocol Implementations -
 
 extension Task: Publisher {
@@ -129,7 +139,7 @@ extension Task: Subject {
     }
     
     public func send(completion: Subscribers.Completion<Failure>) {
-        lock.withCriticalScope {            
+        lock.withCriticalScope {
             switch completion {
                 case .finished: do {
                     if !_status.isTerminal {

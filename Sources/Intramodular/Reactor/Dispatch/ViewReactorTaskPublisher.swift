@@ -9,12 +9,7 @@ public final class ViewReactorTaskPublisher<R: ViewReactor>: TaskPublisher<Void,
     public typealias Output = Task<Void, Error>.Output
     public typealias Failure = Task<Void, Error>.Failure
     
-    public convenience init(action: @escaping () -> ()) {
-        self.init(Deferred(createPublisher: { Just(action()) })
-            .setFailureType(to: Error.self))
-    }
-    
-    public convenience init(action: @escaping () throws -> ()) {
+    public required convenience init(action: @escaping () throws -> ()) {
         self.init(Deferred(createPublisher: { Just(()).tryMap { try action() } }))
     }
     

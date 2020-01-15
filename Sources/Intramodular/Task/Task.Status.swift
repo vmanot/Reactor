@@ -175,6 +175,33 @@ extension Task {
             }
         }
         
+        public var successValue: Success? {
+            if case let .success(success) = self {
+                return success
+            } else {
+                return nil
+            }
+        }
+        
+        public var errorValue: Error? {
+            if case let .error(error) = self {
+                return error
+            } else {
+                return nil
+            }
+        }
+        
+        public var simpleResultValue: Result<Success, Error>? {
+            switch self {
+                case .success(let success):
+                    return .success(success)
+                case .error(let error):
+                    return .failure(error)
+                default:
+                    return nil
+            }
+        }
+        
         public func map<T>(_ transform: (Success) -> T) -> Task<T, Error>.Status {
             switch self {
                 case .idle:

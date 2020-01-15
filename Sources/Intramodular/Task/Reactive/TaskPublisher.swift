@@ -6,6 +6,8 @@ import Merge
 import SwiftUIX
 
 open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
+    public typealias _Success = Success
+    public typealias _Error = Error
     public typealias Output = Task<Success, Error>.Output
     public typealias Failure = Task<Success, Error>.Failure
     
@@ -14,7 +16,7 @@ open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
     public required init(_ body: @escaping (Task<Success, Error>) -> AnyCancellable) {
         self.body = body
     }
-        
+    
     open func receive<S: Subscriber>(
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
@@ -28,7 +30,16 @@ open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
     open func start(_ task: Task<Success, Error>) {
         task.cancellables.insert(body(task))
     }
-
+    
+    public required convenience init(action: @escaping () -> Success) {
+        self.init { (task: Task<Success, Error>) in
+            task.start()
+            task.succeed(with: action())
+            
+            return .empty()
+        }
+    }
+    
     public required convenience init(_ attemptToFulfill: @escaping (@escaping
         (Result<Success, Error>) -> ()) -> Void) {
         self.init { (task: Task<Success, Error>) in
