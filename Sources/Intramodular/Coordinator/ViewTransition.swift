@@ -13,14 +13,14 @@ public enum ViewTransition: ViewTransitionContext {
         case notANavigationController
     }
     
-    case present(OpaqueView)
-    case replacePresented(OpaqueView)
+    case present(AnyPresentationView)
+    case replacePresented(AnyPresentationView)
     case dismiss
     
-    case push(OpaqueView)
+    case push(AnyPresentationView)
     case pop
     
-    case set(OpaqueView, navigatable: Bool = false)
+    case set(AnyPresentationView)
     
     case none
     
@@ -30,24 +30,24 @@ public enum ViewTransition: ViewTransitionContext {
 }
 
 extension ViewTransition {
-    public func transformView<V: View>(_ transform: (OpaqueView) -> V) -> ViewTransition {
+    public func transformView<V: View>(_ transform: (AnyPresentationView) -> V) -> ViewTransition {
         switch self {
             case .present(let view):
-                return ViewTransition.present(transform(view).eraseToOpaqueView())
+                return ViewTransition.present(transform(view).eraseToAnyPresentationView())
             case .replacePresented(let view):
-                return .replacePresented(with: transform(view).eraseToOpaqueView())
+                return ViewTransition.replacePresented(with: transform(view).eraseToAnyPresentationView())
             case .dismiss:
                 return self
             case .push(let view):
-                return ViewTransition.push(transform(view).eraseToOpaqueView())
+                return ViewTransition.push(transform(view).eraseToAnyPresentationView())
             case .pop:
                 return self
-            case .set(let view, let navigatable):
-                return .set(transform(view).eraseToOpaqueView(), navigatable: navigatable)
+            case .set(let view):
+                return ViewTransition.set(transform(view).eraseToAnyPresentationView())
             case .none:
                 return self
             case .linear(let transitions):
-                return .linear(transitions.map({ $0.transformView(transform) }))
+                return ViewTransition.linear(transitions.map({ $0.transformView(transform) }))
             case .dynamic:
                 return self
         }
@@ -58,23 +58,19 @@ extension ViewTransition {
 
 extension ViewTransition {
     public static func present<V: View>(_ view: V) -> ViewTransition {
-        ViewTransition.present(view.eraseToOpaqueView())
+        ViewTransition.present(view.eraseToAnyPresentationView())
     }
     
     public static func replacePresented<V: View>(with view: V) -> ViewTransition {
-        ViewTransition.replacePresented(view.eraseToOpaqueView())
+        ViewTransition.replacePresented(view.eraseToAnyPresentationView())
     }
     
     public static func push<V: View>(_ view: V) -> ViewTransition {
-        ViewTransition.push(view.eraseToOpaqueView())
+        ViewTransition.push(view.eraseToAnyPresentationView())
     }
     
     public static func set<V: View>(_ view: V) -> ViewTransition {
-        ViewTransition.set(view.eraseToOpaqueView(), navigatable: false)
-    }
-    
-    public static func setNavigatable<V: View>(_ view: V) -> ViewTransition {
-        ViewTransition.set(view.eraseToOpaqueView(), navigatable: true)
+        ViewTransition.set(view.eraseToAnyPresentationView())
     }
     
     public static func linear(_ transitions: ViewTransition...) -> ViewTransition {
@@ -148,12 +144,8 @@ extension ViewTransition {
         
         return Future { attemptToFulfill in
             switch transition {
-                case .set(let view, let navigatable): do {
-                    if navigatable {
-                        window.rootViewController = UINavigationController(rootViewController: CocoaHostingController(rootView: view))
-                    } else {
-                        window.rootViewController = CocoaHostingController(rootView: view)
-                    }
+                case .set(let view): do {
+                    window.rootViewController = CocoaHostingController(rootView: view)
                 }
                 
                 case .none: do {

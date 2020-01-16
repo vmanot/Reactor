@@ -16,8 +16,7 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
     
     private var reactor: R
     private var actionOrPlan: ActionOrPlan
-    private var _cancellable: RetainUntilCancel<CancellableRetain<ViewReactorTaskSubscriber>>!
-    private var cancellable: AnyCancellable!
+    private var cancellable: RetainUntilCancel<CancellableRetain<ViewReactorTaskSubscriber>>!
     
     public init(reactor: R, actionOrPlan: ActionOrPlan) {
         self.reactor = reactor
@@ -25,10 +24,9 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
         
         super.init()
         
-        self._cancellable = .init(.init(self))
-        self.cancellable = .init(_cancellable)
+        self.cancellable = .init(.init(self))
         
-        reactor.cancellables.insert(cancellable)
+        reactor.cancellables.insert(.init(cancellable))
     }
     
     public convenience init(reactor: R, action: R.Action) {
@@ -58,9 +56,6 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
     
     override public func receive(completion: Subscribers.Completion<Failure>) {
         reactor.environment.taskPipeline?.taskEnded(subscription!)
-        
-        _cancellable.cancel()
-        _cancellable = nil
         
         cancellable.cancel()
         cancellable = nil

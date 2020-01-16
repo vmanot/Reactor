@@ -55,10 +55,10 @@ extension UIViewController {
                 }
             }
             
-            case .set(let view, let navigatable): do {
+            case .set(let view): do {
                 if topMostPresentedViewController != nil {
                     dismissTopMost(animated: animated) {
-                        self.presentOnTop(view, navigatable: navigatable, animated: true) {
+                        self.presentOnTop(view, animated: true) {
                             completion()
                         }
                     }
@@ -121,29 +121,13 @@ extension UIViewController {
     
     public func presentOnTop<V: View>(
         _ view: V,
-        navigatable: Bool = false,
         animated: Bool,
         completion: @escaping () -> () = { }
     ) {
-        if let controller = (topMostPresentedViewController as? opaque_CocoaController) ?? (self as? opaque_CocoaController) {
-            controller.present(
-                .init(
-                    content: { view },
-                    shouldDismiss: { true },
-                    onDismiss: nil,
-                    resetBinding: { },
-                    style: .automatic,
-                    environment: nil
-                ),
-                animated: animated,
-                completion: completion
-            )
-        } else {
-            if !navigatable {
-                topMostViewController.present(CocoaHostingController(rootView: view), animated: animated, completion: completion)
-            } else {
-                topMostViewController.present(UINavigationController(rootViewController: CocoaHostingController(rootView: view)), animated: animated, completion: completion)
-            }
-        }
+        topMostViewController.present(
+            view,
+            onDismiss: nil,
+            style: .automatic
+        )
     }
 }

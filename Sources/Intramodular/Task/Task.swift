@@ -148,9 +148,10 @@ extension Task: Subject {
                 }
                 case .failure(let failure):
                     objectWillChange.send(.init(failure))
-                    
                     _status = .init(failure)
             }
+            
+            cancellables.cancel()
         }
     }
     

@@ -39,6 +39,7 @@ public struct ReactorEnvironment: DynamicProperty {
 }
 
 extension ViewReactor {
+    /// Present a view.
     public func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)? = nil,
@@ -47,11 +48,16 @@ extension ViewReactor {
         environment.dynamicViewPresenter?.present(
             view,
             onDismiss: onDismiss,
-            style: style,
-            environment: environment.environment
+            style: style
         )
     }
     
+    /// Dismiss the view owned by `self`.
+    public func dismiss() {
+        environment.dynamicViewPresenter?.dismiss()
+    }
+    
+    /// Dismiss the view with the given name.
     public func dismiss(viewNamed name: ViewNames) {
         environment.dynamicViewPresenter?.dismiss(viewNamed: name)
     }

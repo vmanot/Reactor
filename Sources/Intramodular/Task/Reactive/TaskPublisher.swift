@@ -59,23 +59,14 @@ open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
     public required convenience init(_ attemptToFulfill: @escaping (@escaping
         (Result<Success, Error>) -> ()) -> AnyCancellable) {
         self.init { (task: Task<Success, Error>) in
-            let _cancellable = SingleAssignmentAnyCancellable()
-            let cancellable = AnyCancellable(_cancellable)
-            
-            task.cancellables.insert(cancellable)
-            
-            _cancellable.set(attemptToFulfill { result in
+            return attemptToFulfill { result in
                 switch result {
                     case .success(let value):
                         task.succeed(with: value)
                     case .failure(let value):
                         task.fail(with: value)
                 }
-                
-                task.cancellables.remove(cancellable)
-            })
-            
-            return cancellable
+            }
         }
     }
     
