@@ -21,12 +21,7 @@ extension ReactorDependentView {
     
     public func instantiate(from reactor: Reactor) -> some View {
         makeBody(reactor: reactor)
-    }
-}
-
-extension ViewReactor {
-    public func instantiate<V: ReactorDependentView>(_ view: V) -> some View where V.Reactor == Self {
-        view.makeBody(reactor: self)
+            .injectReactor(reactor)
     }
 }
 
@@ -38,6 +33,6 @@ struct InjectionInstantiatedReactorDependentView<Base: ReactorDependentView>: Vi
     @InjectedReactor var reactor: Base.Reactor
     
     var body: some View {
-        reactor.instantiate(base)
+        base.instantiate(from: reactor)
     }
 }

@@ -5,12 +5,12 @@
 import Merge
 import SwiftUIX
 
-public struct ViewReactorInjector<R: ViewReactor>: ViewModifier {
+struct ViewReactorInjector<R: ViewReactor>: ViewModifier {
     @Reactors() var reactors
     
-    public let reactor: () -> R
+    let reactor: () -> R
     
-    public func body(content: Content) -> some View {
+    func body(content: Content) -> some View {
         content
             .environment(\.viewReactors, reactors.inserting(reactor))
     }
