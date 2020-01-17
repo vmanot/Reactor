@@ -86,12 +86,32 @@ extension Task {
                     return false
             }
         }
+        
+        public func map<T>(_ transform: (Success) -> T) -> Task<T, Error>.Output {
+            switch self {
+                case .started:
+                    return .started
+                case .progress(let progress):
+                    return .progress(progress)
+                case .success(let success):
+                    return .success(transform(success))
+            }
+        }
     }
     
     /// The failure of a task.
     public enum Failure: Swift.Error {
         case canceled
         case error(Error)
+        
+        public func map<T>(_ transform: (Success) -> T) -> Task<T, Error>.Failure {
+            switch self {
+                case .canceled:
+                    return .canceled
+                case .error(let error):
+                    return .error(error)
+            }
+        }
     }
     
     /// The status of a task.

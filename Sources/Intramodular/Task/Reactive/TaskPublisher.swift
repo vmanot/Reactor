@@ -11,28 +11,28 @@ open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
     public typealias Output = Task<Success, Error>.Output
     public typealias Failure = Task<Success, Error>.Failure
     
-    let body: (Task<Success, Error>) -> AnyCancellable
+    let body: (MutableTask<Success, Error>) -> AnyCancellable
     
-    public required init(_ body: @escaping (Task<Success, Error>) -> AnyCancellable) {
+    public required init(_ body: @escaping (MutableTask<Success, Error>) -> AnyCancellable) {
         self.body = body
     }
     
     open func receive<S: Subscriber>(
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
-        let task = Task<Success, Error>()
+        let task = MutableTask<Success, Error>()
         
         start(task)
         
         subscriber.receive(subscription: task)
     }
     
-    open func start(_ task: Task<Success, Error>) {
+    open func start(_ task: MutableTask<Success, Error>) {
         task.cancellables.insert(body(task))
     }
     
     public required convenience init(action: @escaping () -> Success) {
-        self.init { (task: Task<Success, Error>) in
+        self.init { (task: MutableTask<Success, Error>) in
             task.start()
             task.succeed(with: action())
             
@@ -42,7 +42,7 @@ open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
     
     public required convenience init(_ attemptToFulfill: @escaping (@escaping
         (Result<Success, Error>) -> ()) -> Void) {
-        self.init { (task: Task<Success, Error>) in
+        self.init { (task: MutableTask<Success, Error>) in
             attemptToFulfill { result in
                 switch result {
                     case .success(let value):
@@ -58,7 +58,7 @@ open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
     
     public required convenience init(_ attemptToFulfill: @escaping (@escaping
         (Result<Success, Error>) -> ()) -> AnyCancellable) {
-        self.init { (task: Task<Success, Error>) in
+        self.init { (task: MutableTask<Success, Error>) in
             return attemptToFulfill { result in
                 switch result {
                     case .success(let value):

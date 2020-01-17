@@ -18,8 +18,6 @@ extension ReactorView {
 extension ReactorView {
     public var body: some View {
         makeBody(reactor: reactor)
-            .injectReactorEnvironment(self.reactor.environment)
-            .injectReactor(self.reactor)
-            .environmentObjects(reactor.createEnvironment())
+            .attach(self.reactor)
     }
 }

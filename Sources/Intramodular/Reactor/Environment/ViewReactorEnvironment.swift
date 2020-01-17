@@ -46,7 +46,7 @@ extension ViewReactor {
         style: ModalViewPresentationStyle = .automatic
     ) {
         environment.dynamicViewPresenter?.present(
-            view,
+            view.attach(self),
             onDismiss: onDismiss,
             style: style
         )
