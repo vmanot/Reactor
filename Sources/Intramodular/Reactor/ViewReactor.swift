@@ -18,22 +18,24 @@ extension opaque_ViewReactor where Self: ViewReactor {
 public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
     associatedtype Action: ViewReactorAction
     associatedtype Plan: ViewReactorPlan = EmptyViewReactorPlan
-    
-    associatedtype ViewNames: Hashable = Never
+    associatedtype Repository: ViewReactorRepository = EmptyViewReactorRepository
+    associatedtype Router: ViewRouter = EmptyViewRouter
+    associatedtype Subview: Hashable = Never
     
     typealias ActionTask = ViewReactorTaskPublisher<Self>
-    typealias ActionPlan = ViewReactorActionPlan<Self>
+    typealias ActionTaskPlan = ViewReactorActionTaskPlan<Self>
     
     var environment: ViewReactorEnvironment { get }
+    var repository: Repository { get }
+    var router: Router { get }
+    
+    func createEnvironmentObjects() -> EnvironmentObjects
     
     func task(for _: Action) -> ActionTask
-    func actionPlan(for _: Plan) -> ViewReactorActionPlan<Self>
+    func taskPlan(for _: Plan) -> ActionTaskPlan
     
-    func dispatcher(for _: Action) -> ViewReactorActionDispatcher<Self>
     @discardableResult
     func dispatch(_: Action) -> Task<Void, Error>
-    
-    func createEnvironment() -> EnvironmentObjects
 }
 
 public protocol InitiableViewReactor: ViewReactor {
@@ -42,8 +44,20 @@ public protocol InitiableViewReactor: ViewReactor {
 
 // MARK: - Implementation -
 
+extension ViewReactor where Repository == EmptyViewReactorRepository {
+    public var repository: Repository {
+        .init()
+    }
+}
+
+extension ViewReactor where Router == EmptyViewRouter {
+    public var router: EmptyViewRouter {
+        .init()
+    }
+}
+
 extension ViewReactor {
-    public func createEnvironment() -> EnvironmentObjects {
+    public func createEnvironmentObjects() -> EnvironmentObjects {
         .init()
     }
 }

@@ -58,7 +58,7 @@ extension ViewReactor {
     }
     
     /// Dismiss the view with the given name.
-    public func dismiss(viewNamed name: ViewNames) {
+    public func dismiss(viewNamed name: Subview) {
         environment.dynamicViewPresenter?.dismiss(viewNamed: name)
     }
 }

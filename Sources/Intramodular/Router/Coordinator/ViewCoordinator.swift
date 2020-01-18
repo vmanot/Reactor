@@ -114,9 +114,9 @@ extension ActionLabelView {
 // MARK: - API -
 
 extension ViewReactorTaskPublisher {
-    public class func trigger<C: ViewCoordinator>(_ route: C.Route, in coordinator: C) -> Self {
+    public class func trigger<R: ViewRouter>(_ route: R.Route, in router: R) -> Self {
         return .init(action: {
-            coordinator.trigger(route)
+            router.trigger(route)
         })
     }
 }

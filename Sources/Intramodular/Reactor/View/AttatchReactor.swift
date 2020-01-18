@@ -16,7 +16,7 @@ private struct AttachReactor<Reactor: ViewReactor>: ViewModifier {
         content
             .injectReactorEnvironment(self.reactor().environment)
             .injectReactor(self.reactor())
-            .environmentObjects(reactor().createEnvironment())
+            .environmentObjects(reactor().createEnvironmentObjects())
     }
 }
 

@@ -21,7 +21,7 @@ public struct ViewReactorPlanDispatcher<R: ViewReactor>: Publisher {
     public func dispatch() -> Task<Void, Error> {
         let subscriber = ViewReactorTaskSubscriber(reactor: reactor, plan: plan)
         
-        switch reactor.actionPlan(for: plan) {
+        switch reactor.taskPlan(for: plan) {
             case .linear(let actions): do {
                 let publisher = actions
                     .map(reactor.dispatcher(for:))

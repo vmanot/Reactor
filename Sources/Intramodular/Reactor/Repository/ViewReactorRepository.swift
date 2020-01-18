@@ -16,7 +16,7 @@ public protocol InitiableViewReactorRepository: ViewReactorRepository {
 // MARK: - API -
 
 @propertyWrapper
-public struct Repository<Base: ViewReactorRepository>: DynamicProperty {
+public struct ReactorRepository<Base: ViewReactorRepository>: DynamicProperty {
     public var wrappedValue: Base
     
     public init(wrappedValue: Base) {
@@ -24,7 +24,7 @@ public struct Repository<Base: ViewReactorRepository>: DynamicProperty {
     }
 }
 
-extension Repository where Base: InitiableViewReactorRepository {
+extension ReactorRepository where Base: InitiableViewReactorRepository {
     public init() {
         self.init(wrappedValue: .init())
     }
