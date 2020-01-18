@@ -27,7 +27,7 @@ extension ViewReactorTaskPublisher {
 // MARK: - Helpers -
 
 extension Publisher {
-    public func eraseToTaskPublisher<R: ViewReactor>() -> ViewReactorTaskPublisher<R> {
+    public func eraseToActionTask<R: ViewReactor>() -> ViewReactorTaskPublisher<R> {
         .init(mapTo(()).eraseError())
     }
 }

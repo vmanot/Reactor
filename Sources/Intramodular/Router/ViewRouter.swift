@@ -27,3 +27,4 @@ public protocol ViewRouter: Presentable {
     @discardableResult
     func trigger(_: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError>
 }
+

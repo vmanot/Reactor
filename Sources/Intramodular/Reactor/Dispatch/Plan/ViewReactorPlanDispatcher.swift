@@ -27,7 +27,7 @@ public struct ViewReactorPlanDispatcher<R: ViewReactor>: Publisher {
                     .map(reactor.dispatcher(for:))
                     .map({ $0.eraseToAnyPublisher() })
                     .join()
-                    .eraseToTaskPublisher() as R.ActionTask
+                    .eraseToActionTask() as R.ActionTask
                 
                 publisher.receive(subscriber: subscriber)
             }

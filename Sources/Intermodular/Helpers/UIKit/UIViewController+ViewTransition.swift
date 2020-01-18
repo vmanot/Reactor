@@ -18,7 +18,13 @@ extension UIViewController {
             }
             
             case .replacePresented(let view): do {
-                dismissTopMost(animated: animated) {
+                if presentedViewController != nil {
+                    dismiss { // FIXME: Does not respect `animated`!
+                        self.presentOnTop(view, animated: animated) {
+                            completion()
+                        }
+                    }
+                } else {
                     self.presentOnTop(view, animated: animated) {
                         completion()
                     }
@@ -57,7 +63,7 @@ extension UIViewController {
             
             case .set(let view): do {
                 if topMostPresentedViewController != nil {
-                    dismissTopMost(animated: animated) {
+                    dismiss { // FIXME: Does not respect `animated`!
                         self.presentOnTop(view, animated: true) {
                             completion()
                         }
@@ -104,30 +110,17 @@ extension UIViewController {
             }
         }
     }
-    
-    public func dismissTopMost(
-        animated: Bool,
-        completion: @escaping () -> () = { }
-    ) {
-        guard let presentingViewController = topMostViewController.presentingViewController else {
-            return completion()
-        }
         
-        presentingViewController.dismiss(
-            animated: animated,
-            completion: completion
-        )
-    }
-    
     public func presentOnTop<V: View>(
         _ view: V,
         animated: Bool,
-        completion: @escaping () -> () = { }
+        completion: (() -> Void)? = nil
     ) {
         topMostViewController.present(
             view,
             onDismiss: nil,
-            style: .automatic
+            style: .automatic,
+            completion: completion
         )
     }
 }

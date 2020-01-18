@@ -39,24 +39,35 @@ public struct ReactorEnvironment: DynamicProperty {
 }
 
 extension ViewReactor {
+    public var isPresented: Bool {
+        environment.dynamicViewPresenter?.isPresented ?? false
+    }
+    
     /// Present a view.
     public func present<V: View>(
         _ view: V,
         onDismiss: (() -> Void)? = nil,
-        style: ModalViewPresentationStyle = .automatic
+        style: ModalViewPresentationStyle = .automatic,
+        completion: (() -> Void)? = nil
     ) {
         environment.dynamicViewPresenter?.present(
             view.attach(self),
             onDismiss: onDismiss,
-            style: style
+            style: style,
+            completion: completion
         )
     }
     
     /// Dismiss the view owned by `self`.
+    public func dismiss(completion: (() -> Void)?) {
+        environment.dynamicViewPresenter?.dismiss(completion: completion)
+    }
+
+    /// Dismiss the view owned by `self`.
     public func dismiss() {
         environment.dynamicViewPresenter?.dismiss()
     }
-    
+        
     /// Dismiss the view with the given name.
     public func dismiss(viewNamed name: Subview) {
         environment.dynamicViewPresenter?.dismiss(viewNamed: name)

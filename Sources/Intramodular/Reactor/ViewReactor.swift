@@ -15,7 +15,7 @@ extension opaque_ViewReactor where Self: ViewReactor {
     }
 }
 
-public protocol ViewReactor: opaque_ViewReactor, DynamicProperty {
+public protocol ViewReactor: opaque_ViewReactor, DynamicProperty, DynamicViewPresenter {
     associatedtype Action: ViewReactorAction
     associatedtype Plan: ViewReactorPlan = EmptyViewReactorPlan
     associatedtype Repository: ViewReactorRepository = EmptyViewReactorRepository

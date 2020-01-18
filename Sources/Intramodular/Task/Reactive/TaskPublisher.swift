@@ -98,11 +98,3 @@ extension TaskPublisher {
         .just(.failure(error))
     }
 }
-
-// MARK: - Helpers -
-
-extension Publisher {
-    public func eraseToTaskPublisher() -> TaskPublisher<Output, Failure> {
-        return .init(self)
-    }
-}
