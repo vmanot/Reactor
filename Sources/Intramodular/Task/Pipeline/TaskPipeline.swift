@@ -27,7 +27,7 @@ public final class TaskPipeline: ObservableObject {
     
     func track<Success, Error>(_ task: Task<Success, Error>) {
         DispatchQueue.main.async {
-            if task.isEnded {
+            if task.hasEnded {
                 self.taskHistory[task.name, default: []].append(task.statusDescription)
                 self.taskMap.removeValue(forKey: task.name)
             } else {

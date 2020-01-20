@@ -7,12 +7,12 @@ import SwiftUIX
 
 /// A mutable task.
 public class MutableTask<Success, Error: Swift.Error>: Task<Success, Error> {
-    public typealias Body = (MutableTask<Success, Error>) -> AnyCancellable
+    public typealias Body = (Self) -> AnyCancellable
     
     private let body: Body
     private var bodyCancellable: SingleAssignmentAnyCancellable
     
-    public init(body: @escaping Body) {
+    public required init(body: @escaping Body) {
         self.body = body
         self.bodyCancellable = .init()
         
@@ -22,7 +22,7 @@ public class MutableTask<Success, Error: Swift.Error>: Task<Success, Error> {
     public func send(status: Status) {
         if let output = status.output {
             if case .started = output, self.statusDescription == .idle {
-                bodyCancellable.set(body(self))
+                bodyCancellable.set(body(self as! Self))
             }
             statusValueSubject.send(.init(output))
         } else if let failure = status.failure {

@@ -9,15 +9,15 @@ import SwiftUIX
 public class Task<Success, Error: Swift.Error>: OpaqueTask {
     public let cancellables = Cancellables()
     
-    var name: TaskName = .init(UUID())
+    let statusValueSubject = CurrentValueSubject<Status, Never>(.idle)
+    
+    public private(set) var name: TaskName = .init(UUID())
     
     weak var pipeline: TaskPipeline? {
         didSet {
             pipeline?.track(self)
         }
     }
-    
-    let statusValueSubject = CurrentValueSubject<Status, Never>(.idle)
     
     public var status: Status {
         get {
@@ -31,24 +31,28 @@ public class Task<Success, Error: Swift.Error>: OpaqueTask {
         return .init(status)
     }
     
-    public var isEnded: Bool {
-        status.isTerminal
-    }
-    
     public init(pipeline: TaskPipeline?) {
         self.pipeline = pipeline
     }
     
     public func start() {
-        
+        fatalError()
     }
     
     public func cancel() {
-        
+        fatalError()
     }
 }
 
 extension Task {
+    public func setName(_ name: TaskName) {
+        guard pipeline == nil else {
+            fatalError()
+        }
+        
+        self.name = name
+    }
+    
     public func insert(into pipeline: TaskPipeline) {
         self.pipeline = pipeline
     }
@@ -87,7 +91,7 @@ extension Task: Publisher {
 
 extension Task: Subscription {
     public func request(_ demand: Subscribers.Demand) {
-        guard demand != .none, status.isIdle else {
+        guard demand != .none, statusDescription == .idle else {
             return
         }
         

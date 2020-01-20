@@ -10,7 +10,7 @@ public protocol opaque_ViewReactorAction {
 }
 
 public protocol ViewReactorAction: opaque_ViewReactorAction, Hashable {
-
+    
 }
 
 /// A control which dispatches a reactor action when triggered.

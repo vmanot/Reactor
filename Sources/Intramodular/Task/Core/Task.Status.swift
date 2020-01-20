@@ -208,3 +208,35 @@ extension Task.Failure: Hashable where Error: Hashable {
 extension Task.Status: Hashable where Success: Hashable, Error: Hashable {
     
 }
+
+// MARK: - Helpers -
+
+extension Task {
+    public var isActive: Bool {
+        status.isActive
+    }
+    
+    public var hasSucceeded: Bool {
+        if case .success = statusDescription {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    public var isCanceled: Bool {
+        statusDescription == .canceled
+    }
+    
+    public var hasFailed: Bool {
+        if case .error = statusDescription {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    public var hasEnded: Bool {
+        status.isTerminal
+    }
+}
