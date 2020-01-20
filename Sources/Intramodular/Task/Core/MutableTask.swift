@@ -5,41 +5,48 @@
 import Merge
 import SwiftUIX
 
+/// A mutable task.
 public class MutableTask<Success, Error: Swift.Error>: Task<Success, Error> {
     public typealias Body = (MutableTask<Success, Error>) -> AnyCancellable
     
-    private let body: Body?
-    private var bodyCancellable: AnyCancellable?
+    private let body: Body
+    private var bodyCancellable: SingleAssignmentAnyCancellable
     
-    public init(body: Body? = nil) {
+    public init(body: @escaping Body = { _ in .empty() }) {
         self.body = body
+        self.bodyCancellable = .init()
     }
     
-    /// Publish task start.
+    override func didFinish() {
+        bodyCancellable.cancel()
+        cancellables.cancel()
+    }
+    
+    /// Start the task.
     public override func start() {
-        bodyCancellable = body?(self)
+        bodyCancellable.set(body(self))
         
         send(.started)
     }
     
-    /// Publish task cancellation.
+    /// Cancel the task.
     public override func cancel() {
         send(.canceled)
     }
 }
 
 extension MutableTask {
-    /// Publish task progress.
+    /// Publishes progress.
     public func progress(_ progress: Progress?) {
         send(.progress(progress))
     }
     
-    /// Publish task success.
+    /// Publishes a success.
     public func succeed(with value: Success) {
         send(.success(value))
     }
     
-    /// Publish task failure.
+    /// Publishes a failure.
     public func fail(with error: Error) {
         send(.error(error))
     }
@@ -48,6 +55,9 @@ extension MutableTask {
 // MARK: - Protocol Implementations -
 
 extension MutableTask: Subject {
+    /// Sends a value to the subscriber.
+    ///
+    /// - Parameter value: The value to send.
     public func send(_ value: Output) {
         statusValueSubject.send(.init(value))
         
@@ -56,10 +66,16 @@ extension MutableTask: Subject {
         }
     }
     
+    /// Sends a completion signal to the subscriber.
+    ///
+    /// - Parameter failure: The failure to send.
     public func send(_ failure: Failure) {
         send(completion: .failure(failure))
     }
     
+    /// Sends a completion signal to the subscriber.
+    ///
+    /// - Parameter completion: A `Completion` instance which indicates whether publishing has finished normally or failed with an error.
     public func send(completion: Subscribers.Completion<Failure>) {
         switch completion {
             case .finished: do {

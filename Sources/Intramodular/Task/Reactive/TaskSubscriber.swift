@@ -21,7 +21,7 @@ open class TaskSubscriber<Success, Error: Swift.Error>: Subscriber {
             receiveOutput: { _ = self.receive($0) },
             receiveCompletion: { self.receive(completion: $0) }
         ).subscribe(storeIn: subscription.cancellables)
-        
+
         receive(subscription: subscription)
     }
     

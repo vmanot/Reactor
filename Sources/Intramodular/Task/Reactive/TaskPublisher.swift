@@ -23,7 +23,7 @@ open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
         let task = MutableTask<Success, Error>()
         
         task.cancellables.insert(body(task))
-
+        
         subscriber.receive(subscription: task)
     }
     

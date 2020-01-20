@@ -36,15 +36,9 @@ public class Task<Success, Error: Swift.Error>: OpaqueTask {
     public func cancel() {
         
     }
-}
-
-// MARK: - Extensions -
-
-extension Task {
-    public func eraseToSimplePublisher() -> AnyPublisher<Success, Error> {
-        self.compactMap({ Task.Status($0).successValue })
-            .mapError({ Task.Status($0).errorValue! })
-            .eraseToAnyPublisher()
+    
+    func didFinish() {
+        
     }
 }
 
@@ -86,5 +80,15 @@ extension Task: Subscription {
         }
         
         start()
+    }
+}
+
+// MARK: - Auxiliary -
+
+extension Task {
+    public func toSuccessErrorPublisher() -> AnyPublisher<Success, Error> {
+        self.compactMap({ Task.Status($0).successValue })
+            .mapError({ Task.Status($0).errorValue! })
+            .eraseToAnyPublisher()
     }
 }
