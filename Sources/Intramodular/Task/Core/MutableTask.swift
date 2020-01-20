@@ -58,7 +58,7 @@ public class MutableTask<Success, Error: Swift.Error>: Task<Success, Error> {
     
     /// Cancel the task.
     public override func cancel() {
-        send(.canceled)
+        send(status: .canceled)
     }
     
     /// Publishes a failure.

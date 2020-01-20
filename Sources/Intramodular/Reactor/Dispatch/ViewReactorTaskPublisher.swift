@@ -22,6 +22,10 @@ extension ViewReactorTaskPublisher {
     public class func error(description: String) -> Self {
         error(ViewError(description: description))
     }
+    
+    public static func action(_ action: @escaping () throws -> ()) -> Self {
+        .init(action: action)
+    }
 }
 
 // MARK: - Helpers -

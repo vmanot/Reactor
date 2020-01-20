@@ -73,20 +73,5 @@ extension OpaqueTask.StatusDescription {
                 return false
             }
         }
-        
-        public static func != (
-            lhs: OpaqueTask.StatusDescription?,
-            rhs: Self
-        ) -> Bool {
-            if let lhs = lhs {
-                switch rhs {
-                    case .active:
-                        return !lhs.isActive
-                }
-            } else {
-                return false
-            }
-        }
-
     }
 }
