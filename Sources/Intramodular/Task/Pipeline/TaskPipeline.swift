@@ -7,7 +7,7 @@ import SwiftUIX
 
 public final class TaskPipeline: ObservableObject {
     private weak var parent: TaskPipeline?
-        
+    
     @Published private var taskHistory: [TaskName: [OpaqueTask.StatusDescription]] = [:]
     @Published private var taskMap: [TaskName: OpaqueTask] = [:]
     
@@ -25,16 +25,14 @@ public final class TaskPipeline: ObservableObject {
         }
     }
     
-    public func taskStarted<Success, Error>(_ task: Task<Success, Error>) {
+    func track<Success, Error>(_ task: Task<Success, Error>) {
         DispatchQueue.main.async {
-            self.taskMap[task.name] = task
-        }
-    }
-    
-    public func taskEnded<Success, Error>(_ task: Task<Success, Error>) {
-        DispatchQueue.main.async {
-            self.taskHistory[task.name, default: []].append(task.statusDescription)
-            self.taskMap[task.name] = nil
+            if task.isEnded {
+                self.taskHistory[task.name, default: []].append(task.statusDescription)
+                self.taskMap.removeValue(forKey: task.name)
+            } else {
+                self.taskMap[task.name] = task
+            }
         }
     }
 }

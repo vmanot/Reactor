@@ -5,22 +5,17 @@
 import Merge
 import SwiftUIX
 
-public enum ViewReactorActionOrPlan<R: ViewReactor> {
-    case action(R.Action)
-    case plan(R.Plan)
-}
-
 /// A subscriber that attaches to a `ViewReactorTaskPublisher`.
 public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Error> {
     public typealias ActionOrPlan = ViewReactorActionOrPlan<R>
     
     private var reactor: R
-    private var actionOrPlan: ActionOrPlan
+    private var dispatchable: ActionOrPlan
     private var cancellable: RetainUntilCancel<CancellableRetain<ViewReactorTaskSubscriber>>!
     
-    public init(reactor: R, actionOrPlan: ActionOrPlan) {
+    public init(reactor: R, dispatchable: ActionOrPlan) {
         self.reactor = reactor
-        self.actionOrPlan = actionOrPlan
+        self.dispatchable = dispatchable
         
         super.init()
         
@@ -29,34 +24,18 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
         reactor.cancellables.insert(.init(cancellable))
     }
     
-    public convenience init(reactor: R, action: R.Action) {
-        self.init(reactor: reactor, actionOrPlan: .action(action))
-    }
-    
-    public convenience init(reactor: R, plan: R.Plan) {
-        self.init(reactor: reactor, actionOrPlan: .plan(plan))
-    }
-    
-    override public func receive(subscription: Task<Void, Error>) {
-        switch actionOrPlan {
-            case let .action(action):
-                subscription.name = .init(action)
-            case let .plan(plan):
-                subscription.name = plan.createTaskName()
-        }
+    override public func receive(task: Task<Void, Error>) {
+        task.name = dispatchable.createTaskName()
         
-        subscription.request(.unlimited)
-        
-        reactor.environment.taskPipeline?.taskStarted(subscription)
+        task.insert(into: reactor.environment.taskPipeline)
+        task.request(.unlimited)
     }
     
     override public func receive(_ input: Input) -> Subscribers.Demand {
-        return .unlimited
+        .max(1)
     }
     
     override public func receive(completion: Subscribers.Completion<Failure>) {
-        reactor.environment.taskPipeline?.taskEnded(subscription!)
-        
         cancellable.cancel()
         cancellable = nil
     }

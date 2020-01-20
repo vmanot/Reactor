@@ -12,43 +12,58 @@ public class MutableTask<Success, Error: Swift.Error>: Task<Success, Error> {
     private let body: Body
     private var bodyCancellable: SingleAssignmentAnyCancellable
     
-    public init(body: @escaping Body = { _ in .empty() }) {
+    public init(body: @escaping Body) {
         self.body = body
         self.bodyCancellable = .init()
+        
+        super.init(pipeline: nil)
     }
     
-    override func didFinish() {
-        bodyCancellable.cancel()
-        cancellables.cancel()
+    public func send(status: Status) {
+        if let output = status.output {
+            if case .started = output, self.statusDescription == .idle {
+                bodyCancellable.set(body(self))
+            }
+            statusValueSubject.send(.init(output))
+        } else if let failure = status.failure {
+            statusValueSubject.send(.init(failure))
+        } else {
+            assertionFailure()
+        }
+        
+        if status.isTerminal {
+            statusValueSubject.send(completion: .finished)
+            
+            bodyCancellable.cancel()
+            cancellables.cancel()
+        }
+        
+        pipeline?.track(self)
     }
     
     /// Start the task.
     public override func start() {
-        bodyCancellable.set(body(self))
-        
         send(.started)
+    }
+    
+    /// Publishes progress.
+    public func progress(_ progress: Progress?) {
+        send(status: .progress(progress))
+    }
+    
+    /// Publishes a success.
+    public func succeed(with value: Success) {
+        send(status: .success(value))
     }
     
     /// Cancel the task.
     public override func cancel() {
         send(.canceled)
     }
-}
-
-extension MutableTask {
-    /// Publishes progress.
-    public func progress(_ progress: Progress?) {
-        send(.progress(progress))
-    }
-    
-    /// Publishes a success.
-    public func succeed(with value: Success) {
-        send(.success(value))
-    }
     
     /// Publishes a failure.
     public func fail(with error: Error) {
-        send(.error(error))
+        send(status: .error(error))
     }
 }
 
@@ -58,19 +73,15 @@ extension MutableTask: Subject {
     /// Sends a value to the subscriber.
     ///
     /// - Parameter value: The value to send.
-    public func send(_ value: Output) {
-        statusValueSubject.send(.init(value))
-        
-        if value.isTerminal {
-            statusValueSubject.send(completion: .finished)
-        }
+    public func send(_ output: Output) {
+        send(status: .init(output))
     }
     
     /// Sends a completion signal to the subscriber.
     ///
     /// - Parameter failure: The failure to send.
     public func send(_ failure: Failure) {
-        send(completion: .failure(failure))
+        send(status: .init(failure))
     }
     
     /// Sends a completion signal to the subscriber.
@@ -78,17 +89,11 @@ extension MutableTask: Subject {
     /// - Parameter completion: A `Completion` instance which indicates whether publishing has finished normally or failed with an error.
     public func send(completion: Subscribers.Completion<Failure>) {
         switch completion {
-            case .finished: do {
-                if !statusValueSubject.value.isTerminal {
-                    assertionFailure()
-                }
-            }
-            case .failure(let failure): do {
-                statusValueSubject.send(.init(failure))
-            }
+            case .finished:
+                break
+            case .failure(let failure):
+                send(status: .init(failure))
         }
-        
-        statusValueSubject.send(completion: .finished)
     }
     
     public func send(subscription: Subscription) {

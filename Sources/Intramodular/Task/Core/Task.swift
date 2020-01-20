@@ -9,6 +9,14 @@ import SwiftUIX
 public class Task<Success, Error: Swift.Error>: OpaqueTask {
     public let cancellables = Cancellables()
     
+    var name: TaskName = .init(UUID())
+    
+    weak var pipeline: TaskPipeline? {
+        didSet {
+            pipeline?.track(self)
+        }
+    }
+    
     let statusValueSubject = CurrentValueSubject<Status, Never>(.idle)
     
     public var status: Status {
@@ -23,10 +31,12 @@ public class Task<Success, Error: Swift.Error>: OpaqueTask {
         return .init(status)
     }
     
-    var name: TaskName = .init(UUID())
+    public var isEnded: Bool {
+        status.isTerminal
+    }
     
-    public override init() {
-        
+    public init(pipeline: TaskPipeline?) {
+        self.pipeline = pipeline
     }
     
     public func start() {
@@ -36,9 +46,11 @@ public class Task<Success, Error: Swift.Error>: OpaqueTask {
     public func cancel() {
         
     }
-    
-    func didFinish() {
-        
+}
+
+extension Task {
+    public func insert(into pipeline: TaskPipeline) {
+        self.pipeline = pipeline
     }
 }
 
@@ -80,15 +92,5 @@ extension Task: Subscription {
         }
         
         start()
-    }
-}
-
-// MARK: - Auxiliary -
-
-extension Task {
-    public func toSuccessErrorPublisher() -> AnyPublisher<Success, Error> {
-        self.compactMap({ Task.Status($0).successValue })
-            .mapError({ Task.Status($0).errorValue! })
-            .eraseToAnyPublisher()
     }
 }

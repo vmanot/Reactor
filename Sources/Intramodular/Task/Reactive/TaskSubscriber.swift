@@ -22,10 +22,10 @@ open class TaskSubscriber<Success, Error: Swift.Error>: Subscriber {
             receiveCompletion: { self.receive(completion: $0) }
         ).subscribe(storeIn: subscription.cancellables)
 
-        receive(subscription: subscription)
+        receive(task: subscription)
     }
     
-    open func receive(subscription: Task<Success, Error>) {
+    open func receive(task: Task<Success, Error>) {
         
     }
     

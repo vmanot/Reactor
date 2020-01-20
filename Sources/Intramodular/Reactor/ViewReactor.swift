@@ -36,6 +36,8 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicProperty, DynamicViewPre
     
     @discardableResult
     func dispatch(_: Action) -> Task<Void, Error>
+    @discardableResult
+    func dispatch(_: Plan) -> Task<Void, Error>
 }
 
 public protocol InitiableViewReactor: ViewReactor {
