@@ -22,13 +22,9 @@ open class TaskPublisher<Success, Error: Swift.Error>: Publisher {
     ) where S.Input == Output, S.Failure == Failure {
         let task = MutableTask<Success, Error>()
         
-        start(task)
-        
-        subscriber.receive(subscription: task)
-    }
-    
-    open func start(_ task: MutableTask<Success, Error>) {
         task.cancellables.insert(body(task))
+
+        subscriber.receive(subscription: task)
     }
     
     public required convenience init(action: @escaping () -> Success) {

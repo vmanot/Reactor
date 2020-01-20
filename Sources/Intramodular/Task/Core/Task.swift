@@ -6,25 +6,16 @@ import Merge
 import SwiftUIX
 
 /// An opinionated definition of a task.
-public class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
-    private let lock = OSUnfairLock()
-    
+public class Task<Success, Error: Swift.Error>: OpaqueTask {
     public let cancellables = Cancellables()
-    public let objectWillChange = PassthroughSubject<Status, Never>()
     
-    private var _status: Status = .idle
+    let statusValueSubject = CurrentValueSubject<Status, Never>(.idle)
     
     public var status: Status {
         get {
-            lock.withCriticalScope {
-                _status
-            }
+            statusValueSubject.value
         } set {
-            lock.withCriticalScope {
-                objectWillChange.send(newValue)
-                
-                _status = newValue
-            }
+            statusValueSubject.value = newValue
         }
     }
     
@@ -32,17 +23,12 @@ public class Task<Success, Error: Swift.Error>: OpaqueTask, ObservableObject {
         return .init(status)
     }
     
-    public var name: TaskName? = nil
-    
-    public init(name: TaskName) {
-        self.name = name
-    }
+    var name: TaskName = .init(UUID())
     
     public override init() {
-        self.name = nil
+        
     }
     
-    /// Publish task start.
     public func start() {
         
     }
@@ -64,52 +50,32 @@ extension Task {
 
 // MARK: - Protocol Implementations -
 
+extension Task: ObservableObject {
+    public var objectWillChange: AnyPublisher<Status, Never> {
+        statusValueSubject.eraseToAnyPublisher()
+    }
+}
+
 extension Task: Publisher {
     open func receive<S: Subscriber>(
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
         objectWillChange
-            .prefixUntil(after: { $0.isTerminal })
             .setFailureType(to: Failure.self)
             .flatMap({ status -> AnyPublisher<Output, Failure> in
                 if let output = status.output {
                     return Just(output)
                         .setFailureType(to: Failure.self)
                         .eraseToAnyPublisher()
+                } else if let failure = status.failure {
+                    return Fail<Output, Failure>(error: failure)
+                        .eraseToAnyPublisher()
                 } else {
-                    return Fail<Output, Failure>(error: status.failure!)
+                    return Empty<Output, Failure>()
                         .eraseToAnyPublisher()
                 }
-            }).receive(subscriber: subscriber)
-    }
-}
-
-extension Task: Subject {
-    public func send(_ value: Output) {
-        status = .init(value)
-    }
-    
-    public func send(_ failure: Failure) {
-        send(completion: .failure(failure))
-    }
-    
-    public func send(completion: Subscribers.Completion<Failure>) {
-        lock.withCriticalScope {
-            switch completion {
-                case .finished: do {
-                    if !_status.isTerminal {
-                        fatalError()
-                    }
-                }
-                case .failure(let failure):
-                    objectWillChange.send(.init(failure))
-                    _status = .init(failure)
-            }
-        }
-    }
-    
-    public func send(subscription: Subscription) {
-        subscription.request(.unlimited)
+            })
+            .receive(subscriber: subscriber)
     }
 }
 
@@ -120,20 +86,5 @@ extension Task: Subscription {
         }
         
         start()
-    }
-}
-
-// MARK: - Auxiliary Implementation -
-
-extension Task {
-    public func map<T>(_ transform: @escaping (Success) -> T) -> Task<T, Error> {
-        let result = MutableTask<T, Error>()
-        
-        eraseToAnyPublisher()
-            .map({ $0.map(transform) })
-            .mapError({ $0.map(transform) })
-            .subscribe(result, storeIn: cancellables)
-        
-        return result
     }
 }

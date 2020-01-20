@@ -44,7 +44,7 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
             case let .plan(plan):
                 subscription.name = plan.createTaskName()
         }
-
+        
         subscription.request(.unlimited)
         
         reactor.environment.taskPipeline?.taskStarted(subscription)

@@ -26,23 +26,15 @@ public final class TaskPipeline: ObservableObject {
     }
     
     public func taskStarted<Success, Error>(_ task: Task<Success, Error>) {
-        guard let taskName = task.name else {
-            return
-        }
-        
         DispatchQueue.main.async {
-            self.taskMap[taskName] = task
+            self.taskMap[task.name] = task
         }
     }
     
     public func taskEnded<Success, Error>(_ task: Task<Success, Error>) {
-        guard let taskName = task.name else {
-            return
-        }
-        
         DispatchQueue.main.async {
-            self.taskHistory[taskName, default: []].append(task.statusDescription)
-            self.taskMap[taskName] = nil
+            self.taskHistory[task.name, default: []].append(task.statusDescription)
+            self.taskMap[task.name] = nil
         }
     }
 }
