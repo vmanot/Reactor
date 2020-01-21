@@ -15,13 +15,13 @@ public protocol ReactorDependentView {
 // MARK: - API -
 
 extension ReactorDependentView {
-    public func instantiate() -> some View {
-        InjectionInstantiatedReactorDependentView(base: self)
-    }
-    
     public func instantiate(from reactor: Reactor) -> some View {
         makeBody(reactor: reactor)
-            .injectReactor(reactor)
+            .attach(reactor)
+    }
+    
+    public func instantiate() -> some View {
+        InjectionInstantiatedReactorDependentView(base: self)
     }
 }
 

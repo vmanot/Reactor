@@ -18,7 +18,6 @@ private struct AttachReactor<Reactor: ViewReactor, Content: View>: View {
         content
             .injectReactorEnvironment(self.reactor().environment)
             .injectReactor(self.reactor())
-            .environmentObjects(reactor().createEnvironmentObjects())
     }
 }
 

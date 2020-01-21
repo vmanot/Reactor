@@ -13,6 +13,7 @@ struct ViewReactorInjector<R: ViewReactor>: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environment(\.viewReactors, reactors.inserting(reactor))
+            .insertEnvironmentObjects(reactor().createEnvironmentObjects())
     }
 }
 
@@ -20,10 +21,10 @@ struct ViewReactorInjector<R: ViewReactor>: ViewModifier {
 
 @propertyWrapper
 public struct InjectedReactor<Reactor: ViewReactor>: DynamicProperty {
-    @Reactors() var reactors
+    @Reactors() var injectedReactors
     
     public var wrappedValue: Reactor {
-        reactors[Reactor.self]!
+        injectedReactors[Reactor.self]!
     }
     
     public init() {

@@ -19,7 +19,7 @@ public enum ViewRouterError: Error {
     }
 }
 
-public protocol ViewRouter: Presentable {
+public protocol ViewRouter: ObservableObject, Presentable {
     associatedtype Route: ViewRoute
     
     func triggerPublisher(for _: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError>

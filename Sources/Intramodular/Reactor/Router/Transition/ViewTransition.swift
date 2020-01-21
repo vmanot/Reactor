@@ -98,13 +98,13 @@ extension ViewTransition {
     
     public func environmentObject<B: ObservableObject>(_ bindable: B) -> ViewTransition {
         transformView {
-            $0.environmentObject(bindable).name($0.name)
+            $0.environmentObject(bindable)
         }
     }
     
     public func environmentObjects(_ bindables: EnvironmentObjects) -> ViewTransition {
         transformView {
-            $0.environmentObjects(bindables).name($0.name)
+            $0.insertEnvironmentObjects(bindables)
         }
     }
     
