@@ -23,12 +23,14 @@ extension ViewReactor where Self: DynamicViewPresenter {
     /// Present a view.
     public func present<V: View>(
         _ view: V,
+        named viewName: ViewName? = nil,
         onDismiss: (() -> Void)? = nil,
         style: ModalViewPresentationStyle = .automatic,
         completion: (() -> Void)? = nil
     ) {
         environment.dynamicViewPresenter?.present(
             view.attach(self),
+            named: viewName,
             onDismiss: onDismiss,
             style: style,
             completion: completion
