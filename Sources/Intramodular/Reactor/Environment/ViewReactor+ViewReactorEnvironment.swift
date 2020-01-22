@@ -48,8 +48,8 @@ extension ViewReactor where Self: DynamicViewPresenter {
     }
     
     /// Dismiss the view with the given name.
-    public func dismiss(viewNamed name: Subview) {
-        environment.dynamicViewPresenter?.dismiss(viewNamed: name)
+    public func dismissView(named name: Subview) {
+        environment.dynamicViewPresenter?.dismissView(named: name)
     }
 }
 
