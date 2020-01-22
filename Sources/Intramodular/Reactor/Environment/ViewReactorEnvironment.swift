@@ -2,32 +2,32 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Combine
 import Merge
 import SwiftUIX
+import SwiftUI
 
 public struct ViewReactorEnvironment: DynamicProperty {
-    public let cancellables = Cancellables()
+    final class Object: ObservableObject {
+        let cancellables = Cancellables()
+    }
+    
+    let object = Object()
+    
+    @Reactors() public var injectedReactors
     
     @Environment(\.self) var environment
-    @Reactors() public var injectedReactors
-    @OptionalEnvironmentObject var parentTaskPipeline: TaskPipeline?
-    @OptionalObservedObject var taskPipeline: TaskPipeline!
     @Environment(\.dynamicViewPresenter) public var dynamicViewPresenter
     
+    @OptionalEnvironmentObject var parentTaskPipeline: TaskPipeline?
+    @OptionalObservedObject var taskPipeline: TaskPipeline!
+    
     public init() {
-        self.taskPipeline = .init(parent: parentTaskPipeline)
+        taskPipeline = .init(parent: parentTaskPipeline)
     }
 }
 
-// MARK: - Extensions -
-
-extension ViewReactorEnvironment {
-    public subscript<R: ViewReactor>(_ reactorType: R.Type) -> R? {
-        injectedReactors[reactorType]
-    }
-}
-
-// MARK: - Helpers -
+// MARK: - API -
 
 @propertyWrapper
 public struct ReactorEnvironment: DynamicProperty {
@@ -35,47 +35,5 @@ public struct ReactorEnvironment: DynamicProperty {
     
     public init() {
         
-    }
-}
-
-extension ViewReactor {
-    public var isPresented: Bool {
-        environment.dynamicViewPresenter?.isPresented ?? false
-    }
-    
-    /// Present a view.
-    public func present<V: View>(
-        _ view: V,
-        onDismiss: (() -> Void)? = nil,
-        style: ModalViewPresentationStyle = .automatic,
-        completion: (() -> Void)? = nil
-    ) {
-        environment.dynamicViewPresenter?.present(
-            view.attach(self),
-            onDismiss: onDismiss,
-            style: style,
-            completion: completion
-        )
-    }
-    
-    /// Dismiss the view owned by `self`.
-    public func dismiss(completion: (() -> Void)?) {
-        environment.dynamicViewPresenter?.dismiss(completion: completion)
-    }
-
-    /// Dismiss the view owned by `self`.
-    public func dismiss() {
-        environment.dynamicViewPresenter?.dismiss()
-    }
-        
-    /// Dismiss the view with the given name.
-    public func dismiss(viewNamed name: Subview) {
-        environment.dynamicViewPresenter?.dismiss(viewNamed: name)
-    }
-}
-
-extension ViewReactor {
-    public func status(of action: Action) -> OpaqueTask.StatusDescription? {
-        environment.taskPipeline[.init(action)]?.statusDescription
     }
 }

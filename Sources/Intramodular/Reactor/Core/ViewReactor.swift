@@ -46,6 +46,16 @@ public protocol InitiableViewReactor: ViewReactor {
 
 // MARK: - Implementation -
 
+extension ViewReactor {
+    public func createEnvironmentObjects() -> EnvironmentObjects {
+        .init()
+    }
+    
+    public func update() {
+        environment.object.objectWillChange.send()
+    }
+}
+
 extension ViewReactor where Repository == EmptyViewReactorRepository {
     public var repository: Repository {
         .init()
@@ -55,23 +65,5 @@ extension ViewReactor where Repository == EmptyViewReactorRepository {
 extension ViewReactor where Router == EmptyViewRouter {
     public var router: EmptyViewRouter {
         .init()
-    }
-}
-
-extension ViewReactor {
-    public func createEnvironmentObjects() -> EnvironmentObjects {
-        .init()
-    }
-}
-
-// MARK: - Extensions -
-
-extension ViewReactor {
-    public var cancellables: Cancellables {
-        environment.cancellables
-    }
-    
-    public var injectedReactors: ViewReactors {
-        environment.injectedReactors
     }
 }
