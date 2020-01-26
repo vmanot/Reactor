@@ -4,6 +4,7 @@
 
 import Merge
 import SwiftUIX
+import Task
 
 public protocol opaque_ViewReactor {
     func opaque_dispatch(_ action: opaque_ViewReactorAction) -> Task<Void, Error>?

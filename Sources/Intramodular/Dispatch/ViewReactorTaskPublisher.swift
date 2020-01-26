@@ -4,6 +4,7 @@
 
 import Merge
 import SwiftUIX
+import Task
 
 public final class ViewReactorTaskPublisher<R: ViewReactor>: TaskPublisher<Void, Error> {
     public typealias Output = Task<Void, Error>.Output

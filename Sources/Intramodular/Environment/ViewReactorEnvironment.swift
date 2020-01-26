@@ -6,6 +6,7 @@ import Combine
 import Merge
 import SwiftUIX
 import SwiftUI
+import Task
 
 public struct ViewReactorEnvironment: DynamicProperty {
     final class Object: ObservableObject {

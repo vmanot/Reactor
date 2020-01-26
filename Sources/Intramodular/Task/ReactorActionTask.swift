@@ -4,6 +4,7 @@
 
 import Merge
 import SwiftUIX
+import Task
 
 public final class ReactorActionTask<Success, Error: Swift.Error, Reactor: ViewReactor>: MutableTask<Success, Error> {
     

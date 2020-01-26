@@ -4,6 +4,7 @@
 
 import Merge
 import SwiftUIX
+import Task
 
 /// A subscriber that attaches to a `ViewReactorTaskPublisher`.
 public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Error> {

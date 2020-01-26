@@ -34,7 +34,9 @@ extension UINavigationController {
             return DispatchQueue.main.async(execute: { completion() })
         }
         
-        coordinator.animate(alongsideTransition: nil) { _ in completion() }
+        coordinator.animate(alongsideTransition: nil) { _ in
+            completion()
+        }
     }
 }
 
