@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Reduce",
+    name: "Reactor",
     platforms: [
         .iOS(.v13),
         .macOS(.v10_15),
@@ -11,20 +11,20 @@ let package = Package(
         .watchOS(.v6)
     ],
     products: [
-        .library(name: "Reduce", targets: ["Reduce"])
+        .library(name: "Reactor", targets: ["Reactor"])
     ],
     dependencies: [
-        .package(url: "git@github.com:vmanot/API.git", .branch("master")),
         .package(url: "git@github.com:vmanot/Merge.git", .branch("master")),
-        .package(url: "https://github.com/SwiftUIX/SwiftUIX.git", .branch("master")),
+        .package(url: "git@github.com:vmanot/Task.git", .branch("master")),
+        .package(url: "git@github.com:SwiftUIX/SwiftUIX.git", .branch("master")),
     ],
     targets: [
         .target(
-            name: "Reduce",
+            name: "Reactor",
             dependencies: [
-                "API",
                 "Merge",
-                "SwiftUIX"
+                "Task",
+                "SwiftUIX",
             ],
             path: "Sources"
         ),
