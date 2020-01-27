@@ -4,6 +4,7 @@
 
 import Merge
 import SwiftUIX
+import Task
 
 public struct ViewReactors {
     private var value: [ObjectIdentifier: () -> opaque_ViewReactor] = [:]
@@ -26,7 +27,8 @@ public struct ViewReactors {
         }
     }
     
-    public func dispatch(_ action: opaque_ViewReactorAction) {
-        value.values.forEach({ _ = $0().opaque_dispatch(action) })
+    @discardableResult
+    public func dispatch(_ action: opaque_ViewReactorAction) -> Task<Void, Error>! {
+        value.values.compactMap({ $0().opaque_dispatch(action) }).first
     }
 }
