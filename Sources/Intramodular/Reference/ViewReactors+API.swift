@@ -26,7 +26,7 @@ extension ViewReactors {
 }
 
 extension EnvironmentValues {
-    public var injectedViewReactors: ViewReactors {
+    public var viewReactors: ViewReactors {
         get {
             self[ViewReactors.EnvironmentKey.self]
         } set {

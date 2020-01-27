@@ -60,7 +60,6 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
     @discardableResult
     public func trigger(_ route: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         let publisher = triggerPublisher(for: route)
-        
         let result = PassthroughSubject<ViewTransitionContext, ViewRouterError>()
         
         publisher.subscribe(result, storeIn: cancellables)
@@ -81,7 +80,9 @@ public struct ReactorRouter<C: ViewCoordinator>: DynamicProperty {
     @EnvironmentObject public private(set) var _wrappedValue: AnyViewCoordinator<C.Route>
     
     public var wrappedValue: AnyViewCoordinator<C.Route> {
-        _wrappedValue.environmentObjects.environmentReactors(environmentReactors)
+        _wrappedValue.environmentObjects.transformEnvironment {
+            $0.viewReactors.insert(self.environmentReactors)
+        }
         
         return _wrappedValue
     }

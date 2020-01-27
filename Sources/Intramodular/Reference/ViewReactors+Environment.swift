@@ -7,7 +7,7 @@ import SwiftUIX
 
 @propertyWrapper
 public struct EnvironmentReactors: DynamicProperty {
-    @Environment(\.injectedViewReactors) public private(set) var wrappedValue
+    @Environment(\.viewReactors) public private(set) var wrappedValue
     
     public init() {
         
@@ -31,7 +31,7 @@ extension View {
     public func environmentReactor<R: ViewReactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {
-        transformEnvironment(\.injectedViewReactors) {
+        transformEnvironment(\.viewReactors) {
             $0.insert(reactor)
         }
         .insertEnvironmentObjects(reactor().createEnvironmentObjects())
@@ -40,7 +40,7 @@ extension View {
     public func environmentReactors(
         _ reactors: ViewReactors
     ) -> some View {
-        transformEnvironment(\.injectedViewReactors) {
+        transformEnvironment(\.viewReactors) {
             $0.insert(reactors)
         }
     }
