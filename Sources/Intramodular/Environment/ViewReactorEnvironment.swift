@@ -11,14 +11,26 @@ import Task
 public struct ViewReactorEnvironment: DynamicProperty {
     final class Object: ObservableObject {
         let cancellables = Cancellables()
+        
+        var onReactorInitialization: Actions?
+        
+        var isReactorInitialized: Bool = false {
+            didSet {
+                guard isReactorInitialized, oldValue == false else {
+                    return
+                }
+                
+                onReactorInitialization?.perform()
+            }
+        }
     }
     
     let object = Object()
     
-    @Reactors() public var injectedReactors
+    @InjectedReactors() public var injectedReactors
     
     @Environment(\.self) var environment
-    @Environment(\.dynamicViewPresenter) public var dynamicViewPresenter
+    @Environment(\.dynamicViewPresenter) var dynamicViewPresenter
     
     @OptionalEnvironmentObject var parentTaskPipeline: TaskPipeline?
     @OptionalObservedObject var taskPipeline: TaskPipeline!

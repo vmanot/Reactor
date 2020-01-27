@@ -14,15 +14,6 @@ public struct Reactor<Base: ViewReactor>: DynamicProperty {
     }
 }
 
-@propertyWrapper
-public struct Reactors: DynamicProperty {
-    @Environment(\.viewReactors) public private(set) var wrappedValue
-    
-    public init() {
-        
-    }
-}
-
 extension Reactor where Base: InitiableViewReactor {
     public init() {
         self.init(wrappedValue: .init())

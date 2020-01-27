@@ -15,9 +15,12 @@ private struct AttachReactor<Reactor: ViewReactor, Content: View>: View {
     }
     
     var body: some View {
-        content
+        return content
             .injectReactorEnvironment(self.reactor().environment)
             .injectReactor(self.reactor())
+            .transformPreference(OnReactorInitializationPreferenceKey.self, { actions in
+                self.reactor().environment.object.onReactorInitialization = .init(actions)
+            })
     }
 }
 

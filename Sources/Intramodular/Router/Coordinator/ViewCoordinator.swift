@@ -13,10 +13,8 @@ public protocol ViewCoordinator: ViewRouter {
 // MARK: - Extensions -
 
 extension ViewCoordinator {
-    public func injectingReactors(_ reactors: ViewReactors) -> Self {
-        environmentObjects.set({ $0.environment(\.viewReactors, reactors) }, forKey: ObjectIdentifier(ViewReactors.self))
-        
-        return self
+    public func injectReactors(_ reactors: ViewReactors) {
+        environmentObjects.set({ $0.environment(\.injectedViewReactors, reactors) }, forKey: ObjectIdentifier(ViewReactors.self))
     }
 }
 
@@ -86,12 +84,14 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
 // MARK: - Auxiliary Implementation -
 
 @propertyWrapper
-public struct Coordinator<C: ViewCoordinator>: DynamicProperty {
-    @Reactors() var reactors
+public struct ReactorRouter<C: ViewCoordinator>: DynamicProperty {
+    @InjectedReactors() var injectedReactors
     @EnvironmentObject public private(set) var _wrappedValue: AnyViewCoordinator<C.Route>
     
     public var wrappedValue: AnyViewCoordinator<C.Route> {
-        _wrappedValue.injectingReactors(reactors)
+        _wrappedValue.injectReactors(injectedReactors)
+        
+        return _wrappedValue
     }
     
     public init() {

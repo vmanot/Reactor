@@ -6,22 +6,32 @@ import Merge
 import SwiftUIX
 
 struct ViewReactorInjector<R: ViewReactor>: ViewModifier {
-    @Reactors() var reactors
+    @InjectedReactors() var reactors
     
     let reactor: () -> R
     
     func body(content: Content) -> some View {
-        content
-            .environment(\.viewReactors, reactors.inserting(reactor))
-            .insertEnvironmentObjects(reactor().createEnvironmentObjects())
+        content.transformEnvironment(\.injectedViewReactors) {
+            $0.insert(self.reactor)
+        }
+        .insertEnvironmentObjects(reactor().createEnvironmentObjects())
     }
 }
 
 // MARK: - Helpers -
 
 @propertyWrapper
+public struct InjectedReactors: DynamicProperty {
+    @Environment(\.injectedViewReactors) public private(set) var wrappedValue
+    
+    public init() {
+        
+    }
+}
+
+@propertyWrapper
 public struct InjectedReactor<Reactor: ViewReactor>: DynamicProperty {
-    @Reactors() var injectedReactors
+    @InjectedReactors() var injectedReactors
     
     public var wrappedValue: Reactor {
         injectedReactors[Reactor.self]!
