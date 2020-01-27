@@ -39,7 +39,8 @@ extension ViewReactorEnvironment {
         self.object.update()
         
         if object.cycle == 1 {
-            reactor.wrappedValue.router.environmentObjects.environmentReactor(reactor)
+            reactor.wrappedValue.router.environmentBuilder.insertEnvironmentReactor(reactor)
+            reactor.wrappedValue.setup()
         }
     }
 }
@@ -52,5 +53,13 @@ public struct ReactorEnvironment: DynamicProperty {
     
     public init() {
         
+    }
+}
+
+// MARK: - Helpers -
+
+extension EnvironmentBuilder {
+    public mutating func insertEnvironmentReactor<R: ViewReactor>(_ reactor: ReactorReference<R>) {
+        set({ $0.environmentReactor(reactor.wrappedValue) }, forKey: ObjectIdentifier(R.self))
     }
 }

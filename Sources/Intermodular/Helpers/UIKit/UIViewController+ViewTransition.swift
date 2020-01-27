@@ -10,7 +10,7 @@ extension UIViewController {
         animated: Bool,
         completion: @escaping () -> ()
     ) throws {
-        switch transition {
+        switch transition._payload {
             case .present(let view): do {
                 presentOnTop(view, animated: animated) {
                     completion()
@@ -37,6 +37,12 @@ extension UIViewController {
                 }
                 
                 dismiss(animated: animated) {
+                    completion()
+                }
+            }
+            
+            case .dismissView(let name): do {
+                dismissView(named: name) { // FIXME: Does not respect `animated`!
                     completion()
                 }
             }
@@ -77,10 +83,6 @@ extension UIViewController {
                     
                     completion()
                 }
-            }
-            
-            case .none: do {
-                completion()
             }
             
             case .linear(var transitions): do {

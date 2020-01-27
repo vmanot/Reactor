@@ -17,7 +17,7 @@ open class UIViewControllerCoordinator<Route: ViewRoute>: BaseViewCoordinator<Ro
     
     public override func triggerPublisher(for route: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         transition(for: route)
-            .environmentObjects(environmentObjects)
+            .mergeEnvironmentBuilder(environmentBuilder)
             .triggerPublisher(in: rootViewController, animated: true, coordinator: self)
     }
 }
@@ -38,7 +38,7 @@ open class UIWindowCoordinator<Route: ViewRoute>: BaseViewCoordinator<Route> {
     @discardableResult
     public override func triggerPublisher(for route: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         return transition(for: route)
-            .environmentObjects(environmentObjects)
+            .mergeEnvironmentBuilder(environmentBuilder)
             .triggerPublisher(in: window, animated: true, coordinator: self)
             .handleSubscription({ _ in self.window.makeKeyAndVisible() })
             .eraseToAnyPublisher()

@@ -11,7 +11,7 @@ public enum EmptyViewRoute: ViewRoute {
 public class EmptyViewRouter: ViewRouter {
     public typealias Route = EmptyViewRoute
     
-    public var environmentObjects = EnvironmentObjects()
+    public var environmentBuilder = EnvironmentBuilder()
     
     public var presenter: Presentable? {
         return nil

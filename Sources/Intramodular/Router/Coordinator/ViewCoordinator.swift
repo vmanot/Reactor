@@ -15,7 +15,7 @@ public protocol ViewCoordinator: ViewRouter {
 open class OpaqueBaseViewCoordinator: Presentable {
     public let cancellables = Cancellables()
     
-    open var environmentObjects = EnvironmentObjects()
+    open var environmentBuilder = EnvironmentBuilder()
     
     open fileprivate(set) var presenter: Presentable?
     open fileprivate(set) var children: [Presentable] = []
@@ -32,7 +32,7 @@ open class OpaqueBaseViewCoordinator: Presentable {
 open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, ViewCoordinator {
     open func addChild(_ presentable: Presentable) {
         presentable.appendEnvironmentObject(AnyViewCoordinator(self))
-        presentable.appendEnvironmentObjects(environmentObjects)
+        presentable.appendEnvironmentBuilder(environmentBuilder)
         
         (presentable as? OpaqueBaseViewCoordinator)?.becomeChild(of: self)
         
@@ -44,13 +44,13 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
         
         parent.appendEnvironmentObject(AnyViewCoordinator(self))
         
-        appendEnvironmentObjects(parent.environmentObjects)
+        appendEnvironmentBuilder(parent.environmentBuilder)
         
         children.forEach({ ($0 as? OpaqueBaseViewCoordinator)?.becomeChild(of: self) })
     }
     
     open func transition(for _: Route) -> ViewTransition {
-        return .none
+        fatalError()
     }
     
     public func triggerPublisher(for route: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
@@ -80,7 +80,7 @@ public struct ReactorRouter<C: ViewCoordinator>: DynamicProperty {
     @EnvironmentObject public private(set) var _wrappedValue: AnyViewCoordinator<C.Route>
     
     public var wrappedValue: AnyViewCoordinator<C.Route> {
-        _wrappedValue.environmentObjects.transformEnvironment {
+        _wrappedValue.environmentBuilder.transformEnvironment {
             $0.viewReactors.insert(self.environmentReactors)
         }
         

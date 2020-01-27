@@ -6,122 +6,131 @@ import Merge
 import Foundation
 import SwiftUIX
 
-public enum ViewTransition: ViewTransitionContext {
+public struct ViewTransition: ViewTransitionContext {
     public enum Error: Swift.Error {
         case isRoot
         case nothingToDismiss
         case notANavigationController
     }
     
-    case present(AnyPresentationView)
-    case replacePresented(AnyPresentationView)
-    case dismiss
-    
-    case push(AnyPresentationView)
-    case pop
-    
-    case set(AnyPresentationView)
-    
-    case none
-    
-    case linear([ViewTransition])
-    
-    case dynamic(() -> AnyPublisher<ViewTransitionContext, ViewRouterError>)
+    var _payload: ViewTransitionPayload
+    var _environment: EnvironmentBuilder
 }
 
 extension ViewTransition {
-    public func transformView<V: View>(_ transform: (AnyPresentationView) -> V) -> ViewTransition {
-        switch self {
+    var _payloadView: AnyPresentationView? {
+        switch _payload {
             case .present(let view):
-                return ViewTransition.present(transform(view).eraseToAnyPresentationView())
+                return view
             case .replacePresented(let view):
-                return ViewTransition.replacePresented(with: transform(view).eraseToAnyPresentationView())
+                return view
             case .dismiss:
-                return self
+                return nil
+            case .dismissView:
+                return nil
             case .push(let view):
-                return ViewTransition.push(transform(view).eraseToAnyPresentationView())
+                return view
             case .pop:
-                return self
+                return nil
             case .set(let view):
-                return ViewTransition.set(transform(view).eraseToAnyPresentationView())
-            case .none:
-                return self
-            case .linear(let transitions):
-                return ViewTransition.linear(transitions.map({ $0.transformView(transform) }))
+                return view
+            case .linear:
+                return nil
             case .dynamic:
-                return self
+                return nil
         }
+    }
+    
+    var payload: ViewTransitionPayload {
+        _payload.transformView({ $0 = $0.mergeEnvironmentBuilder(_environment) })
+    }
+    
+    func transformView(_ transform: (inout AnyPresentationView) -> Void) -> Self {
+        var result = self
+        
+        result._payload = _payload.transformView(transform)
+        
+        return result
+    }
+    
+    init(_ _payload: ViewTransitionPayload) {
+        self._payload = _payload
+        self._environment = .init()
     }
 }
 
-// MARK: - Extensions -
+// MARK: - API -
 
 extension ViewTransition {
     public static func present<V: View>(_ view: V) -> ViewTransition {
-        ViewTransition.present(view.eraseToAnyPresentationView())
+        .init(.present(.init(view)))
     }
     
     public static func replacePresented<V: View>(with view: V) -> ViewTransition {
-        ViewTransition.replacePresented(view.eraseToAnyPresentationView())
+        .init(.replacePresented(with: .init(view)))
+    }
+    
+    public static var dismiss: ViewTransition {
+        .init(.dismiss)
+    }
+    
+    public static func dismissView<H: Hashable>(named name: H) -> ViewTransition {
+        .init(.dismissView(named: .init(name)))
     }
     
     public static func push<V: View>(_ view: V) -> ViewTransition {
-        ViewTransition.push(view.eraseToAnyPresentationView())
+        .init(.push(.init(view)))
+    }
+    
+    public static var pop: ViewTransition {
+        .init(.pop)
     }
     
     public static func set<V: View>(_ view: V) -> ViewTransition {
-        ViewTransition.set(view.eraseToAnyPresentationView())
+        .init(.set(.init(view)))
+    }
+    
+    public static func linear(_ transitions: [ViewTransition]) -> ViewTransition {
+        .init(.linear(transitions))
     }
     
     public static func linear(_ transitions: ViewTransition...) -> ViewTransition {
-        return .linear(transitions)
+        linear(transitions)
+    }
+    
+    public static func dynamic(
+        _ body: @escaping () -> AnyPublisher<ViewTransitionContext, ViewRouterError>
+    ) -> ViewTransition {
+        .init(.dynamic(body))
     }
 }
 
 extension ViewTransition {
-    public var isNavigation: Bool {
-        switch self {
-            case .push, .pop:
-                return true
-            default:
-                return false
-        }
+    public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> ViewTransition {
+        var result = self
+        
+        result._environment.merge(builder)
+        
+        return result
     }
     
-    public var isSet: Bool {
-        if case .set = self {
-            return true
-        } else {
-            return false
-        }
-    }
-    
-    public func environmentObject<B: ObservableObject>(_ bindable: B) -> ViewTransition {
-        transformView {
-            $0.environmentObject(bindable)
-        }
-    }
-    
-    public func environmentObjects(_ bindables: EnvironmentObjects) -> ViewTransition {
-        transformView {
-            $0.insertEnvironmentObjects(bindables)
-        }
-    }
-    
-    public func parentCoordinator<VC: ViewCoordinator>(_ coordinator: VC) -> Self {
-        environmentObject(AnyViewCoordinator(coordinator))
+    public func mergeCoordinator<VC: ViewCoordinator>(_ coordinator: VC) -> Self {
+        mergeEnvironmentBuilder(.object(coordinator))
+            .mergeEnvironmentBuilder(.object(AnyViewCoordinator(coordinator)))
     }
 }
+
+// MARK: - Auxiliary Implementation -
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension ViewTransition {
     func triggerPublisher<VC: ViewCoordinator>(in controller: UIViewController, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
-        if case .dynamic(let trigger) = self {
+        let transition = mergeCoordinator(coordinator)
+        
+        if case .dynamic(let trigger) = transition._payload {
             return trigger()
         }
-        
-        let transition = self.parentCoordinator(AnyViewCoordinator(coordinator))
         
         return Future { attemptToFulfill in
             do {
@@ -136,27 +145,22 @@ extension ViewTransition {
     }
     
     func triggerPublisher<VC: ViewCoordinator>(in window: UIWindow, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
-        let transition = parentCoordinator(AnyViewCoordinator(coordinator))
+        let transition = mergeCoordinator(coordinator)
         
-        if case .dynamic(let trigger) = self {
+        if case .dynamic(let trigger) = transition._payload {
             return trigger()
         }
         
         return Future { attemptToFulfill in
-            switch transition {
+            switch transition._payload {
                 case .set(let view): do {
                     window.rootViewController = CocoaHostingController(rootView: view)
                 }
                 
-                case .none: do {
-                    attemptToFulfill(.success(self))
-                }
-                
                 default: do {
                     do {
-                        try window.rootViewController!
-                            .trigger(self.parentCoordinator(AnyViewCoordinator(coordinator)), animated: animated) {
-                                attemptToFulfill(.success(self))
+                        try window.rootViewController!.trigger(transition, animated: animated) {
+                            attemptToFulfill(.success(self))
                         }
                     } catch {
                         attemptToFulfill(.failure(.init(error)))

@@ -30,13 +30,23 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, DynamicPr
     var repository: Repository { get }
     var router: Router { get }
     
-    func createEnvironmentObjects() -> EnvironmentObjects
+    /// Perform any necessary setup after the reactor has been initialized.
+    func setup()
     
+    /// Create an environment builder for this reactor's sub-components.
+    func createEnvironmentBuilder() -> EnvironmentBuilder
+    
+    /// Produce a task for a given action.
     func task(for _: Action) -> ActionTask
-    func taskPlan(for _: Plan) -> ActionTaskPlan
     
+    /// Dispatch an action.
     @discardableResult
     func dispatch(_: Action) -> Task<Void, Error>
+    
+    /// Produce a task plan for a given plan.
+    func taskPlan(for _: Plan) -> ActionTaskPlan
+    
+    /// Dispatch an action plan.
     @discardableResult
     func dispatch(_: Plan) -> Task<Void, Error>
 }
@@ -48,7 +58,11 @@ public protocol InitiableViewReactor: ViewReactor {
 // MARK: - Implementation -
 
 extension ViewReactor {
-    public func createEnvironmentObjects() -> EnvironmentObjects {
+    public func setup() {
+        
+    }
+    
+    public func createEnvironmentBuilder() -> EnvironmentBuilder {
         .init()
     }
     

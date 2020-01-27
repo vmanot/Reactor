@@ -7,18 +7,18 @@ import Foundation
 import SwiftUIX
 
 public protocol Presentable: class {
-    var environmentObjects: EnvironmentObjects { get set }
+    var environmentBuilder: EnvironmentBuilder { get set }
     
     var presenter: Presentable? { get }
 }
 
 extension Presentable {
     public func appendEnvironmentObject<B: ObservableObject>(_ bindable: B) {
-        environmentObjects.append(bindable)
+        environmentBuilder.insert(bindable)
     }
     
-    public func appendEnvironmentObjects(_ bindables: EnvironmentObjects) {
-        environmentObjects.append(contentsOf: bindables)
+    public func appendEnvironmentBuilder(_ bindables: EnvironmentBuilder) {
+        environmentBuilder.merge(bindables)
     }
 }
 
@@ -31,7 +31,7 @@ extension UIView: Presentable {
         return superview
     }
     
-    public var environmentObjects: EnvironmentObjects {
+    public var environmentBuilder: EnvironmentBuilder {
         get {
             .init()
         } set {
@@ -45,7 +45,7 @@ extension UIViewController: Presentable {
         return parent
     }
     
-    public var environmentObjects: EnvironmentObjects {
+    public var environmentBuilder: EnvironmentBuilder {
         get {
             .init()
         } set {

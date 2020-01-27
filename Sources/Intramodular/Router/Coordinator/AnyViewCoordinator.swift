@@ -13,11 +13,11 @@ open class AnyViewCoordinator<Route: ViewRoute>: ViewCoordinator {
         return base.presenter
     }
     
-    public var environmentObjects: EnvironmentObjects {
+    public var environmentBuilder: EnvironmentBuilder {
         get {
-            base.environmentObjects
+            base.environmentBuilder
         } set {
-            base.environmentObjects = newValue
+            base.environmentBuilder = newValue
         }
     }
     
