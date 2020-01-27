@@ -10,24 +10,18 @@ import Task
 
 public struct ViewReactorEnvironment: DynamicProperty {
     final class Object: ObservableObject {
+        @Published var cycle: Int = 0
+        
         let cancellables = Cancellables()
         
-        var onReactorInitialization: Actions?
-        
-        var isReactorInitialized: Bool = false {
-            didSet {
-                guard isReactorInitialized, oldValue == false else {
-                    return
-                }
-                
-                onReactorInitialization?.perform()
-            }
+        func update() {
+            cycle += 1
         }
     }
     
     let object = Object()
     
-    @InjectedReactors() public var injectedReactors
+    @EnvironmentReactors() public var environmentReactors
     
     @Environment(\.self) var environment
     @Environment(\.dynamicViewPresenter) var dynamicViewPresenter
@@ -37,6 +31,16 @@ public struct ViewReactorEnvironment: DynamicProperty {
     
     public init() {
         taskPipeline = .init(parent: parentTaskPipeline)
+    }
+}
+
+extension ViewReactorEnvironment {
+    func update<R: ViewReactor>(reactor: ReactorReference<R>) {
+        self.object.update()
+        
+        if object.cycle == 1 {
+            reactor.wrappedValue.router.environmentObjects.environmentReactor(reactor)
+        }
     }
 }
 

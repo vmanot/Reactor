@@ -18,7 +18,7 @@ public struct ViewReactorEnvironmentInjector: ViewModifier {
 // MARK: - API -
 
 extension View {
-    public func injectReactorEnvironment(
+    public func environmentReactorEnvironment(
         _ environment: @autoclosure @escaping () -> ViewReactorEnvironment
     ) -> some View {
         modifier(ViewReactorEnvironmentInjector(environment: environment))

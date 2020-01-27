@@ -16,7 +16,7 @@ extension opaque_ViewReactor where Self: ViewReactor {
     }
 }
 
-public protocol ViewReactor: opaque_ViewReactor, DynamicProperty, DynamicViewPresenter {
+public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, DynamicProperty {
     associatedtype Action: ViewReactorAction
     associatedtype Plan: ViewReactorPlan = EmptyViewReactorPlan
     associatedtype Repository: ViewReactorRepository = EmptyRepository
@@ -53,7 +53,7 @@ extension ViewReactor {
     }
     
     public func update() {
-        environment.object.objectWillChange.send()
+        environment.update(reactor: .init(wrappedValue: self))
     }
 }
 

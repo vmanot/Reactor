@@ -10,8 +10,8 @@ public protocol ReactorView: ReactorDependentView, View {
 }
 
 extension ReactorView {
-    public var injectedReactors: ViewReactors {
-        return reactor.environment.injectedReactors
+    public var environmentReactors: ViewReactors {
+        return reactor.environment.environmentReactors
     }
 }
 

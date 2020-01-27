@@ -10,14 +10,6 @@ public protocol ViewCoordinator: ViewRouter {
     func transition(for: Route) -> ViewTransition
 }
 
-// MARK: - Extensions -
-
-extension ViewCoordinator {
-    public func injectReactors(_ reactors: ViewReactors) {
-        environmentObjects.set({ $0.environment(\.injectedViewReactors, reactors) }, forKey: ObjectIdentifier(ViewReactors.self))
-    }
-}
-
 // MARK: - Implementation -
 
 open class OpaqueBaseViewCoordinator: Presentable {
@@ -85,11 +77,11 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
 
 @propertyWrapper
 public struct ReactorRouter<C: ViewCoordinator>: DynamicProperty {
-    @InjectedReactors() var injectedReactors
+    @EnvironmentReactors() var environmentReactors
     @EnvironmentObject public private(set) var _wrappedValue: AnyViewCoordinator<C.Route>
     
     public var wrappedValue: AnyViewCoordinator<C.Route> {
-        _wrappedValue.injectReactors(injectedReactors)
+        _wrappedValue.environmentObjects.environmentReactors(environmentReactors)
         
         return _wrappedValue
     }

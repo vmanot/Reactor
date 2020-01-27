@@ -5,7 +5,7 @@
 import Merge
 import SwiftUIX
 
-public protocol ViewReactorRepository: DynamicProperty {
+public protocol ViewReactorRepository: ViewReactorComponent {
     
 }
 

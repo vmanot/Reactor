@@ -11,8 +11,8 @@ extension ViewReactor {
         environment.object.cancellables
     }
     
-    public var injectedReactors: ViewReactors {
-        environment.injectedReactors
+    public var environmentReactors: ViewReactors {
+        environment.environmentReactors
     }
 }
 

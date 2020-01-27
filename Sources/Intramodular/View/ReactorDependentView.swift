@@ -30,7 +30,7 @@ extension ReactorDependentView {
 struct InjectionInstantiatedReactorDependentView<Base: ReactorDependentView>: View {
     let base: Base
     
-    @InjectedReactor var reactor: Base.Reactor
+    @EnvironmentReactor var reactor: Base.Reactor
     
     var body: some View {
         base.instantiate(from: reactor)
