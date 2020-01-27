@@ -5,7 +5,7 @@
 import Merge
 import SwiftUIX
 
-public struct EmptyViewReactorRepository: InitiableViewReactorRepository {
+public struct EmptyRepository: InitiableViewReactorRepository {
     public init() {
         
     }
