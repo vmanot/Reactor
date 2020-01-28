@@ -14,10 +14,12 @@ public struct ViewTransition: ViewTransitionContext {
     }
     
     private var _payload: Payload
-    private var _environment: EnvironmentBuilder
+    
+    var payloadViewName: ViewName?
+    var environment: EnvironmentBuilder
 
     var payload: Payload {
-        _payload.transformView({ $0 = $0.mergeEnvironmentBuilder(_environment) })
+        _payload.transformView({ $0 = $0.mergeEnvironmentBuilder(environment) })
     }
 }
 
@@ -55,7 +57,13 @@ extension ViewTransition {
     
     init(_ _payload: ViewTransition.Payload) {
         self._payload = _payload
-        self._environment = .init()
+        self.environment = .init()
+    }
+    
+    init<V: View>(_ _payload: ViewTransition.Payload, view: V) {
+        self._payload = _payload
+        self.payloadViewName = (view as? opaque_NamedView)?.name
+        self.environment = .init()
     }
 }
 
@@ -63,11 +71,11 @@ extension ViewTransition {
 
 extension ViewTransition {
     public static func present<V: View>(_ view: V) -> ViewTransition {
-        .init(.present(.init(view)))
+        .init(.present(.init(view)), view: view)
     }
     
     public static func replacePresented<V: View>(with view: V) -> ViewTransition {
-        .init(.replacePresented(with: .init(view)))
+        .init(.replacePresented(with: .init(view)), view: view)
     }
     
     public static var dismiss: ViewTransition {
@@ -79,7 +87,7 @@ extension ViewTransition {
     }
     
     public static func push<V: View>(_ view: V) -> ViewTransition {
-        .init(.push(.init(view)))
+        .init(.push(.init(view)), view: view)
     }
     
     public static var pop: ViewTransition {
@@ -87,7 +95,7 @@ extension ViewTransition {
     }
     
     public static func set<V: View>(_ view: V) -> ViewTransition {
-        .init(.set(.init(view)))
+        .init(.set(.init(view)), view: view)
     }
     
     public static func linear(_ transitions: [ViewTransition]) -> ViewTransition {
@@ -109,7 +117,7 @@ extension ViewTransition {
     public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> ViewTransition {
         var result = self
         
-        result._environment.merge(builder)
+        result.environment.merge(builder)
         
         return result
     }
@@ -119,57 +127,3 @@ extension ViewTransition {
             .mergeEnvironmentBuilder(.object(AnyViewCoordinator(coordinator)))
     }
 }
-
-// MARK: - Auxiliary Implementation -
-
-#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
-
-extension ViewTransition {
-    func triggerPublisher<VC: ViewCoordinator>(in controller: UIViewController, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
-        let transition = mergeCoordinator(coordinator)
-        
-        if case .dynamic(let trigger) = transition.payload {
-            return trigger()
-        }
-        
-        return Future { attemptToFulfill in
-            do {
-                try controller.trigger(transition, animated: animated) {
-                    attemptToFulfill(.success(transition))
-                }
-            } catch {
-                attemptToFulfill(.failure(.init(error)))
-            }
-        }
-        .eraseToAnyPublisher()
-    }
-    
-    func triggerPublisher<VC: ViewCoordinator>(in window: UIWindow, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
-        let transition = mergeCoordinator(coordinator)
-        
-        if case .dynamic(let trigger) = transition.payload {
-            return trigger()
-        }
-        
-        return Future { attemptToFulfill in
-            switch transition.payload {
-                case .set(let view): do {
-                    window.rootViewController = CocoaHostingController(rootView: view)
-                }
-                
-                default: do {
-                    do {
-                        try window.rootViewController!.trigger(transition, animated: animated) {
-                            attemptToFulfill(.success(self))
-                        }
-                    } catch {
-                        attemptToFulfill(.failure(.init(error)))
-                    }
-                }
-            }
-        }
-        .eraseToAnyPublisher()
-    }
-}
-
-#endif

@@ -4,6 +4,8 @@
 
 import SwiftUIX
 
+#if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
 extension UIViewController {
     public func trigger(
         _ transition: ViewTransition,
@@ -12,7 +14,7 @@ extension UIViewController {
     ) throws {
         switch transition.payload {
             case .present(let view): do {
-                presentOnTop(view, animated: animated) {
+                presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                     completion()
                 }
             }
@@ -20,12 +22,12 @@ extension UIViewController {
             case .replacePresented(let view): do {
                 if presentedViewController != nil {
                     dismiss { // FIXME: Does not respect `animated`!
-                        self.presentOnTop(view, animated: animated) {
+                        self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                             completion()
                         }
                     }
                 } else {
-                    self.presentOnTop(view, animated: animated) {
+                    self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                         completion()
                     }
                 }
@@ -70,7 +72,7 @@ extension UIViewController {
             case .set(let view): do {
                 if topMostPresentedViewController != nil {
                     dismiss { // FIXME: Does not respect `animated`!
-                        self.presentOnTop(view, animated: true) {
+                        self.presentOnTop(view, named: transition.payloadViewName, animated: true) {
                             completion()
                         }
                     }
@@ -115,14 +117,68 @@ extension UIViewController {
     
     public func presentOnTop<V: View>(
         _ view: V,
+        named viewName: ViewName?,
         animated: Bool,
         completion: (() -> Void)? = nil
     ) {
         topMostViewController.present(
             view,
+            named: viewName,
             onDismiss: nil,
             style: .automatic,
             completion: completion
         )
     }
 }
+
+extension ViewTransition {
+    func triggerPublisher<VC: ViewCoordinator>(in window: UIWindow, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
+        let transition = mergeCoordinator(coordinator)
+        
+        if case .dynamic(let trigger) = transition.payload {
+            return trigger()
+        }
+        
+        return Future { attemptToFulfill in
+            switch transition.payload {
+                case .set(let view): do {
+                    window.rootViewController = CocoaHostingController(rootView: view)
+                }
+                
+                default: do {
+                    do {
+                        try window.rootViewController!.trigger(transition, animated: animated) {
+                            attemptToFulfill(.success(self))
+                        }
+                    } catch {
+                        attemptToFulfill(.failure(.init(error)))
+                    }
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+}
+
+extension ViewTransition {
+    func triggerPublisher<VC: ViewCoordinator>(in controller: UIViewController, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
+        let transition = mergeCoordinator(coordinator)
+        
+        if case .dynamic(let trigger) = transition.payload {
+            return trigger()
+        }
+        
+        return Future { attemptToFulfill in
+            do {
+                try controller.trigger(transition, animated: animated) {
+                    attemptToFulfill(.success(transition))
+                }
+            } catch {
+                attemptToFulfill(.failure(.init(error)))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+}
+
+#endif
