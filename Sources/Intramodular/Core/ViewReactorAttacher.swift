@@ -5,25 +5,13 @@
 import Merge
 import SwiftUIX
 
-private struct ViewReactorAttacher<Reactor: ViewReactor, Content: View>: View {
+private struct ViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
     let reactor: () -> Reactor
-    let content: Content
     
-    init(reactor: @escaping () -> Reactor, content: Content) {
-        self.reactor = reactor
-        self.content = content
-    }
-    
-    var body: some View {
-        return content
+    public func body(content: Content) -> some View {
+        content
             .environmentReactorEnvironment(self.reactor().environment)
             .environmentReactor(self.reactor())
-    }
-}
-
-extension ViewReactorAttacher: opaque_NamedView where Content: opaque_NamedView {
-    var name: ViewName {
-        content.name
     }
 }
 
@@ -33,6 +21,6 @@ extension View {
     public func attach<R: ViewReactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {
-        ViewReactorAttacher(reactor: reactor, content: self)
+        modifier(ViewReactorAttacher(reactor: reactor))
     }
 }

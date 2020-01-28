@@ -56,10 +56,14 @@ public struct ReactorEnvironment: DynamicProperty {
     }
 }
 
-// MARK: - Helpers -
+// MARK: - Auxiliary Implementation -
 
 extension EnvironmentBuilder {
-    public mutating func insertEnvironmentReactor<R: ViewReactor>(_ reactor: ReactorReference<R>) {
-        set({ $0.environmentReactor(reactor.wrappedValue) }, forKey: ObjectIdentifier(R.self))
+    public mutating func insertEnvironmentReactor<R: ViewReactor>(
+        _ reactor: ReactorReference<R>
+    ) {
+        transformEnvironment({
+            $0.viewReactors.insert({ reactor.wrappedValue })
+        })
     }
 }

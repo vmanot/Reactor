@@ -6,19 +6,21 @@ import Merge
 import Foundation
 import SwiftUIX
 
-enum ViewTransitionPayload {
-    case present(AnyPresentationView)
-    case replacePresented(with: AnyPresentationView)
-    case dismiss
-    case dismissView(named: ViewName)
-    case push(AnyPresentationView)
-    case pop
-    case set(AnyPresentationView)
-    case linear([ViewTransition])
-    case dynamic(() -> AnyPublisher<ViewTransitionContext, ViewRouterError>)
+extension ViewTransition {
+    enum Payload {
+        case present(AnyPresentationView)
+        case replacePresented(with: AnyPresentationView)
+        case dismiss
+        case dismissView(named: ViewName)
+        case push(AnyPresentationView)
+        case pop
+        case set(AnyPresentationView)
+        case linear([ViewTransition])
+        case dynamic(() -> AnyPublisher<ViewTransitionContext, ViewRouterError>)
+    }
 }
 
-extension ViewTransitionPayload {
+extension ViewTransition.Payload {
     func transformView(_ transform: (inout AnyPresentationView) -> Void) -> Self {
         switch self {
             case .present(let view):

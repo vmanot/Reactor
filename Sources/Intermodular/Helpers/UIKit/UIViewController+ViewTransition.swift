@@ -10,7 +10,7 @@ extension UIViewController {
         animated: Bool,
         completion: @escaping () -> ()
     ) throws {
-        switch transition._payload {
+        switch transition.payload {
             case .present(let view): do {
                 presentOnTop(view, animated: animated) {
                     completion()

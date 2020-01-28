@@ -13,8 +13,12 @@ public struct ViewTransition: ViewTransitionContext {
         case notANavigationController
     }
     
-    var _payload: ViewTransitionPayload
-    var _environment: EnvironmentBuilder
+    private var _payload: Payload
+    private var _environment: EnvironmentBuilder
+
+    var payload: Payload {
+        _payload.transformView({ $0 = $0.mergeEnvironmentBuilder(_environment) })
+    }
 }
 
 extension ViewTransition {
@@ -40,11 +44,7 @@ extension ViewTransition {
                 return nil
         }
     }
-    
-    var payload: ViewTransitionPayload {
-        _payload.transformView({ $0 = $0.mergeEnvironmentBuilder(_environment) })
-    }
-    
+        
     func transformView(_ transform: (inout AnyPresentationView) -> Void) -> Self {
         var result = self
         
@@ -53,7 +53,7 @@ extension ViewTransition {
         return result
     }
     
-    init(_ _payload: ViewTransitionPayload) {
+    init(_ _payload: ViewTransition.Payload) {
         self._payload = _payload
         self._environment = .init()
     }
@@ -128,7 +128,7 @@ extension ViewTransition {
     func triggerPublisher<VC: ViewCoordinator>(in controller: UIViewController, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         let transition = mergeCoordinator(coordinator)
         
-        if case .dynamic(let trigger) = transition._payload {
+        if case .dynamic(let trigger) = transition.payload {
             return trigger()
         }
         
@@ -147,12 +147,12 @@ extension ViewTransition {
     func triggerPublisher<VC: ViewCoordinator>(in window: UIWindow, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         let transition = mergeCoordinator(coordinator)
         
-        if case .dynamic(let trigger) = transition._payload {
+        if case .dynamic(let trigger) = transition.payload {
             return trigger()
         }
         
         return Future { attemptToFulfill in
-            switch transition._payload {
+            switch transition.payload {
                 case .set(let view): do {
                     window.rootViewController = CocoaHostingController(rootView: view)
                 }
