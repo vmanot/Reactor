@@ -17,10 +17,14 @@ extension ViewReactor {
 }
 
 extension ViewReactor where Self: DynamicViewPresenter {
-    public var isPresented: Bool {
-        environment.dynamicViewPresenter?.isPresented ?? false
+    public var presenting: DynamicViewPresenter? {
+        environment.dynamicViewPresenter?.presenting
     }
     
+    public var presented: DynamicViewPresenter? {
+        environment.dynamicViewPresenter?.presented
+    }
+
     /// Present a view.
     public func present<V: View>(
         _ view: V,

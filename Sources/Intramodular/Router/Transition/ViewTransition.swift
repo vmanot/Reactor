@@ -15,55 +15,29 @@ public struct ViewTransition: ViewTransitionContext {
     
     private var _payload: Payload
     
-    var payloadViewName: ViewName?
-    var environment: EnvironmentBuilder
-
     var payload: Payload {
-        _payload.transformView({ $0 = $0.mergeEnvironmentBuilder(environment) })
+        _payload.transformViewIfPresent({ $0 = $0.mergeEnvironmentBuilder(environmentBuilder) })
     }
-}
-
-extension ViewTransition {
-    var _payloadView: AnyPresentationView? {
-        switch _payload {
-            case .present(let view):
-                return view
-            case .replacePresented(let view):
-                return view
-            case .dismiss:
-                return nil
-            case .dismissView:
-                return nil
-            case .push(let view):
-                return view
-            case .pop:
-                return nil
-            case .set(let view):
-                return view
-            case .linear:
-                return nil
-            case .dynamic:
-                return nil
-        }
-    }
+    
+    var payloadViewName: ViewName?
+    var environmentBuilder: EnvironmentBuilder
         
-    func transformView(_ transform: (inout AnyPresentationView) -> Void) -> Self {
+    init<V: View>(payload: ViewTransition.Payload, view: V) {
+        self._payload = payload
+        self.payloadViewName = (view as? opaque_NamedView)?.name
+        self.environmentBuilder = .init()
+    }
+    
+    init(payload: ViewTransition.Payload) {
+        self.init(payload: payload, view: EmptyView())
+    }
+    
+    func transformViewIfPresent(_ transform: (inout AnyPresentationView) -> Void) -> Self {
         var result = self
         
-        result._payload = _payload.transformView(transform)
+        result._payload = _payload.transformViewIfPresent(transform)
         
         return result
-    }
-    
-    init(_ _payload: ViewTransition.Payload) {
-        self._payload = _payload
-        self.environment = .init()
-    }
-    
-    init<V: View>(_ _payload: ViewTransition.Payload, view: V) {
-        self._payload = _payload
-        self.payloadViewName = (view as? opaque_NamedView)?.name
-        self.environment = .init()
     }
 }
 
@@ -71,35 +45,35 @@ extension ViewTransition {
 
 extension ViewTransition {
     public static func present<V: View>(_ view: V) -> ViewTransition {
-        .init(.present(.init(view)), view: view)
+        .init(payload: .present(.init(view)), view: view)
     }
     
     public static func replacePresented<V: View>(with view: V) -> ViewTransition {
-        .init(.replacePresented(with: .init(view)), view: view)
+        .init(payload: .replacePresented(with: .init(view)), view: view)
     }
     
     public static var dismiss: ViewTransition {
-        .init(.dismiss)
+        .init(payload: .dismiss)
     }
     
     public static func dismissView<H: Hashable>(named name: H) -> ViewTransition {
-        .init(.dismissView(named: .init(name)))
+        .init(payload: .dismissView(named: .init(name)))
     }
     
     public static func push<V: View>(_ view: V) -> ViewTransition {
-        .init(.push(.init(view)), view: view)
+        .init(payload: .push(.init(view)), view: view)
     }
     
     public static var pop: ViewTransition {
-        .init(.pop)
+        .init(payload: .pop)
     }
     
     public static func set<V: View>(_ view: V) -> ViewTransition {
-        .init(.set(.init(view)), view: view)
+        .init(payload: .set(.init(view)), view: view)
     }
     
     public static func linear(_ transitions: [ViewTransition]) -> ViewTransition {
-        .init(.linear(transitions))
+        .init(payload: .linear(transitions))
     }
     
     public static func linear(_ transitions: ViewTransition...) -> ViewTransition {
@@ -109,7 +83,7 @@ extension ViewTransition {
     public static func dynamic(
         _ body: @escaping () -> AnyPublisher<ViewTransitionContext, ViewRouterError>
     ) -> ViewTransition {
-        .init(.dynamic(body))
+        .init(payload: .dynamic(body))
     }
 }
 
@@ -117,7 +91,7 @@ extension ViewTransition {
     public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) -> ViewTransition {
         var result = self
         
-        result.environment.merge(builder)
+        result.environmentBuilder.merge(builder)
         
         return result
     }

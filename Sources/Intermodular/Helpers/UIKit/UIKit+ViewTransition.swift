@@ -20,9 +20,9 @@ extension UIViewController {
             }
             
             case .replacePresented(let view): do {
-                if presentedViewController != nil {
-                    dismiss { // FIXME: Does not respect `animated`!
-                        self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
+                if let viewController = topMostPresentedViewController?.presentingViewController {
+                    viewController.dismiss { // FIXME: Does not respect `animated`!
+                        viewController.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                             completion()
                         }
                     }
