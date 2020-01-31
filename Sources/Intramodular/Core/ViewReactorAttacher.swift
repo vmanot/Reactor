@@ -8,10 +8,11 @@ import SwiftUIX
 private struct ViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
     let reactor: () -> Reactor
     
-    public func body(content: Content) -> some View {
+    func body(content: Content) -> some View {
         content
-            .environmentReactorEnvironment(self.reactor().environment)
+            .environmentObject(self.reactor().environment.object)
             .environmentReactor(self.reactor())
+            .taskPipeline(self.reactor().environment.taskPipeline)
     }
 }
 
