@@ -8,15 +8,15 @@ import SwiftUIX
 
 extension ViewTransition {
     enum Payload {
-        case present(AnyPresentationView)
-        case replacePresented(with: AnyPresentationView)
+        case present(EnvironmentalAnyView)
+        case replacePresented(with: EnvironmentalAnyView)
         case dismiss
         case dismissView(named: ViewName)
         
-        case push(AnyPresentationView)
+        case push(EnvironmentalAnyView)
         case pop
         
-        case set(AnyPresentationView)
+        case set(EnvironmentalAnyView)
         
         case linear([ViewTransition])
         
@@ -25,7 +25,7 @@ extension ViewTransition {
 }
 
 extension ViewTransition.Payload {
-    var view: AnyPresentationView? {
+    var view: EnvironmentalAnyView? {
         get {
             switch self {
                 case .present(let view):
@@ -75,7 +75,7 @@ extension ViewTransition.Payload {
         }
     }
     
-    func transformViewIfPresent(_ transform: (inout AnyPresentationView) -> Void) -> Self {
+    func transformViewIfPresent(_ transform: (inout EnvironmentalAnyView) -> Void) -> Self {
         switch self {
             case .present(let view):
                 return .present(view.then(transform))

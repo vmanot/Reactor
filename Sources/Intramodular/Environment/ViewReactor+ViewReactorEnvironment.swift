@@ -26,42 +26,30 @@ extension ViewReactor where Self: DynamicViewPresenter {
     }
 
     /// Present a view.
-    public func present<V: View>(
-        _ view: V,
-        named viewName: ViewName? = nil,
-        onDismiss: (() -> Void)? = nil,
-        style: ModalViewPresentationStyle = .automatic,
-        completion: (() -> Void)? = nil
-    ) {
-        environment.dynamicViewPresenter?.present(
-            view.attach(self),
-            named: viewName,
-            onDismiss: onDismiss,
-            style: style,
-            completion: completion
-        )
+    public func present(_ modal: AnyModalPresentation) {
+        environment.dynamicViewPresenter!.present(modal)
     }
     
     /// Dismiss the view owned by `self`.
-    public func dismiss(completion: (() -> Void)?) {
-        environment.dynamicViewPresenter?.dismiss(completion: completion)
+    public func dismiss(completion: @escaping () -> Void) {
+        environment.dynamicViewPresenter!.dismiss(completion: completion)
     }
     
     /// Dismiss the view owned by `self`.
     public func dismiss() {
-        environment.dynamicViewPresenter?.dismiss()
+        environment.dynamicViewPresenter!.dismiss()
     }
     
     public func dismissView(
         named name: ViewName,
-        completion: (() -> Void)?
+        completion: @escaping () -> Void
     ) {
-        environment.dynamicViewPresenter?.dismissView(named: name, completion: completion)
+        environment.dynamicViewPresenter!.dismissView(named: name, completion: completion)
     }
     
     /// Dismiss the view with the given name.
     public func dismissView(named name: Subview) {
-        environment.dynamicViewPresenter?.dismissView(named: name)
+        environment.dynamicViewPresenter!.dismissView(named: name)
     }
 }
 

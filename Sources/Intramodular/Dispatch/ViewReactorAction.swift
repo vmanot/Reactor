@@ -14,6 +14,8 @@ public protocol ViewReactorAction: opaque_ViewReactorAction, Hashable {
     
 }
 
+// MARK: - Helpers -
+
 /// A control which dispatches a reactor action when triggered.
 public struct ReactorActionDispatchButton<R: ViewReactor, Label: View>: View {
     private let action: R.Action

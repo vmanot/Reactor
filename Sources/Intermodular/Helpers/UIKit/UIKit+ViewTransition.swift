@@ -119,15 +119,9 @@ extension UIViewController {
         _ view: V,
         named viewName: ViewName?,
         animated: Bool,
-        completion: (() -> Void)? = nil
+        completion: @escaping () -> Void
     ) {
-        topMostViewController.present(
-            view,
-            named: viewName,
-            onDismiss: nil,
-            style: .automatic,
-            completion: completion
-        )
+        topMostViewController.present(view, named: viewName, completion: completion)
     }
 }
 

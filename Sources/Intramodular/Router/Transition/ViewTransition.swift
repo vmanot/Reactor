@@ -32,7 +32,7 @@ public struct ViewTransition: ViewTransitionContext {
         self.init(payload: payload, view: EmptyView())
     }
     
-    func transformViewIfPresent(_ transform: (inout AnyPresentationView) -> Void) -> Self {
+    func transformViewIfPresent(_ transform: (inout EnvironmentalAnyView) -> Void) -> Self {
         var result = self
         
         result._payload = _payload.transformViewIfPresent(transform)
