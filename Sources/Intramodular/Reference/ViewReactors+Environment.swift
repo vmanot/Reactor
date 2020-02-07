@@ -7,7 +7,7 @@ import SwiftUIX
 
 @propertyWrapper
 public struct EnvironmentReactors: DynamicProperty {
-    @Environment(\.viewReactors) public private(set) var wrappedValue
+    @Environment(\.viewReactors) public var wrappedValue
     
     public init() {
         

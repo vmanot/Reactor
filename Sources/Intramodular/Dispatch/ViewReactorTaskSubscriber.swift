@@ -27,7 +27,7 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
     
     override public func receive(task: Task<Void, Error>) {
         task.setName(dispatchable.createTaskName())
-        task.insert(into: reactor.environment.taskPipeline)
+        task.insert(into: reactor.environment.taskPipeline!)
         task.request(.unlimited)
     }
     

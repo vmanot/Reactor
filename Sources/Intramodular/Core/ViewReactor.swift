@@ -83,6 +83,19 @@ extension ViewReactor where Router == EmptyViewRouter {
     }
 }
 
+// MARK: - Auxiliary Implementation -
+
+struct ViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
+    let reactor: () -> Reactor
+    
+    func body(content: Content) -> some View {
+        content
+            .environmentObject(self.reactor().environment.object)
+            .environmentReactor(self.reactor())
+            .taskPipeline(self.reactor().environment.taskPipeline!)
+    }
+}
+
 // MARK: - API -
 
 @propertyWrapper
@@ -97,5 +110,13 @@ public struct Reactor<Base: ViewReactor>: DynamicProperty {
 extension Reactor where Base: InitiableViewReactor {
     public init() {
         self.init(wrappedValue: .init())
+    }
+}
+
+extension View {
+    public func attach<R: ViewReactor>(
+        _ reactor: @autoclosure @escaping () -> R
+    ) -> some View {
+        modifier(ViewReactorAttacher(reactor: reactor))
     }
 }
