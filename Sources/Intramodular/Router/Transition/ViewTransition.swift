@@ -19,6 +19,7 @@ public struct ViewTransition: ViewTransitionContext {
         _payload.transformViewIfPresent({ $0 = $0.mergeEnvironmentBuilder(environmentBuilder) })
     }
     
+    var animated: Bool = true
     var payloadViewName: ViewName?
     var environmentBuilder: EnvironmentBuilder
         

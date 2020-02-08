@@ -21,6 +21,8 @@ public struct ViewReactorEnvironment: DynamicProperty {
     
     let object = Object()
     
+    @State var refresh: Bool = false
+    
     @EnvironmentReactors() public var environmentReactors
     
     @Environment(\.self) var environment
@@ -31,6 +33,10 @@ public struct ViewReactorEnvironment: DynamicProperty {
     
     public init() {
         taskPipeline = .init(parent: parentTaskPipeline)
+    }
+    
+    func updateReactor() {
+        self.refresh.toggle()
     }
 }
 

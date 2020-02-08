@@ -13,7 +13,7 @@ public enum ViewReactorActionOrPlan<R: ViewReactor> {
     public func createTaskName() -> TaskName {
         switch self {
             case .action(let action):
-                return .init(action)
+                return action.createTaskName()
             case .plan(let plan):
                 return plan.createTaskName()
         }

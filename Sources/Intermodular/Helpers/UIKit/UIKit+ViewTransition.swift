@@ -126,9 +126,12 @@ extension UIViewController {
 }
 
 extension ViewTransition {
-    func triggerPublisher<VC: ViewCoordinator>(in window: UIWindow, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
+    func triggerPublisher<VC: ViewCoordinator>(
+        in window: UIWindow,
+        coordinator: VC
+    ) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         let transition = mergeCoordinator(coordinator)
-        
+        let animated = transition.animated
         if case .dynamic(let trigger) = transition.payload {
             return trigger()
         }

@@ -58,7 +58,9 @@ extension ViewReactor {
     
     @discardableResult
     public func dispatch(_ plan: Plan) -> Task<Void, Error> {
-        dispatcher(for: plan).dispatch()
+        environment.updateReactor()
+
+        return dispatcher(for: plan).dispatch()
     }
     
     public func dispatcher(for action: Action) -> ViewReactorDispatcher<Self> {
@@ -66,7 +68,9 @@ extension ViewReactor {
     }
     
     @discardableResult
-    public func dispatch(_ plan: Action) -> Task<Void, Error> {
-        dispatcher(for: plan).dispatch()
+    public func dispatch(_ action: Action) -> Task<Void, Error> {
+        environment.updateReactor()
+
+        return dispatcher(for: action).dispatch()
     }
 }

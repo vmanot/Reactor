@@ -10,7 +10,7 @@ public protocol opaque_ViewReactorAction {
     
 }
 
-public protocol ViewReactorAction: opaque_ViewReactorAction, Hashable {
+public protocol ViewReactorAction: opaque_ViewReactorAction, ViewReactorDispatchable {
     
 }
 

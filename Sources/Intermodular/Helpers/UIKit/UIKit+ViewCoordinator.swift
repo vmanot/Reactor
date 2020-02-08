@@ -39,7 +39,7 @@ open class UIWindowCoordinator<Route: ViewRoute>: BaseViewCoordinator<Route> {
     public override func triggerPublisher(for route: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         return transition(for: route)
             .mergeEnvironmentBuilder(environmentBuilder)
-            .triggerPublisher(in: window, animated: true, coordinator: self)
+            .triggerPublisher(in: window, coordinator: self)
             .handleSubscription({ _ in self.window.makeKeyAndVisible() })
             .eraseToAnyPublisher()
     }
