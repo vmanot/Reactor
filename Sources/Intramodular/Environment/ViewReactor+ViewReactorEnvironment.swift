@@ -18,13 +18,17 @@ extension ViewReactor {
 
 extension ViewReactor where Self: DynamicViewPresenter {
     public var presenting: DynamicViewPresenter? {
-        environment.dynamicViewPresenter?.presenting
+        environment.dynamicViewPresenter!.presenting
     }
     
     public var presented: DynamicViewPresenter? {
-        environment.dynamicViewPresenter?.presented
+        environment.dynamicViewPresenter!.presented
     }
 
+    public var presentedViewName: ViewName? {
+        environment.dynamicViewPresenter!.presentedViewName
+    }
+    
     /// Present a view.
     public func present(_ modal: AnyModalPresentation) {
         environment.dynamicViewPresenter!.present(modal)
