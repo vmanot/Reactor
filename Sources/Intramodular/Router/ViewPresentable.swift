@@ -13,18 +13,20 @@ public protocol Presentable: class {
 }
 
 extension Presentable {
-    public func appendEnvironmentObject<B: ObservableObject>(_ bindable: B) {
+    public func insertEnvironmentObject<B: ObservableObject>(_ bindable: B) {
         environmentBuilder.insert(bindable)
     }
     
-    public func appendEnvironmentBuilder(_ bindables: EnvironmentBuilder) {
-        environmentBuilder.merge(bindables)
+    public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) {
+        environmentBuilder.merge(builder)
     }
 }
 
 // MARK: - Concrete Implementations -
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
+
+private var environmentBuilderKey: Void = ()
 
 extension UIView: Presentable {
     public var presenter: Presentable? {
@@ -33,9 +35,9 @@ extension UIView: Presentable {
     
     public var environmentBuilder: EnvironmentBuilder {
         get {
-            .init()
+            objc_getAssociatedObject(self, &environmentBuilderKey) as? EnvironmentBuilder ?? .init()
         } set {
-            fatalError()
+            objc_setAssociatedObject(self, &environmentBuilderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
         }
     }
 }
@@ -47,9 +49,9 @@ extension UIViewController: Presentable {
     
     public var environmentBuilder: EnvironmentBuilder {
         get {
-            .init()
+            objc_getAssociatedObject(self, &environmentBuilderKey) as? EnvironmentBuilder ?? .init()
         } set {
-            fatalError()
+            objc_setAssociatedObject(self, &environmentBuilderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
         }
     }
 }

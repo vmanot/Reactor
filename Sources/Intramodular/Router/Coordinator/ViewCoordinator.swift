@@ -31,8 +31,8 @@ open class OpaqueBaseViewCoordinator: Presentable {
 
 open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, ViewCoordinator {
     open func addChild(_ presentable: Presentable) {
-        presentable.appendEnvironmentObject(AnyViewCoordinator(self))
-        presentable.appendEnvironmentBuilder(environmentBuilder)
+        presentable.insertEnvironmentObject(AnyViewCoordinator(self))
+        presentable.mergeEnvironmentBuilder(environmentBuilder)
         
         (presentable as? OpaqueBaseViewCoordinator)?.becomeChild(of: self)
         
@@ -42,9 +42,9 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
     override open func becomeChild(of parent: OpaqueBaseViewCoordinator) {
         presenter = parent
         
-        parent.appendEnvironmentObject(AnyViewCoordinator(self))
+        parent.insertEnvironmentObject(AnyViewCoordinator(self))
         
-        appendEnvironmentBuilder(parent.environmentBuilder)
+        mergeEnvironmentBuilder(parent.environmentBuilder)
         
         children.forEach({ ($0 as? OpaqueBaseViewCoordinator)?.becomeChild(of: self) })
     }

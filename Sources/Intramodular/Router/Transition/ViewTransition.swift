@@ -22,7 +22,7 @@ public struct ViewTransition: ViewTransitionContext {
     var animated: Bool = true
     var payloadViewName: ViewName?
     var environmentBuilder: EnvironmentBuilder
-        
+    
     init<V: View>(payload: ViewTransition.Payload, view: V) {
         self._payload = payload
         self.payloadViewName = (view as? opaque_NamedView)?.name
