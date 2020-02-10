@@ -6,7 +6,7 @@ import Merge
 import SwiftUIX
 
 @propertyWrapper
-public struct IndirectReactor<Reactor: ViewReactor>: DynamicProperty {
+public struct IndirectEnvironmentReactor<Reactor: ViewReactor>: DynamicProperty {
     @EnvironmentReactor var base: Reactor
     @OptionalObservedObject var object: ViewReactorEnvironment.Object?
     

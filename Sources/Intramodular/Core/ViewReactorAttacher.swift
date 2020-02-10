@@ -16,6 +16,17 @@ private struct ViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
     }
 }
 
+private struct IndirectViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
+    let reactor: () -> Reactor
+    
+    func body(content: Content) -> some View {
+        content
+            .environmentObject(self.reactor().environment.object)
+            .environmentReactor(self.reactor())
+            .taskPipeline(self.reactor().environment.taskPipeline)
+    }
+}
+
 // MARK: - API -
 
 extension View {
@@ -23,5 +34,11 @@ extension View {
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {
         modifier(ViewReactorAttacher(reactor: reactor))
+    }
+    
+    public func attach<R: ViewReactor>(
+        indirect reactor: @autoclosure @escaping () -> R
+    ) -> some View {
+        modifier(IndirectViewReactorAttacher(reactor: reactor))
     }
 }

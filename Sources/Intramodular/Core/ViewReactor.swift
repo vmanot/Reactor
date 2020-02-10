@@ -26,7 +26,7 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, DynamicPr
     typealias ActionTask = ViewReactorTaskPublisher<Self>
     typealias ActionTaskPlan = ViewReactorActionTaskPlan<Self>
     
-    var environment: ViewReactorEnvironment { get }
+    var environment: ViewReactorEnvironment { get set }
     var repository: Repository { get }
     var router: Router { get }
     
@@ -57,7 +57,7 @@ public protocol InitiableViewReactor: ViewReactor {
 
 // MARK: - Implementation -
 
-extension ViewReactor {
+extension ViewReactor  {
     public func setup() {
         
     }
@@ -65,9 +65,13 @@ extension ViewReactor {
     public func createEnvironmentBuilder() -> EnvironmentBuilder {
         .init()
     }
-    
-    public func update() {
-        environment.update(reactor: .init(wrappedValue: self))
+}
+
+extension ViewReactor where Self: DynamicProperty {
+    public mutating func update() {
+        let reactor = self
+        
+        environment.update(reactor: .init(wrappedValue: reactor))
     }
 }
 

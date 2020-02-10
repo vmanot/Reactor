@@ -8,7 +8,7 @@ import Task
 
 extension ViewReactor {
     public var cancellables: Cancellables {
-        environment.object.cancellables
+        environment.cancellables
     }
     
     public var environmentReactors: ViewReactors {
@@ -24,7 +24,7 @@ extension ViewReactor where Self: DynamicViewPresenter {
     public var presented: DynamicViewPresenter? {
         environment.dynamicViewPresenter!.presented
     }
-
+    
     public var presentedViewName: ViewName? {
         environment.dynamicViewPresenter!.presentedViewName
     }

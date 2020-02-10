@@ -20,6 +20,8 @@ public struct ViewReactorEnvironment: DynamicProperty {
     }
     
     let object = Object()
+    
+    @State var cancellables = Cancellables()
         
     @EnvironmentReactors() public var environmentReactors
     
@@ -49,7 +51,7 @@ extension ViewReactorEnvironment {
 
 @propertyWrapper
 public struct ReactorEnvironment: DynamicProperty {
-    public private(set) var wrappedValue = ViewReactorEnvironment()
+    public var wrappedValue = ViewReactorEnvironment()
     
     public init() {
         
