@@ -87,6 +87,24 @@ extension UIViewController {
                 }
             }
             
+            case .setNavigatable(let view): do {
+                if topMostPresentedViewController != nil {
+                    dismiss { // FIXME: Does not respect `animated`!
+                        self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
+                            completion()
+                        }
+                    }
+                } else if let viewController = nearestNavigationController {
+                    viewController.setViewControllers([CocoaHostingController(rootView: view)], animated: animated)
+                    
+                    completion()
+                } else if let window = self.view.window, window.rootViewController === self {
+                    window.rootViewController = UINavigationController(rootViewController: CocoaHostingController(rootView: view))
+                    
+                    completion()
+                }
+            }
+            
             case .linear(var transitions): do {
                 guard !transitions.isEmpty else {
                     return completion()
@@ -140,6 +158,10 @@ extension ViewTransition {
             switch transition.payload {
                 case .set(let view): do {
                     window.rootViewController = CocoaHostingController(rootView: view)
+                }
+                
+                case .setNavigatable(let view): do {
+                    window.rootViewController = UINavigationController(rootViewController: CocoaHostingController(rootView: view))
                 }
                 
                 default: do {

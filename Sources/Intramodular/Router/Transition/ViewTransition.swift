@@ -73,6 +73,10 @@ extension ViewTransition {
         .init(payload: .set(.init(view)), view: view)
     }
     
+    public static func setNavigatable<V: View>(_ view: V) -> ViewTransition {
+        .init(payload: .setNavigatable(.init(view)), view: view)
+    }
+
     public static func linear(_ transitions: [ViewTransition]) -> ViewTransition {
         .init(payload: .linear(transitions))
     }

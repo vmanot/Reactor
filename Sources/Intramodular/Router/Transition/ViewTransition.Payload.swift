@@ -17,6 +17,7 @@ extension ViewTransition {
         case pop
         
         case set(EnvironmentalAnyView)
+        case setNavigatable(EnvironmentalAnyView)
         
         case linear([ViewTransition])
         
@@ -41,6 +42,8 @@ extension ViewTransition.Payload {
                 case .pop:
                     return nil
                 case .set(let view):
+                    return view
+                case .setNavigatable(let view):
                     return view
                 case .linear:
                     return nil
@@ -67,6 +70,8 @@ extension ViewTransition.Payload {
                     break
                 case .set:
                     self = .set(newValue)
+                case .setNavigatable:
+                    self = .setNavigatable(newValue)
                 case .linear:
                     break
                 case .dynamic:
@@ -91,6 +96,8 @@ extension ViewTransition.Payload {
                 return self
             case .set(let view):
                 return .set(view.then(transform))
+            case .setNavigatable(let view):
+                return .setNavigatable(view.then(transform))
             case .linear(let transitions):
                 return .linear(transitions.map({ $0.transformViewIfPresent(transform) }))
             case .dynamic:
