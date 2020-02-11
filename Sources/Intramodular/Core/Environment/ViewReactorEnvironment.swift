@@ -11,18 +11,11 @@ import Task
 public struct ViewReactorEnvironment: DynamicProperty {
     final class Object: ObservableObject {
         @Published var cycle: Int = 0
-        
-        let cancellables = Cancellables()
-        
-        func update() {
-            cycle += 1
-        }
     }
     
-    let object = Object()
-    
+    @State var object = Object()
     @State var cancellables = Cancellables()
-        
+    
     @EnvironmentReactors() public var environmentReactors
     
     @Environment(\.self) var environment
@@ -38,10 +31,16 @@ public struct ViewReactorEnvironment: DynamicProperty {
 
 extension ViewReactorEnvironment {
     func update<R: ViewReactor>(reactor: ReactorReference<R>) {
-        self.object.update()
+        print(object.cycle)
+        
+        object.cycle += 1
         
         if object.cycle == 1 {
-            reactor.wrappedValue.router.environmentBuilder.insertEnvironmentReactor(reactor)
+            reactor.wrappedValue
+                .router
+                .environmentBuilder
+                .insertEnvironmentReactor(reactor)
+            
             reactor.wrappedValue.setup()
         }
     }

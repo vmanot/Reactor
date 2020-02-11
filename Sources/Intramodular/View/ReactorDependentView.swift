@@ -4,6 +4,7 @@
 
 import Merge
 import SwiftUIX
+import SwiftUI
 
 public protocol ReactorDependentView {
     associatedtype Reactor: ViewReactor
@@ -25,7 +26,9 @@ extension ReactorDependentView {
     }
     
     public func instantiate() -> some View {
-        InjectionInstantiatedReactorDependentView(base: self)
+        EnvironmentValueAccessView(\.viewReactors) { viewReactors in
+            self.instantiate(from: viewReactors[Reactor.self]!)
+        }
     }
 }
 
@@ -36,28 +39,8 @@ extension IndirectReactorDependentView {
     }
     
     public func instantiate() -> some View {
-        IndirectInjectionInstantiatedReactorDependentView(base: self)
-    }
-}
-
-// MARK: - Helpers -
-
-struct InjectionInstantiatedReactorDependentView<Base: ReactorDependentView>: View {
-    let base: Base
-    
-    @EnvironmentReactor var reactor: Base.Reactor
-    
-    var body: some View {
-        base.instantiate(from: reactor)
-    }
-}
-
-struct IndirectInjectionInstantiatedReactorDependentView<Base: IndirectReactorDependentView>: View {
-    let base: Base
-    
-    @IndirectEnvironmentReactor var reactor: Base.Reactor
-    
-    var body: some View {
-        base.instantiate(from: reactor)
+        EnvironmentValueAccessView(\.viewReactors) { viewReactors in
+            self.instantiate(from: viewReactors[Reactor.self]!)
+        }
     }
 }

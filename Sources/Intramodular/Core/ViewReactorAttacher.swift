@@ -10,7 +10,6 @@ private struct ViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .environmentObject(self.reactor().environment.object)
             .environmentReactor(self.reactor())
             .taskPipeline(self.reactor().environment.taskPipeline)
     }
