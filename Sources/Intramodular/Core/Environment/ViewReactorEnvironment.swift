@@ -31,8 +31,6 @@ public struct ViewReactorEnvironment: DynamicProperty {
 
 extension ViewReactorEnvironment {
     func update<R: ViewReactor>(reactor: ReactorReference<R>) {
-        print(object.cycle)
-        
         object.cycle += 1
         
         if object.cycle == 1 {

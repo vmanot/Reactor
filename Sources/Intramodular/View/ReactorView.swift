@@ -5,7 +5,7 @@
 import Merge
 import SwiftUIX
 
-public protocol ReactorView: ReactorDependentView, View {
+public protocol ReactorView: ReactorDependentView, NamedView {
     var reactor: Reactor { get }
 }
 

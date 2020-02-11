@@ -79,29 +79,4 @@ extension ViewTransition.Payload {
             }
         }
     }
-    
-    func transformViewIfPresent(_ transform: (inout EnvironmentalAnyView) -> Void) -> Self {
-        switch self {
-            case .present(let view):
-                return .present(view.then(transform))
-            case .replacePresented(let view):
-                return .replacePresented(with: view.then(transform))
-            case .dismiss:
-                return self
-            case .dismissView:
-                return self
-            case .push(let view):
-                return .push(view.then(transform))
-            case .pop:
-                return self
-            case .set(let view):
-                return .set(view.then(transform))
-            case .setNavigatable(let view):
-                return .setNavigatable(view.then(transform))
-            case .linear(let transitions):
-                return .linear(transitions.map({ $0.transformViewIfPresent(transform) }))
-            case .dynamic:
-                return self
-        }
-    }
 }

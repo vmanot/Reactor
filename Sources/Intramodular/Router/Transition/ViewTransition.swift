@@ -15,30 +15,36 @@ public struct ViewTransition: ViewTransitionContext {
     
     private var _payload: Payload
     
+    private var _payloadView: EnvironmentalAnyView? {
+        get {
+            _payload.view
+        } set {
+            _payload.view = newValue
+        }
+    }
+    
     var payload: Payload {
-        _payload.transformViewIfPresent({ $0 = $0.mergeEnvironmentBuilder(environmentBuilder) })
+        var result = _payload
+        
+        result.view = result.view?.mergeEnvironmentBuilder(environmentBuilder)
+        
+        return result
     }
     
     var animated: Bool = true
     var payloadViewName: ViewName?
+    var payloadViewType: Any.Type
     var environmentBuilder: EnvironmentBuilder
     
     init<V: View>(payload: ViewTransition.Payload, view: V) {
         self._payload = payload
         self.payloadViewName = (view as? opaque_NamedView)?.name
+        self.payloadViewType = type(of: view)
         self.environmentBuilder = .init()
     }
     
     init(payload: ViewTransition.Payload) {
         self.init(payload: payload, view: EmptyView())
-    }
-    
-    func transformViewIfPresent(_ transform: (inout EnvironmentalAnyView) -> Void) -> Self {
-        var result = self
-        
-        result._payload = _payload.transformViewIfPresent(transform)
-        
-        return result
     }
 }
 
@@ -76,7 +82,7 @@ extension ViewTransition {
     public static func setNavigatable<V: View>(_ view: V) -> ViewTransition {
         .init(payload: .setNavigatable(.init(view)), view: view)
     }
-
+    
     public static func linear(_ transitions: [ViewTransition]) -> ViewTransition {
         .init(payload: .linear(transitions))
     }
