@@ -27,7 +27,7 @@ extension UIViewController {
                         }
                     }
                 } else {
-                    self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
+                    presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                         completion()
                     }
                 }
@@ -50,8 +50,8 @@ extension UIViewController {
             }
             
             case .push(let view): do {
-                guard let viewController = self as? UINavigationController else {
-                    throw ViewRouterError.transitionError(.notANavigationController)
+                guard let viewController = nearestNavigationController else {
+                    throw ViewRouterError.transitionError(.navigationControllerMissing)
                 }
                 
                 viewController.pushViewController(CocoaHostingController(rootView: view), animated: animated) {
@@ -60,8 +60,8 @@ extension UIViewController {
             }
             
             case .pop: do {
-                guard let viewController = self as? UINavigationController else {
-                    throw ViewRouterError.transitionError(.notANavigationController)
+                guard let viewController = nearestNavigationController else {
+                    throw ViewRouterError.transitionError(.navigationControllerMissing)
                 }
                 
                 viewController.popViewController(animated: animated) {
@@ -72,11 +72,11 @@ extension UIViewController {
             case .set(let view): do {
                 if topMostPresentedViewController != nil {
                     dismiss { // FIXME: Does not respect `animated`!
-                        self.presentOnTop(view, named: transition.payloadViewName, animated: true) {
+                        self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                             completion()
                         }
                     }
-                } else if let viewController = self as? UINavigationController {
+                } else if let viewController = nearestNavigationController {
                     viewController.setViewControllers([CocoaHostingController(rootView: view)], animated: animated)
                     
                     completion()

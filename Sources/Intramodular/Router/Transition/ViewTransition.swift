@@ -10,7 +10,7 @@ public struct ViewTransition: ViewTransitionContext {
     public enum Error: Swift.Error {
         case isRoot
         case nothingToDismiss
-        case notANavigationController
+        case navigationControllerMissing
     }
     
     private var _payload: Payload
