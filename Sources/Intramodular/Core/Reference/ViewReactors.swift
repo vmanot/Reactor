@@ -28,7 +28,7 @@ public struct ViewReactors {
     }
     
     @discardableResult
-    public func dispatch(_ action: opaque_ViewReactorAction) -> Task<Void, Error>! {
-        value.values.compactMap({ $0().opaque_dispatch(action) }).first
+    public func dispatch(_ action: opaque_ViewReactorAction) -> Task<Void, Error> {
+        value.values.compactMap({ $0().opaque_dispatch(action) }).first!
     }
 }

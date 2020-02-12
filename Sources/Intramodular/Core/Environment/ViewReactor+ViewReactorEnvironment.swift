@@ -61,4 +61,8 @@ extension ViewReactor {
     public func status(of action: Action) -> OpaqueTask.StatusDescription? {
         environment.taskPipeline[.init(action)]?.statusDescription
     }
+    
+    public func cancel(action: Action) {
+        environment.taskPipeline[TaskName(action)]?.cancel()
+    }
 }
