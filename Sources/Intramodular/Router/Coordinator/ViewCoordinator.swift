@@ -79,12 +79,12 @@ public struct ReactorRouter<C: ViewCoordinator>: DynamicProperty {
     @EnvironmentReactors() var environmentReactors
     @EnvironmentObject public private(set) var _wrappedValue: AnyViewCoordinator<C.Route>
     
-    public var wrappedValue: AnyViewCoordinator<C.Route> {
+    public var wrappedValue: C {
         _wrappedValue.environmentBuilder.transformEnvironment {
             $0.viewReactors.insert(self.environmentReactors)
         }
         
-        return _wrappedValue
+        return _wrappedValue.base as! C
     }
     
     public init() {

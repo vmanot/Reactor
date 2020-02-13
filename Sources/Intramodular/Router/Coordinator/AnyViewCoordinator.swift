@@ -7,7 +7,7 @@ import Foundation
 import SwiftUIX
 
 open class AnyViewCoordinator<Route: ViewRoute>: ViewCoordinator {
-    private let base: Presentable
+    public let base: Presentable
     
     public var presenter: Presentable? {
         return base.presenter
