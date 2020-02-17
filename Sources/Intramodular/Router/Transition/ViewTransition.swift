@@ -26,7 +26,9 @@ public struct ViewTransition: ViewTransitionContext {
     var payload: Payload {
         var result = _payload
         
-        result.view = result.view?.mergeEnvironmentBuilder(environmentBuilder)
+        result.mutateViewInPlace({
+            $0.mergeEnvironmentBuilderInPlace(environmentBuilder)
+        })
         
         return result
     }
@@ -110,5 +112,51 @@ extension ViewTransition {
     public func mergeCoordinator<VC: ViewCoordinator>(_ coordinator: VC) -> Self {
         mergeEnvironmentBuilder(.object(coordinator))
             .mergeEnvironmentBuilder(.object(AnyViewCoordinator(coordinator)))
+    }
+}
+
+// MARK: - Helpers -
+
+extension ViewTransition.Payload {
+    mutating func mutateViewInPlace(_ body: (inout EnvironmentalAnyView) -> Void) {
+        switch self {
+            case .linear(let transitions):
+                self = .linear(transitions.map({
+                    var transition = $0
+                    
+                    transition.mutateViewInPlace(body)
+                    
+                    return transition
+                }))
+            default: do {
+                if var view = self.view {
+                    body(&view)
+                    
+                    self.view = view
+                }
+            }
+        }
+    }
+}
+
+extension ViewTransition {
+    mutating func mutateViewInPlace(_ body: (inout EnvironmentalAnyView) -> Void) {
+        switch _payload {
+            case .linear(let transitions):
+                _payload = .linear(transitions.map({
+                    var transition = $0
+                    
+                    transition.mutateViewInPlace(body)
+                    
+                    return transition
+                }))
+            default: do {
+                if var view = payload.view {
+                    body(&view)
+                    
+                    _payload.view = view
+                }
+            }
+        }
     }
 }
