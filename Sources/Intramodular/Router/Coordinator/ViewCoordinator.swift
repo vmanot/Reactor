@@ -30,6 +30,18 @@ open class OpaqueBaseViewCoordinator: Presentable {
 }
 
 open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, ViewCoordinator {
+    public func insertEnvironmentObject<B: ObservableObject>(_ bindable: B) {
+        environmentBuilder.insert(bindable)
+        
+        children.forEach({ $0.insertEnvironmentObject(bindable) })
+    }
+    
+    public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) {
+        environmentBuilder.merge(builder)
+        
+        children.forEach({ $0.mergeEnvironmentBuilder(builder) })
+    }
+    
     open func addChild(_ presentable: Presentable) {
         presentable.insertEnvironmentObject(AnyViewCoordinator(self))
         presentable.mergeEnvironmentBuilder(environmentBuilder)
