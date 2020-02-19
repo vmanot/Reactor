@@ -72,11 +72,11 @@ extension ViewTransition {
     public static func push<V: View>(_ view: V) -> ViewTransition {
         .init(payload: .push(.init(view)), view: view)
     }
-
+    
     public static func pushOrPresent<V: View>(_ view: V) -> ViewTransition {
         .init(payload: .pushOrPresent(.init(view)), view: view)
     }
-
+    
     public static var pop: ViewTransition {
         .init(payload: .pop)
     }
