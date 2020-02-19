@@ -69,4 +69,8 @@ extension ViewReactor {
     public func cancel(action: Action) {
         environment.taskPipeline[action.createTaskName()]?.cancel()
     }
+    
+    public func cancelAllTasks() {
+        environment.taskPipeline.cancelAllTasks()
+    }
 }
