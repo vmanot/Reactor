@@ -14,6 +14,7 @@ extension ViewTransition {
         case dismissView(named: ViewName)
         
         case push(EnvironmentalAnyView)
+        case pushOrPresent(EnvironmentalAnyView)
         case pop
         
         case set(EnvironmentalAnyView)
@@ -38,6 +39,8 @@ extension ViewTransition.Payload {
                 case .dismissView:
                     return nil
                 case .push(let view):
+                    return view
+                case .pushOrPresent(let view):
                     return view
                 case .pop:
                     return nil
@@ -66,6 +69,8 @@ extension ViewTransition.Payload {
                     break
                 case .push:
                     self = .push(newValue)
+                case .pushOrPresent:
+                    self = .pushOrPresent(newValue)
                 case .pop:
                     break
                 case .set:

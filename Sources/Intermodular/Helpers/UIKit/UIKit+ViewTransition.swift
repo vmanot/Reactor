@@ -50,12 +50,30 @@ extension UIViewController {
             }
             
             case .push(let view): do {
-                guard let viewController = nearestNavigationController else {
+                guard let navigationController = nearestNavigationController else {
                     throw ViewRouterError.transitionError(.navigationControllerMissing)
                 }
                 
-                viewController.pushViewController(CocoaHostingController(rootView: view), animated: animated) {
+                navigationController.pushViewController(
+                    CocoaHostingController(rootView: view),
+                    animated: animated
+                ) {
                     completion()
+                }
+            }
+            
+            case .pushOrPresent(let view): do {
+                if let navigationController = nearestNavigationController {
+                    navigationController.pushViewController(
+                        CocoaHostingController(rootView: view),
+                        animated: animated
+                    ) {
+                        completion()
+                    }
+                } else {
+                    presentOnTop(view, named: transition.payloadViewName, animated: animated) {
+                        completion()
+                    }
                 }
             }
             
