@@ -88,7 +88,7 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
 
 @propertyWrapper
 public struct ReactorRouter<C: ViewCoordinator>: DynamicProperty {
-    @EnvironmentReactors() var environmentReactors
+    @Environment(\.viewReactors) var environmentReactors
     @EnvironmentObject public var _wrappedValue: AnyViewCoordinator<C.Route>
     
     public var wrappedValue: C {

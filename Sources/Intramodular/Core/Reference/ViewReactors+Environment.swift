@@ -16,7 +16,7 @@ public struct EnvironmentReactors: DynamicProperty {
 
 @propertyWrapper
 public struct EnvironmentReactor<Reactor: ViewReactor>: DynamicProperty {
-    @EnvironmentReactors() var environmentReactors
+    @Environment(\.viewReactors) var environmentReactors
     
     public var wrappedValue: Reactor {
         environmentReactors[Reactor.self]!

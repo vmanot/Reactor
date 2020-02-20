@@ -6,7 +6,7 @@ import Merge
 import SwiftUIX
 
 public struct ViewReactorsView<Content: View>: View {
-    @EnvironmentReactors() private var environmentReactors
+    @Environment(\.viewReactors) private var environmentReactors
     
     public var content: (ViewReactors) -> Content
     
