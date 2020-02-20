@@ -16,13 +16,13 @@ public struct ViewReactorEnvironment: DynamicProperty {
     @State var object = Object()
     @State var cancellables = Cancellables()
     
-    @EnvironmentReactors() public var environmentReactors
+    @Environment(\.viewReactors) public var environmentReactors
     
     @Environment(\.self) var environment
     @Environment(\.dynamicViewPresenter) var dynamicViewPresenter
     
     @OptionalEnvironmentObject var parentTaskPipeline: TaskPipeline?
-    @OptionalObservedObject var taskPipeline: TaskPipeline!
+    @OptionalObservedObject var taskPipeline: TaskPipeline?
     
     var taskPipelineUnwrapped: TaskPipeline {
         taskPipeline!
