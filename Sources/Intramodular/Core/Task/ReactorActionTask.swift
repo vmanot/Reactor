@@ -7,7 +7,7 @@ import SwiftUIX
 import Task
 
 public final class ReactorActionTask<Reactor: ViewReactor>: MutableTask<Void, Error> {
-    var reactor: ReactorReference<Reactor>?
+    var reactor: ReactorReference<Reactor>? = nil
     
     public func attach(_ reactor: @autoclosure @escaping () -> Reactor) {
         self.reactor = .init(wrappedValue: reactor())

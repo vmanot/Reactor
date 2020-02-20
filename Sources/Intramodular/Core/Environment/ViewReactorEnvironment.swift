@@ -24,6 +24,10 @@ public struct ViewReactorEnvironment: DynamicProperty {
     @OptionalEnvironmentObject var parentTaskPipeline: TaskPipeline?
     @OptionalObservedObject var taskPipeline: TaskPipeline!
     
+    var taskPipelineUnwrapped: TaskPipeline {
+        taskPipeline!
+    }
+    
     public init() {
         taskPipeline = .init(parent: parentTaskPipeline)
     }

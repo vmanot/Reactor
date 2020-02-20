@@ -4,25 +4,36 @@
 
 import Merge
 import SwiftUIX
+import Task
 
 private struct ViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
     let reactor: () -> Reactor
     
+    var taskPipeline: TaskPipeline {
+        reactor().environment.taskPipelineUnwrapped
+    }
+    
     func body(content: Content) -> some View {
         content
             .environmentReactor(self.reactor())
-            .taskPipeline(self.reactor().environment.taskPipeline)
+            .environment(\.taskPipeline, taskPipeline)
+            .environmentObject(taskPipeline)
     }
 }
 
 private struct IndirectViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
     let reactor: () -> Reactor
     
+    var taskPipeline: TaskPipeline {
+        reactor().environment.taskPipelineUnwrapped
+    }
+    
     func body(content: Content) -> some View {
         content
             .environmentObject(self.reactor().environment.object)
             .environmentReactor(self.reactor())
-            .taskPipeline(self.reactor().environment.taskPipeline)
+            .environment(\.taskPipeline, taskPipeline)
+            .environmentObject(taskPipeline)
     }
 }
 
