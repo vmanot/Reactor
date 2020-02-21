@@ -20,7 +20,7 @@ extension UIViewController {
             }
             
             case .replacePresented(let view): do {
-                if let viewController = topMostPresentedViewController?.presentingViewController {
+                if let viewController = topmostPresentedViewController?.presentingViewController {
                     viewController.dismiss { // FIXME: Does not respect `animated`!
                         viewController.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                             completion()
@@ -50,7 +50,7 @@ extension UIViewController {
             }
             
             case .push(let view): do {
-                guard let navigationController = nearestNavigationController else {
+                guard let navigationController = topmostNavigationController else {
                     throw ViewRouterError.transitionError(.navigationControllerMissing)
                 }
                 
@@ -63,7 +63,7 @@ extension UIViewController {
             }
             
             case .pushOrPresent(let view): do {
-                if let navigationController = nearestNavigationController {
+                if let navigationController = topmostNavigationController {
                     navigationController.pushViewController(
                         CocoaHostingController(rootView: view),
                         animated: animated
@@ -78,7 +78,7 @@ extension UIViewController {
             }
             
             case .pop: do {
-                guard let viewController = nearestNavigationController else {
+                guard let viewController = topmostNavigationController else {
                     throw ViewRouterError.transitionError(.navigationControllerMissing)
                 }
                 
@@ -88,13 +88,13 @@ extension UIViewController {
             }
             
             case .set(let view): do {
-                if topMostPresentedViewController != nil {
+                if topmostPresentedViewController != nil {
                     dismiss { // FIXME: Does not respect `animated`!
                         self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                             completion()
                         }
                     }
-                } else if let viewController = nearestNavigationController {
+                } else if let viewController = topmostNavigationController {
                     viewController.setViewControllers([CocoaHostingController(rootView: view)], animated: animated)
                     
                     completion()
@@ -106,13 +106,13 @@ extension UIViewController {
             }
             
             case .setNavigatable(let view): do {
-                if topMostPresentedViewController != nil {
+                if topmostPresentedViewController != nil {
                     dismiss { // FIXME: Does not respect `animated`!
                         self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                             completion()
                         }
                     }
-                } else if let viewController = nearestNavigationController {
+                } else if let viewController = topmostNavigationController {
                     viewController.setViewControllers([CocoaHostingController(rootView: view)], animated: animated)
                     
                     completion()
@@ -157,7 +157,7 @@ extension UIViewController {
         animated: Bool,
         completion: @escaping () -> Void
     ) {
-        topMostViewController.present(view, named: viewName, completion: completion)
+        topmostViewController.present(view, named: viewName, completion: completion)
     }
 }
 

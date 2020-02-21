@@ -7,7 +7,7 @@
 import UIKit
 
 extension UIViewController {
-    var topMostPresentedViewController: UIViewController? {
+    var topmostPresentedViewController: UIViewController? {
         var topController = self
         
         while let newTopController = topController.presentedViewController {
@@ -17,8 +17,8 @@ extension UIViewController {
         return topController
     }
     
-    var topMostViewController: UIViewController {
-        topMostPresentedViewController ?? self
+    var topmostViewController: UIViewController {
+        topmostPresentedViewController ?? self
     }
 }
 
