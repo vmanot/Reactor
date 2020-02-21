@@ -22,7 +22,7 @@ public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Err
         
         self.cancellable = .init(.init(self))
         
-        reactor.cancellables.insert(.init(cancellable))
+        reactor.environment.taskPipeline!.cancellables.insert(.init(cancellable))
     }
     
     override public func receive(task: Task<Void, Error>) {

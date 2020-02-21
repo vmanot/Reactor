@@ -14,7 +14,6 @@ public struct ViewReactorEnvironment: DynamicProperty {
     }
     
     @State var object = Object()
-    @State var cancellables = Cancellables()
     
     @Environment(\.viewReactors) public var environmentReactors
     

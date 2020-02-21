@@ -6,11 +6,7 @@ import Merge
 import SwiftUIX
 import Task
 
-extension ViewReactor {
-    public var cancellables: Cancellables {
-        environment.cancellables
-    }
-    
+extension ViewReactor {    
     public var environmentReactors: ViewReactors {
         environment.environmentReactors
     }
