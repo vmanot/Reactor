@@ -23,6 +23,8 @@ extension ViewTransition {
         case linear([ViewTransition])
         
         case dynamic(() -> AnyPublisher<ViewTransitionContext, ViewRouterError>)
+        
+        case none
     }
 }
 
@@ -52,6 +54,8 @@ extension ViewTransition.Payload {
                     return nil
                 case .dynamic:
                     return nil
+                case .none:
+                    return nil
             }
         } set {
             guard let newValue = newValue else {
@@ -80,6 +84,8 @@ extension ViewTransition.Payload {
                 case .linear:
                     break
                 case .dynamic:
+                    break
+                case .none:
                     break
             }
         }

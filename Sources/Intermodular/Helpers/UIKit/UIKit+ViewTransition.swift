@@ -148,6 +148,9 @@ extension UIViewController {
             case .dynamic: do {
                 fatalError()
             }
+            
+            case .none:
+                break
         }
     }
     
