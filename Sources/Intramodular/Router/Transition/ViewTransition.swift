@@ -102,6 +102,10 @@ extension ViewTransition {
     ) -> ViewTransition {
         .init(payload: .dynamic(body))
     }
+    
+    public static var none: ViewTransition {
+        .init(payload: .none)
+    }
 }
 
 extension ViewTransition {
