@@ -51,10 +51,6 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, DynamicPr
     func dispatch(_: Plan) -> Task<Void, Error>
 }
 
-public protocol InitiableViewReactor: ViewReactor {
-    init()
-}
-
 // MARK: - Implementation -
 
 extension ViewReactor  {
@@ -84,22 +80,5 @@ extension ViewReactor where Repository == EmptyRepository {
 extension ViewReactor where Router == EmptyViewRouter {
     public var router: EmptyViewRouter {
         .init()
-    }
-}
-
-// MARK: - API -
-
-@propertyWrapper
-public struct Reactor<Base: ViewReactor>: DynamicProperty {
-    public var wrappedValue: Base
-    
-    public init(wrappedValue: Base) {
-        self.wrappedValue = wrappedValue
-    }
-}
-
-extension Reactor where Base: InitiableViewReactor {
-    public init() {
-        self.init(wrappedValue: .init())
     }
 }
