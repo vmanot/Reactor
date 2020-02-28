@@ -7,6 +7,6 @@ import Swift
 import SwiftUIX
 import Task
 
-public protocol ReactorObject: ObservableObject, Reactor {
+public protocol ReactorEnvironment {
     
 }

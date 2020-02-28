@@ -6,7 +6,7 @@ import Merge
 import SwiftUIX
 
 @propertyWrapper
-public struct ReactorReference<R: ViewReactor>: DynamicProperty {
+public struct ReactorReference<R: Reactor>: DynamicProperty {
     private var _wrappedValue: () -> R
     
     public var wrappedValue: R {

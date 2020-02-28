@@ -6,13 +6,13 @@ import Merge
 import SwiftUIX
 import Task
 
-public protocol ViewReactorPlan: Hashable {
+public protocol ReactorPlan: Hashable {
     
 }
 
 // MARK: - Extensions -
 
-extension ViewReactorPlan {
+extension ReactorPlan {
     public func createTaskName() -> TaskName {
         return .init(self)
     }
@@ -20,11 +20,11 @@ extension ViewReactorPlan {
 
 // MARK: - Helpers -
 
-public enum EmptyViewReactorPlan: ViewReactorPlan {
+public enum EmptyReactorPlan: ReactorPlan {
     
 }
 
-extension ViewReactor where Plan == EmptyViewReactorPlan {
+extension ViewReactor where Plan == EmptyReactorPlan {
     public func taskPlan(for _: Plan) -> ReactorActionTaskPlan<Self> {
         
     }

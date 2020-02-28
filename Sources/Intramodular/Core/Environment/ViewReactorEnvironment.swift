@@ -17,8 +17,6 @@ public struct ViewReactorEnvironment: ViewReactorComponent {
     @State var object = Object()
     
     @Environment(\.viewReactors) public var environmentReactors
-    
-    @Environment(\.self) var environment
     @Environment(\.dynamicViewPresenter) var dynamicViewPresenter
     
     @OptionalEnvironmentObject var parentTaskPipeline: TaskPipeline?

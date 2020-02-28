@@ -10,7 +10,7 @@ public protocol opaque_ReactorAction {
     
 }
 
-public protocol ReactorAction: opaque_ReactorAction, ViewReactorDispatchable {
+public protocol ReactorAction: opaque_ReactorAction, ReactorDispatchable {
     
 }
 

@@ -12,5 +12,5 @@ public protocol opaque_Reactor {
 
 public protocol Reactor: opaque_Reactor {
     associatedtype Action: ReactorAction
-    associatedtype Plan: ViewReactorPlan = EmptyViewReactorPlan
+    associatedtype Plan: ReactorPlan = EmptyReactorPlan
 }

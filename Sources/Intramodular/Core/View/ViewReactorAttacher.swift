@@ -30,7 +30,6 @@ private struct IndirectViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .environmentObject(self.reactor().environment.object)
             .environmentReactor(self.reactor())
             .environment(\.taskPipeline, taskPipeline)
             .environmentObject(taskPipeline)
