@@ -57,6 +57,6 @@ extension ReactorActionTask where R: ViewReactor {
 
 extension Publisher {
     public func eraseToActionTask<R: Reactor>() -> ReactorActionTask<R> {
-        .init(body: { _ in self.sink() })
+        .init(mapTo(()).eraseError())
     }
 }
