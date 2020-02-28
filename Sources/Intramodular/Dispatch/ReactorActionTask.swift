@@ -10,6 +10,10 @@ public final class ReactorActionTask<R: Reactor>: ParametrizedTask<ReactorRefere
     public required convenience init(nilLiteral: ()) {
         self.init(action: { })
     }
+    
+    override public func didSend(status: Status) {
+        
+    }
 }
 
 extension ReactorActionTask {

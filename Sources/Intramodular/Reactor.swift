@@ -15,14 +15,14 @@ public protocol Reactor: opaque_Reactor {
     associatedtype Plan: ReactorPlan = EmptyReactorPlan
     
     typealias ActionTaskPlan = ReactorActionTaskPlan<Self>
-
+    
     /// Dispatch an action.
     @discardableResult
     func dispatch(_: Action) -> Task<Void, Error>
-        
+    
     /// Produce a task plan for a given plan.
     func taskPlan(for _: Plan) -> ActionTaskPlan
-
+    
     /// Dispatch an action plan.
     @discardableResult
     func dispatch(_: Plan) -> Task<Void, Error>
