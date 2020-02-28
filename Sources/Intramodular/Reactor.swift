@@ -10,12 +10,6 @@ public protocol opaque_Reactor {
     func opaque_dispatch(_ action: opaque_ReactorAction) -> Task<Void, Error>?
 }
 
-extension opaque_Reactor where Self: Reactor {
-    public func opaque_dispatch(_ action: opaque_ReactorAction) -> Task<Void, Error>? {
-        (action as? Action).map(dispatch)
-    }
-}
-
 public protocol Reactor: opaque_Reactor {
     associatedtype Action: ReactorAction
     associatedtype Plan: ReactorPlan = EmptyReactorPlan
@@ -32,4 +26,12 @@ public protocol Reactor: opaque_Reactor {
     /// Dispatch an action plan.
     @discardableResult
     func dispatch(_: Plan) -> Task<Void, Error>
+}
+
+// MARK: - Implementation -
+
+extension opaque_Reactor where Self: Reactor {
+    public func opaque_dispatch(_ action: opaque_ReactorAction) -> Task<Void, Error>? {
+        (action as? Action).map(dispatch)
+    }
 }
