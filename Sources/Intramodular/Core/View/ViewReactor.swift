@@ -6,17 +6,11 @@ import Merge
 import SwiftUIX
 import Task
 
-public protocol opaque_ViewReactor {
-    func opaque_dispatch(_ action: opaque_ReactorAction) -> Task<Void, Error>?
+public protocol opaque_ViewReactor: opaque_Reactor {
+
 }
 
-extension opaque_ViewReactor where Self: ViewReactor {
-    public func opaque_dispatch(_ action: opaque_ReactorAction) -> Task<Void, Error>? {
-        (action as? Action).map(dispatch)
-    }
-}
-
-public protocol ViewReactor: opaque_ViewReactor, Reactor, DynamicViewPresenter, DynamicProperty {
+public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, Reactor, ViewReactorComponent {
     associatedtype Repository: ViewReactorRepository = EmptyRepository
     associatedtype Router: ViewRouter = EmptyViewRouter
     associatedtype Subview: Hashable = Never
@@ -36,17 +30,6 @@ public protocol ViewReactor: opaque_ViewReactor, Reactor, DynamicViewPresenter, 
     
     /// Produce a task for a given action.
     func task(for _: Action) -> ActionTask
-    
-    /// Dispatch an action.
-    @discardableResult
-    func dispatch(_: Action) -> Task<Void, Error>
-    
-    /// Produce a task plan for a given plan.
-    func taskPlan(for _: Plan) -> ActionTaskPlan
-    
-    /// Dispatch an action plan.
-    @discardableResult
-    func dispatch(_: Plan) -> Task<Void, Error>
 }
 
 // MARK: - Implementation -
