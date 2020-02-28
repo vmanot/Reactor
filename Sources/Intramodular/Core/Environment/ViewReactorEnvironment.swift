@@ -8,7 +8,8 @@ import SwiftUIX
 import SwiftUI
 import Task
 
-public struct ViewReactorEnvironment: DynamicProperty {
+@propertyWrapper
+public struct ViewReactorEnvironment: ViewReactorComponent {
     final class Object: ObservableObject {
         @Published var cycle: Int = 0
     }
@@ -25,6 +26,18 @@ public struct ViewReactorEnvironment: DynamicProperty {
     
     var taskPipelineUnwrapped: TaskPipeline {
         taskPipeline!
+    }
+    
+    public var wrappedValue: Self {
+        get {
+            self
+        } set {
+            self = newValue
+        }
+    }
+    
+    public init(wrappedValue: Self = .init()) {
+        self.wrappedValue = wrappedValue
     }
     
     public init() {
@@ -44,17 +57,6 @@ extension ViewReactorEnvironment {
             
             reactor.wrappedValue.setup()
         }
-    }
-}
-
-// MARK: - API -
-
-@propertyWrapper
-public struct ReactorEnvironment: DynamicProperty {
-    public var wrappedValue = ViewReactorEnvironment()
-    
-    public init() {
-        
     }
 }
 

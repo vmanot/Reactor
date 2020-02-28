@@ -16,11 +16,11 @@ public struct ExampleView: ReactorView {
 
 extension ExampleView {
     public struct Reactor: ViewReactor {
-        public enum Action: ViewReactorAction {
+        public enum Action: ReactorAction {
             
         }
         
-        @ReactorEnvironment() public var environment
+        @ViewReactorEnvironment() public var environment
     }
 }
 

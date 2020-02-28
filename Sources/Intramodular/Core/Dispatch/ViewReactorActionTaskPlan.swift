@@ -5,7 +5,7 @@
 import Merge
 import SwiftUIX
 
-public enum ViewReactorActionTaskPlan<R: ViewReactor> {
+public enum ReactorActionTaskPlan<R: ViewReactor> {
     case linear([R.Action])
     
     public static func linear(_ actions: R.Action...) -> Self {

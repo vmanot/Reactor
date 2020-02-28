@@ -25,7 +25,7 @@ public enum EmptyViewReactorPlan: ViewReactorPlan {
 }
 
 extension ViewReactor where Plan == EmptyViewReactorPlan {
-    public func taskPlan(for _: Plan) -> ViewReactorActionTaskPlan<Self> {
+    public func taskPlan(for _: Plan) -> ReactorActionTaskPlan<Self> {
         
     }
 }

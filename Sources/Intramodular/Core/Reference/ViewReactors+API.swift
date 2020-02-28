@@ -38,7 +38,7 @@ extension EnvironmentValues {
 // MARK: - API -
 
 extension View {
-    public func onAppear(dispatch action: opaque_ViewReactorAction) -> some View {
+    public func onAppear(dispatch action: opaque_ReactorAction) -> some View {
         ViewReactorsView { reactors in
             self.onAppear {
                 reactors.dispatch(action)

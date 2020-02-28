@@ -6,7 +6,7 @@ import Merge
 import SwiftUIX
 import Task
 
-public enum ViewReactorActionOrPlan<R: ViewReactor> {
+public enum ReactorActionOrPlan<R: Reactor> {
     case action(R.Action)
     case plan(R.Plan)
     

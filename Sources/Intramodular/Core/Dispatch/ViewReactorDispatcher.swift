@@ -11,7 +11,7 @@ public struct ViewReactorDispatcher<R: ViewReactor>: Publisher {
     public typealias Failure = Task<Void, Error>.Failure
     
     public let reactor: R
-    public let dispatchable: ViewReactorActionOrPlan<R>
+    public let dispatchable: ReactorActionOrPlan<R>
     
     public func receive<S: Subscriber>(
         subscriber: S

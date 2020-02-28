@@ -6,7 +6,7 @@ import Merge
 import SwiftUIX
 import Task
 
-extension ViewReactor {    
+extension ViewReactor {
     public var environmentReactors: ViewReactors {
         environment.environmentReactors
     }
@@ -55,7 +55,9 @@ extension ViewReactor where Self: DynamicViewPresenter {
 
 extension ViewReactor {
     public func status(of action: Action) -> OpaqueTask.StatusDescription? {
-        environment.taskPipelineUnwrapped[action.createTaskName()]?.statusDescription
+        environment
+            .taskPipelineUnwrapped[action.createTaskName()]?
+            .statusDescription
     }
     
     public func lastStatus(of action: Action) -> OpaqueTask.StatusDescription? {

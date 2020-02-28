@@ -8,7 +8,7 @@ import Task
 
 /// A subscriber that attaches to a `ViewReactorTaskPublisher`.
 public class ViewReactorTaskSubscriber<R: ViewReactor>: TaskSubscriber<Void, Error> {
-    public typealias ActionOrPlan = ViewReactorActionOrPlan<R>
+    public typealias ActionOrPlan = ReactorActionOrPlan<R>
     
     private var reactor: R
     private var dispatchable: ActionOrPlan
