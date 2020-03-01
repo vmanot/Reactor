@@ -32,27 +32,6 @@ extension ReactorActionTask {
     }
 }
 
-extension ReactorActionTask {
-    public static func trigger<Router: ViewRouter>(
-        _ route: Router.Route,
-        in router: Router
-    ) -> Self {
-        Self.action {
-            router.trigger(route)
-        }
-    }
-}
-
-extension ReactorActionTask where R: ViewReactor {
-    public static func trigger(_ route: R.Router.Route) -> Self {
-        Self.action {
-            $0.unwrap {
-                $0.wrappedValue.router.trigger(route)
-            }
-        }
-    }
-}
-
 // MARK: - Helpers -
 
 extension Publisher {

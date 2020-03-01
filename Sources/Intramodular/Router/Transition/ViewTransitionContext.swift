@@ -7,5 +7,5 @@ import Foundation
 import SwiftUIX
 
 public protocol ViewTransitionContext {
-    
+    var view: EnvironmentalAnyView? { get }
 }

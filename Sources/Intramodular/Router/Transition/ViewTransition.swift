@@ -6,7 +6,7 @@ import Merge
 import Foundation
 import SwiftUIX
 
-public struct ViewTransition: ViewTransitionContext {
+public struct ViewTransition {
     public enum Error: Swift.Error {
         case isRoot
         case nothingToDismiss
@@ -47,6 +47,14 @@ public struct ViewTransition: ViewTransitionContext {
     
     init(payload: ViewTransition.Payload) {
         self.init(payload: payload, view: EmptyView())
+    }
+}
+
+// MARK: - Protocol Implementations -
+
+extension ViewTransition: ViewTransitionContext {
+    public var view: EnvironmentalAnyView? {
+        payload.view
     }
 }
 
