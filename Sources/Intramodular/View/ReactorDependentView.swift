@@ -13,10 +13,6 @@ public protocol ReactorDependentView: View {
     func makeBody(reactor: Reactor) -> ReactorViewBody
 }
 
-public protocol IndirectReactorDependentView: ReactorDependentView {
-    
-}
-
 // MARK: - API -
 
 extension ReactorDependentView {
@@ -29,18 +25,5 @@ extension ReactorDependentView {
     public func instantiate(from reactor: Reactor) -> some View {
         makeBody(reactor: reactor)
             .attach(reactor)
-    }
-}
-
-extension IndirectReactorDependentView {
-    public func instantiate(from reactor: Reactor) -> some View {
-        makeBody(reactor: reactor)
-            .attach(indirect: reactor)
-    }
-    
-    public func instantiate() -> some View {
-        EnvironmentValueAccessView(\.viewReactors) { viewReactors in
-            self.instantiate(from: viewReactors[Reactor.self]!)
-        }
     }
 }

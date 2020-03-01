@@ -44,14 +44,6 @@ extension ViewReactor  {
     }
 }
 
-extension ViewReactor where Self: DynamicProperty {
-    public mutating func update() {
-        let reactor = self
-        
-        environment.update(reactor: .init(wrappedValue: reactor))
-    }
-}
-
 extension ViewReactor where Repository == EmptyRepository {
     public var repository: Repository {
         .init()

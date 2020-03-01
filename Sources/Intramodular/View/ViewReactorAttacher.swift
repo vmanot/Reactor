@@ -14,22 +14,14 @@ private struct ViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
     }
     
     func body(content: Content) -> some View {
-        content
-            .environmentReactor(self.reactor())
-            .environment(\.taskPipeline, taskPipeline)
-            .environmentObject(taskPipeline)
-    }
-}
-
-private struct IndirectViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
-    let reactor: () -> Reactor
-    
-    var taskPipeline: TaskPipeline {
-        reactor().environment.taskPipelineUnwrapped
-    }
-    
-    func body(content: Content) -> some View {
-        content
+        if !reactor().environment.isSetup { // FIXME?
+            DispatchQueue.main.async {
+                self.reactor().environment.$isSetup.wrappedValue = true
+                self.reactor().setup()
+            }
+        }
+        
+        return content
             .environmentReactor(self.reactor())
             .environment(\.taskPipeline, taskPipeline)
             .environmentObject(taskPipeline)
@@ -43,11 +35,5 @@ extension View {
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {
         modifier(ViewReactorAttacher(reactor: reactor))
-    }
-    
-    public func attach<R: ViewReactor>(
-        indirect reactor: @autoclosure @escaping () -> R
-    ) -> some View {
-        modifier(IndirectViewReactorAttacher(reactor: reactor))
     }
 }
