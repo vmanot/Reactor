@@ -39,6 +39,17 @@ public struct ViewReactorEnvironment: ViewReactorComponent {
     }
 }
 
+extension ViewReactorEnvironment {
+    func update<R: ViewReactor>(reactor: ReactorReference<R>) {
+        if !isSetup {
+            reactor.wrappedValue
+                .router
+                .environmentBuilder
+                .insertEnvironmentReactor(reactor)
+        }
+    }
+}
+
 // MARK: - Auxiliary Implementation -
 
 extension EnvironmentBuilder {
