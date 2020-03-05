@@ -14,6 +14,7 @@ public protocol Reactor: opaque_Reactor {
     associatedtype Action: ReactorAction
     associatedtype Plan: ReactorPlan = EmptyReactorPlan
     
+    typealias ActionTask = ReactorActionTask<Self>
     typealias ActionTaskPlan = ReactorActionTaskPlan<Self>
     
     /// Dispatch an action.
@@ -26,6 +27,8 @@ public protocol Reactor: opaque_Reactor {
     /// Dispatch an action plan.
     @discardableResult
     func dispatch(_: Plan) -> Task<Void, Error>
+    
+    func handleStatus(_: ActionTask.Status, for _: Action)
 }
 
 // MARK: - Implementation -
@@ -33,5 +36,11 @@ public protocol Reactor: opaque_Reactor {
 extension opaque_Reactor where Self: Reactor {
     public func opaque_dispatch(_ action: opaque_ReactorAction) -> Task<Void, Error>? {
         (action as? Action).map(dispatch)
+    }
+}
+
+extension Reactor {
+    public func handleStatus(_ status: ActionTask.Status, for action: Action) {
+        
     }
 }

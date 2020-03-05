@@ -14,10 +14,7 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, Reactor, 
     associatedtype Repository: ViewReactorRepository = EmptyRepository
     associatedtype Router: ViewRouter = EmptyViewRouter
     associatedtype Subview: Hashable = Never
-    
-    typealias ActionTask = ReactorActionTask<Self>
-    typealias ActionTaskPlan = ReactorActionTaskPlan<Self>
-    
+        
     var environment: ViewReactorEnvironment { get set }
     var repository: Repository { get }
     var router: Router { get }
