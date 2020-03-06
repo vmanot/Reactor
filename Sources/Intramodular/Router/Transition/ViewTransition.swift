@@ -8,6 +8,7 @@ import SwiftUIX
 
 public struct ViewTransition {
     public enum Error: Swift.Error {
+        case cannotPopRoot
         case isRoot
         case nothingToDismiss
         case navigationControllerMissing
@@ -87,6 +88,10 @@ extension ViewTransition {
     
     public static var pop: ViewTransition {
         .init(payload: .pop)
+    }
+    
+    public static var popOrDismiss: ViewTransition {
+        .init(payload: .popOrDismiss)
     }
     
     public static func set<V: View>(_ view: V) -> ViewTransition {

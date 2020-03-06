@@ -87,6 +87,22 @@ extension UIViewController {
                 }
             }
             
+            case .popOrDismiss: do {
+                if let navigationController = topmostNavigationController, navigationController.viewControllers.count > 1 {
+                    navigationController.popViewController(animated: animated) {
+                        completion()
+                    }
+                } else {
+                    guard presentedViewController != nil else {
+                        throw ViewRouterError.transitionError(.nothingToDismiss)
+                    }
+                    
+                    dismiss(animated: animated) {
+                        completion()
+                    }
+                }
+            }
+            
             case .set(let view): do {
                 if topmostPresentedViewController != nil {
                     dismiss { // FIXME: Does not respect `animated`!
