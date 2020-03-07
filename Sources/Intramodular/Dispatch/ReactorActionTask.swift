@@ -12,16 +12,8 @@ public final class ReactorActionTask<R: Reactor>: ParametrizedTask<ReactorRefere
     }
     
     override public func didSend(status: Status) {
-        unwrapReactor {
-            $0.handleStatus(status, for: name._cast(to: R.Action.self)!)
-        }
-    }
-}
-
-extension ReactorActionTask {
-    public func unwrapReactor(_ body: (R) -> ()) {
-        unwrap {
-            body($0.wrappedValue)
+        withParameter {
+            $0.wrappedValue.handleStatus(status, for: name._cast(to: R.Action.self)!)
         }
     }
 }

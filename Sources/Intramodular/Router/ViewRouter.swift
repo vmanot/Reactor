@@ -23,7 +23,7 @@ public protocol ViewRouter: ObservableObject, Presentable {
     associatedtype Route: ViewRoute
     
     func triggerPublisher(for _: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError>
-
+    
     @discardableResult
     func trigger(_: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError>
 }
@@ -44,7 +44,7 @@ extension ReactorActionTask {
 extension ReactorActionTask where R: ViewReactor {
     public static func trigger(_ route: R.Router.Route) -> Self {
         Self.action {
-            $0.unwrap {
+            $0.withParameter {
                 $0.wrappedValue.router.trigger(route)
             }
         }

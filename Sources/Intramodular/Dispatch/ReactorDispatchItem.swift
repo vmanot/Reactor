@@ -6,15 +6,15 @@ import Merge
 import SwiftUIX
 import Task
 
-public protocol opaque_ReactorDispatchable {
+public protocol opaque_ReactorDispatchItem {
     
 }
 
-public protocol ReactorDispatchable: Hashable {
+public protocol ReactorDispatchItem: Hashable {
     
 }
 
-extension ReactorDispatchable {
+extension ReactorDispatchItem {
     public func createTaskName() -> TaskName {
         return .init(self)
     }
