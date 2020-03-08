@@ -87,6 +87,16 @@ extension UIViewController {
                 }
             }
             
+            case .popToRoot: do {
+                guard let viewController = topmostNavigationController else {
+                    throw ViewRouterError.transitionError(.navigationControllerMissing)
+                }
+                
+                viewController.popToRootViewController(animated: animated) {
+                    completion()
+                }
+            }
+            
             case .popOrDismiss: do {
                 if let navigationController = topmostNavigationController, navigationController.viewControllers.count > 1 {
                     navigationController.popViewController(animated: animated) {

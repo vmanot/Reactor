@@ -38,6 +38,25 @@ extension UINavigationController {
             completion()
         }
     }
+    
+    func popToRootViewController(
+        animated: Bool,
+        completion: (() -> Void)?
+    ) {
+        popToRootViewController(animated: animated)
+        
+        guard let completion = completion else {
+            return
+        }
+        
+        guard animated, let coordinator = transitionCoordinator else {
+            return DispatchQueue.main.async(execute: { completion() })
+        }
+        
+        coordinator.animate(alongsideTransition: nil) { _ in
+            completion()
+        }
+    }
 }
 
 #endif

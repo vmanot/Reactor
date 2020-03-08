@@ -90,6 +90,10 @@ extension ViewTransition {
         .init(payload: .pop)
     }
     
+    public static var popToRoot: ViewTransition {
+        .init(payload: .popToRoot)
+    }
+    
     public static var popOrDismiss: ViewTransition {
         .init(payload: .popOrDismiss)
     }
