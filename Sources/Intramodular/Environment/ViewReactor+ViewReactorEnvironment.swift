@@ -31,7 +31,7 @@ extension ViewReactor where Self: DynamicViewPresenter {
     }
     
     /// Dismiss the view owned by `self`.
-    public func dismiss(animated: Bool, completion: @escaping () -> Void) {
+    public func dismiss(animated: Bool, completion: (() -> Void)?) {
         environment.dynamicViewPresenter!.dismiss(animated: animated, completion: completion)
     }
     
