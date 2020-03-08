@@ -114,13 +114,7 @@ extension UIViewController {
             }
             
             case .set(let view): do {
-                if topmostPresentedViewController != nil {
-                    dismiss { // FIXME: Does not respect `animated`!
-                        self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
-                            completion()
-                        }
-                    }
-                } else if let viewController = topmostNavigationController {
+                if let viewController = topmostNavigationController {
                     viewController.setViewControllers([CocoaHostingController(rootView: view)], animated: animated)
                     
                     completion()
@@ -128,6 +122,16 @@ extension UIViewController {
                     window.rootViewController = CocoaHostingController(rootView: view)
                     
                     completion()
+                } else if let viewController = self as? CocoaHostingController<EnvironmentalAnyView> {
+                    viewController.rootViewContent = view
+                    
+                    completion()
+                } else if topmostPresentedViewController != nil {
+                    dismiss { // FIXME: Does not respect `animated`!
+                        self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
+                            completion()
+                        }
+                    }
                 }
             }
             

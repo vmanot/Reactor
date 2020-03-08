@@ -31,13 +31,8 @@ extension ViewReactor where Self: DynamicViewPresenter {
     }
     
     /// Dismiss the view owned by `self`.
-    public func dismiss(completion: @escaping () -> Void) {
-        environment.dynamicViewPresenter!.dismiss(completion: completion)
-    }
-    
-    /// Dismiss the view owned by `self`.
-    public func dismiss() {
-        environment.dynamicViewPresenter!.dismiss()
+    public func dismiss(animated: Bool, completion: @escaping () -> Void) {
+        environment.dynamicViewPresenter!.dismiss(animated: animated, completion: completion)
     }
     
     public func dismissView(
@@ -59,7 +54,7 @@ extension ViewReactor {
             .taskPipelineUnwrapped[action.createTaskName()]?
             .id
     }
-
+    
     public func status(of action: Action) -> OpaqueTask.StatusDescription? {
         environment
             .taskPipelineUnwrapped[action.createTaskName()]?
