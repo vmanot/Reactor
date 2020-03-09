@@ -21,7 +21,7 @@ extension UIViewController {
             
             case .replacePresented(let view): do {
                 if let viewController = topmostPresentedViewController?.presentingViewController {
-                    viewController.dismiss { // FIXME: Does not respect `animated`!
+                    viewController.dismiss(animated: animated) {
                         viewController.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                             completion()
                         }
@@ -127,7 +127,7 @@ extension UIViewController {
                     
                     completion()
                 } else if topmostPresentedViewController != nil {
-                    dismiss { // FIXME: Does not respect `animated`!
+                    dismiss(animated: animated) {
                         self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                             completion()
                         }
@@ -137,7 +137,7 @@ extension UIViewController {
             
             case .setNavigatable(let view): do {
                 if topmostPresentedViewController != nil {
-                    dismiss { // FIXME: Does not respect `animated`!
+                    dismiss(animated: animated) {
                         self.presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                             completion()
                         }
