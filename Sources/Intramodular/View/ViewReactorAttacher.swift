@@ -6,14 +6,15 @@ import Merge
 import SwiftUIX
 import Task
 
-private struct ViewReactorAttacher<Reactor: ViewReactor>: ViewModifier {
+private struct ViewReactorAttacher<Reactor: ViewReactor, Content: View>: View {
     let reactor: () -> Reactor
-    
+    let content: Content
+
     var taskPipeline: TaskPipeline {
         reactor().environment.taskPipelineUnwrapped
     }
     
-    func body(content: Content) -> some View {
+    var body: some View {
         if !reactor().environment.isSetup { // FIXME?
             DispatchQueue.main.async {
                 self.reactor().environment.$isSetup.wrappedValue = true
@@ -34,6 +35,6 @@ extension View {
     public func attach<R: ViewReactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {
-        modifier(ViewReactorAttacher(reactor: reactor))
+        ViewReactorAttacher(reactor: reactor, content: self)
     }
 }
