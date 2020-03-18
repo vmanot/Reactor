@@ -17,6 +17,10 @@ extension ViewReactor {
         environment.$alert.wrappedValue = alert
         environment.$isAlertPresented.wrappedValue = true
     }
+
+    public func present(@ViewBuilder _ alert: () -> Alert) {
+        present(alert())
+    }
     
     public func dismissAlert() {
         environment.$isAlertPresented.wrappedValue = false
