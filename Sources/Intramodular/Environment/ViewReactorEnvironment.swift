@@ -9,7 +9,7 @@ import SwiftUI
 import Task
 
 @propertyWrapper
-public struct ViewReactorEnvironment: ViewReactorComponent {    
+public struct ViewReactorEnvironment: ReactorEnvironment, ViewReactorComponent {
     @Environment(\.viewReactors) public var environmentReactors
     @Environment(\.dynamicViewPresenter) var dynamicViewPresenter
         
@@ -17,6 +17,9 @@ public struct ViewReactorEnvironment: ViewReactorComponent {
     @OptionalObservedObject var taskPipeline: TaskPipeline?
    
     @State var isSetup: Bool = false
+    
+    @State var isAlertPresented: Bool = false
+    @State var alert: Alert? = nil
 
     var taskPipelineUnwrapped: TaskPipeline {
         taskPipeline!
@@ -60,4 +63,12 @@ extension EnvironmentBuilder {
             $0.viewReactors.insert({ reactor.wrappedValue })
         })
     }
+}
+
+extension Alert {
+     static let dummy = Alert(
+        title: Text("Uh oh!"),
+        message: Text("Something went wrong."),
+        dismissButton: .destructive(Text("Dismiss"))
+    )
 }

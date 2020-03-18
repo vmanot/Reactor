@@ -9,7 +9,7 @@ import Task
 private struct ViewReactorAttacher<Reactor: ViewReactor, Content: View>: View {
     let reactor: () -> Reactor
     let content: Content
-
+    
     var taskPipeline: TaskPipeline {
         reactor().environment.taskPipelineUnwrapped
     }
@@ -26,6 +26,7 @@ private struct ViewReactorAttacher<Reactor: ViewReactor, Content: View>: View {
             .environmentReactor(self.reactor())
             .environment(\.taskPipeline, taskPipeline)
             .environmentObject(taskPipeline)
+            .alert(isPresented: self.reactor().environment.$isAlertPresented, content: { self.reactor().environment.alert ?? .dummy })
     }
 }
 

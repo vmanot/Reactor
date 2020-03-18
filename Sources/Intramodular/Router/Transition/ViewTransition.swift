@@ -12,6 +12,7 @@ public struct ViewTransition {
         case isRoot
         case nothingToDismiss
         case navigationControllerMissing
+        case cannotSetRoot
     }
     
     private var _payload: Payload
@@ -100,6 +101,10 @@ extension ViewTransition {
     
     public static func set<V: View>(_ view: V) -> ViewTransition {
         .init(payload: .set(.init(view)), view: view)
+    }
+    
+    public static func setRoot<V: View>(_ view: V) -> ViewTransition {
+        .init(payload: .setRoot(.init(view)), view: view)
     }
     
     public static func setNavigatable<V: View>(_ view: V) -> ViewTransition {

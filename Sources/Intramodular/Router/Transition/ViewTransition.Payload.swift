@@ -8,19 +8,22 @@ import SwiftUIX
 
 extension ViewTransition {
     enum Payload {
-        case present(EnvironmentalAnyView)
-        case replacePresented(with: EnvironmentalAnyView)
+        typealias View = EnvironmentalAnyView
+        
+        case present(View)
+        case replacePresented(with: View)
         case dismiss
         case dismissView(named: ViewName)
         
-        case push(EnvironmentalAnyView)
-        case pushOrPresent(EnvironmentalAnyView)
+        case push(View)
+        case pushOrPresent(View)
         case pop
         case popToRoot
         case popOrDismiss
         
-        case set(EnvironmentalAnyView)
-        case setNavigatable(EnvironmentalAnyView)
+        case set(View)
+        case setRoot(View)
+        case setNavigatable(View)
         
         case linear([ViewTransition])
         
@@ -53,6 +56,8 @@ extension ViewTransition.Payload {
                 case .popOrDismiss:
                     return nil
                 case .set(let view):
+                    return view
+                case .setRoot(let view):
                     return view
                 case .setNavigatable(let view):
                     return view
@@ -89,6 +94,8 @@ extension ViewTransition.Payload {
                     break
                 case .set:
                     self = .set(newValue)
+                case .setRoot:
+                    self = .setRoot(newValue)
                 case .setNavigatable:
                     self = .setNavigatable(newValue)
                 case .linear:

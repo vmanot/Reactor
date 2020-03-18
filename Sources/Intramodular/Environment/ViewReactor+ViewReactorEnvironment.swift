@@ -12,6 +12,17 @@ extension ViewReactor {
     }
 }
 
+extension ViewReactor {
+    public func present(_ alert: Alert) {
+        environment.$alert.wrappedValue = alert
+        environment.$isAlertPresented.wrappedValue = true
+    }
+    
+    public func dismissAlert() {
+        environment.$isAlertPresented.wrappedValue = false
+    }
+}
+
 extension ViewReactor where Self: DynamicViewPresenter {
     public var presenting: DynamicViewPresenter? {
         environment.dynamicViewPresenter!.presenting

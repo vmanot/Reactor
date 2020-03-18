@@ -113,6 +113,20 @@ extension UIViewController {
                 }
             }
             
+            case .setRoot(let view): do {
+                if let viewController = self as? CocoaHostingController<EnvironmentalAnyView> {
+                    viewController.rootViewContent = view
+                    
+                    completion()
+                } else if let window = self.view.window, window.rootViewController === self {
+                    window.rootViewController = CocoaHostingController(rootView: view)
+                    
+                    completion()
+                } else {
+                    throw ViewTransition.Error.cannotSetRoot
+                }
+            }
+            
             case .set(let view): do {
                 if let viewController = topmostNavigationController {
                     viewController.setViewControllers([CocoaHostingController(rootView: view)], animated: animated)
