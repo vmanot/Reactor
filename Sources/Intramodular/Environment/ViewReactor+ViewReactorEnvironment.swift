@@ -66,25 +66,25 @@ extension ViewReactor where Self: DynamicViewPresenter {
 extension ViewReactor {
     public func activeTaskID(of action: Action) -> some Hashable {
         environment
-            .taskPipelineUnwrapped[action.createTaskName()]?
+            .taskPipeline[action.createTaskName()]?
             .id
     }
     
     public func status(of action: Action) -> OpaqueTask.StatusDescription? {
         environment
-            .taskPipelineUnwrapped[action.createTaskName()]?
+            .taskPipeline[action.createTaskName()]?
             .statusDescription
     }
     
     public func lastStatus(of action: Action) -> OpaqueTask.StatusDescription? {
-        environment.taskPipelineUnwrapped.lastStatus(for: action.createTaskName())
+        environment.taskPipeline.lastStatus(for: action.createTaskName())
     }
     
     public func cancel(action: Action) {
-        environment.taskPipelineUnwrapped[action.createTaskName()]?.cancel()
+        environment.taskPipeline[action.createTaskName()]?.cancel()
     }
     
     public func cancelAllTasks() {
-        environment.taskPipelineUnwrapped.cancelAllTasks()
+        environment.taskPipeline.cancelAllTasks()
     }
 }

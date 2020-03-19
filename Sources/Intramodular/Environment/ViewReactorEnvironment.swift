@@ -12,18 +12,13 @@ import Task
 public struct ViewReactorEnvironment: ReactorEnvironment, ViewReactorComponent {
     @Environment(\.viewReactors) public var environmentReactors
     @Environment(\.dynamicViewPresenter) var dynamicViewPresenter
-        
-    @OptionalEnvironmentObject var parentTaskPipeline: TaskPipeline?
-    @OptionalObservedObject var taskPipeline: TaskPipeline?
-   
+    
+    @ObservedObject var taskPipeline: TaskPipeline
+    
     @State var isSetup: Bool = false
     
     @State var isAlertPresented: Bool = false
     @State var alert: Alert? = nil
-
-    var taskPipelineUnwrapped: TaskPipeline {
-        taskPipeline!
-    }
     
     public var wrappedValue: Self {
         get {
@@ -33,12 +28,8 @@ public struct ViewReactorEnvironment: ReactorEnvironment, ViewReactorComponent {
         }
     }
     
-    public init(wrappedValue: Self = .init()) {
-        self.wrappedValue = wrappedValue
-    }
-    
     public init() {
-        taskPipeline = .init(parent: parentTaskPipeline)
+        taskPipeline = .init()
     }
 }
 
@@ -66,7 +57,7 @@ extension EnvironmentBuilder {
 }
 
 extension Alert {
-     static let dummy = Alert(
+    static let dummy = Alert(
         title: Text("Uh oh!"),
         message: Text("Something went wrong."),
         dismissButton: .destructive(Text("Dismiss"))

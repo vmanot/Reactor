@@ -23,7 +23,7 @@ public struct ReactorActionDispatcher<R: ViewReactor>: Publisher {
         let task = reactor.task(for: action)
         
         task.setName(action.createTaskName())
-        task.insert(into: reactor.environment.taskPipelineUnwrapped)
+        task.insert(into: reactor.environment.taskPipeline)
         task.receive(.init(wrappedValue: self.reactor))
         task.request(.unlimited)
         

@@ -11,7 +11,7 @@ private struct ViewReactorAttacher<Reactor: ViewReactor, Content: View>: View {
     let content: Content
     
     var taskPipeline: TaskPipeline {
-        reactor().environment.taskPipelineUnwrapped
+        reactor().environment.taskPipeline
     }
     
     var body: some View {
