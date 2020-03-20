@@ -7,9 +7,9 @@ import Foundation
 import SwiftUIX
 
 open class AnyViewCoordinator<Route: ViewRoute>: ViewCoordinator {
-    public let base: Presentable
+    public let base: DynamicViewPresentable
     
-    public var presenter: Presentable? {
+    public var presenter: DynamicViewPresenter? {
         return base.presenter
     }
     

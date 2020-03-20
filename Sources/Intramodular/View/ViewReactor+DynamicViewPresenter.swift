@@ -7,8 +7,8 @@ import SwiftUIX
 import Task
 
 extension ViewReactor where Self: DynamicViewPresenter {
-    public var presenting: DynamicViewPresenter? {
-        environment.dynamicViewPresenter!.presenting
+    public var presenter: DynamicViewPresenter? {
+        environment.dynamicViewPresenter!.presenter
     }
     
     public var presented: DynamicViewPresenter? {

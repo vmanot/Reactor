@@ -13,7 +13,7 @@ public class EmptyViewRouter: ViewRouter {
     
     public var environmentBuilder = EnvironmentBuilder()
     
-    public var presenter: Presentable? {
+    public var presenter: DynamicViewPresenter? {
         return nil
     }
     

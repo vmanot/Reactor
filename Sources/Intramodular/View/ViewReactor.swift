@@ -7,14 +7,14 @@ import SwiftUIX
 import Task
 
 public protocol opaque_ViewReactor: opaque_Reactor {
-
+    
 }
 
 public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, Reactor, ViewReactorComponent {
     associatedtype Repository: ViewReactorRepository = EmptyRepository
     associatedtype Router: ViewRouter = EmptyViewRouter
     associatedtype Subview: Hashable = Never
-        
+    
     var environment: ViewReactorEnvironment { get set }
     var repository: Repository { get }
     var router: Router { get }

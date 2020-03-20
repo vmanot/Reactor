@@ -12,13 +12,13 @@ public protocol ViewCoordinator: ViewRouter {
 
 // MARK: - Implementation -
 
-open class OpaqueBaseViewCoordinator: Presentable {
+open class OpaqueBaseViewCoordinator: DynamicViewPresentable {
     public let cancellables = Cancellables()
     
     open var environmentBuilder = EnvironmentBuilder()
     
-    open fileprivate(set) var presenter: Presentable?
-    open fileprivate(set) var children: [Presentable] = []
+    open fileprivate(set) var presenter: DynamicViewPresenter?
+    open fileprivate(set) var children: [DynamicViewPresentable] = []
     
     public init() {
         
@@ -42,7 +42,7 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
         children.forEach({ $0.mergeEnvironmentBuilder(builder) })
     }
     
-    open func addChild(_ presentable: Presentable) {
+    open func addChild(_ presentable: DynamicViewPresentable) {
         presentable.insertEnvironmentObject(AnyViewCoordinator(self))
         presentable.mergeEnvironmentBuilder(environmentBuilder)
         
@@ -52,7 +52,7 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
     }
     
     override open func becomeChild(of parent: OpaqueBaseViewCoordinator) {
-        presenter = parent
+        presenter = parent as? DynamicViewPresenter // FIXME!!!
         
         parent.insertEnvironmentObject(AnyViewCoordinator(self))
         
