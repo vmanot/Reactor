@@ -7,6 +7,16 @@ import SwiftUIX
 import Task
 
 extension ViewReactor {
+    public var environmentBuilder: EnvironmentBuilder {
+        get {
+            environment.environmentBuilder
+        } nonmutating set {
+            environment.$environmentBuilder.wrappedValue = newValue
+        }
+    }
+}
+
+extension ViewReactor {
     public var environmentReactors: ViewReactors {
         environment.environmentReactors
     }
@@ -17,7 +27,7 @@ extension ViewReactor {
         environment.$alert.wrappedValue = alert
         environment.$isAlertPresented.wrappedValue = true
     }
-
+    
     public func present(@ViewBuilder _ alert: () -> Alert) {
         present(alert())
     }

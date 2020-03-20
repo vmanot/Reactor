@@ -22,9 +22,6 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, Reactor, 
     /// Perform any necessary setup after the reactor has been initialized.
     func setup()
     
-    /// Create an environment builder for this reactor's sub-components.
-    func createEnvironmentBuilder() -> EnvironmentBuilder
-    
     /// Produce a task for a given action.
     func task(for _: Action) -> ActionTask
 }
@@ -34,10 +31,6 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, Reactor, 
 extension ViewReactor  {
     public func setup() {
         
-    }
-    
-    public func createEnvironmentBuilder() -> EnvironmentBuilder {
-        .init()
     }
 }
 

@@ -10,6 +10,7 @@ import Task
 
 @propertyWrapper
 public struct ViewReactorEnvironment: ReactorEnvironment, ViewReactorComponent {
+    @State var environmentBuilder = EnvironmentBuilder()
     @Environment(\.viewReactors) public var environmentReactors
     @Environment(\.dynamicViewPresenter) var dynamicViewPresenter
     

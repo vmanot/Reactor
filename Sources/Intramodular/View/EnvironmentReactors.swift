@@ -34,7 +34,7 @@ extension View {
         transformEnvironment(\.viewReactors) {
             $0.insert(reactor)
         }
-        .mergeEnvironmentBuilder(reactor().createEnvironmentBuilder())
+        .mergeEnvironmentBuilder(reactor().environmentBuilder)
     }
     
     public func environmentReactors(
