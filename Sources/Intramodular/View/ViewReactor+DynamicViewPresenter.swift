@@ -11,7 +11,7 @@ extension ViewReactor where Self: DynamicViewPresenter {
         environment.dynamicViewPresenter!.presenter
     }
     
-    public var presented: DynamicViewPresenter? {
+    public var presented: DynamicViewPresentable? {
         environment.dynamicViewPresenter!.presented
     }
     
@@ -44,18 +44,10 @@ extension ViewReactor where Self: DynamicViewPresenter {
 
 extension ReactorActionTask where R: ViewReactor {
     public static func present<V: View>(_ view: V) -> Self {
-        Self.action {
-            $0.withReactor {
-                $0.present(view)
-            }
-        }
+        .action({ $0.withReactor({ $0.present(view) }) })
     }
     
     public static func dismiss() -> Self {
-        Self.action {
-            $0.withReactor {
-                $0.dismiss()
-            }
-        }
+        .action({ $0.withReactor({ $0.dismiss() }) })
     }
 }
