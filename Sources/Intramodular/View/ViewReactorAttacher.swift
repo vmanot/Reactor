@@ -26,7 +26,11 @@ private struct ViewReactorAttacher<Reactor: ViewReactor, Content: View>: View {
             .environmentReactor(self.reactor())
             .environment(\.taskPipeline, taskPipeline)
             .environmentObject(taskPipeline)
-            .alert(isPresented: self.reactor().environment.$isAlertPresented, content: { self.reactor().environment.alert ?? .dummy })
+            .onReceive(ReactorDispatchGlobal.shared.objectWillChange, perform: { action in
+                if let action = action as? Reactor.Action {
+                    self.reactor().dispatch(action)
+                }
+            })
     }
 }
 

@@ -10,16 +10,13 @@ import Task
 
 @propertyWrapper
 public struct ViewReactorEnvironment: ReactorEnvironment, ViewReactorComponent {
-    @State var environmentBuilder = EnvironmentBuilder()
     @Environment(\.viewReactors) public var environmentReactors
     @Environment(\.dynamicViewPresenter) var dynamicViewPresenter
     
     @ObservedObject var taskPipeline: TaskPipeline
     
+    @State var environmentBuilder = EnvironmentBuilder()
     @State var isSetup: Bool = false
-    
-    @State var isAlertPresented: Bool = false
-    @State var alert: Alert? = nil
     
     public var wrappedValue: Self {
         get {
@@ -51,16 +48,6 @@ extension EnvironmentBuilder {
     public mutating func insertEnvironmentReactor<R: ViewReactor>(
         _ reactor: ReactorReference<R>
     ) {
-        transformEnvironment({
-            $0.viewReactors.insert({ reactor.wrappedValue })
-        })
+        transformEnvironment({ $0.viewReactors.insert({ reactor.wrappedValue }) })
     }
-}
-
-extension Alert {
-    static let dummy = Alert(
-        title: Text("Uh oh!"),
-        message: Text("Something went wrong."),
-        dismissButton: .destructive(Text("Dismiss"))
-    )
 }

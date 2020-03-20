@@ -23,21 +23,6 @@ extension ViewReactor {
 }
 
 extension ViewReactor {
-    public func present(_ alert: Alert) {
-        environment.$alert.wrappedValue = alert
-        environment.$isAlertPresented.wrappedValue = true
-    }
-    
-    public func present(@ViewBuilder _ alert: () -> Alert) {
-        present(alert())
-    }
-    
-    public func dismissAlert() {
-        environment.$isAlertPresented.wrappedValue = false
-    }
-}
-
-extension ViewReactor {
     public func activeTaskID(of action: Action) -> some Hashable {
         environment
             .taskPipeline[action.createTaskName()]?
