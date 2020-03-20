@@ -20,6 +20,18 @@ public final class ReactorActionTask<R: Reactor>: ParametrizedTask<ReactorRefere
 
 // MARK: - API -
 
+extension ParametrizedTask {
+    public func withReactor<R: Reactor>(
+        _ body: (R) -> ()
+    ) -> Void where Parameter == ReactorReference<R> {
+        if let parameter = parameter {
+            body(parameter.wrappedValue)
+        } else {
+            assertionFailure()
+        }
+    }
+}
+
 extension ReactorActionTask {
     public class func error(description: String) -> Self {
         error(ViewError(description: description))
