@@ -13,8 +13,12 @@ public class EmptyViewRouter: ViewRouter {
     
     public var environmentBuilder = EnvironmentBuilder()
     
+    public var name: ViewName? {
+        nil
+    }
+    
     public var presenter: DynamicViewPresenter? {
-        return nil
+        nil
     }
     
     public func triggerPublisher(for _: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {

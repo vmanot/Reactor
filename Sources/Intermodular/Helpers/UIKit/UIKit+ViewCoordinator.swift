@@ -8,8 +8,16 @@ import SwiftUIX
 
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
-open class UIViewControllerCoordinator<Route: ViewRoute>: BaseViewCoordinator<Route> {
+open class UIViewControllerCoordinator<Route: ViewRoute>: BaseViewCoordinator<Route>, DynamicViewPresenter {
     public var rootViewController: UIViewController
+    
+    override open var name: ViewName? {
+        rootViewController.name
+    }
+    
+    open var presented: DynamicViewPresentable? {
+        rootViewController.presented
+    }
     
     public init(rootViewController: UIViewController) {
         self.rootViewController = rootViewController
@@ -20,16 +28,32 @@ open class UIViewControllerCoordinator<Route: ViewRoute>: BaseViewCoordinator<Ro
         
         parent.addChild(self)
     }
-
+    
     public override func triggerPublisher(for route: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         transition(for: route)
             .mergeEnvironmentBuilder(environmentBuilder)
             .triggerPublisher(in: rootViewController, animated: true, coordinator: self)
     }
+    
+    public func present(_ presentation: AnyModalPresentation) {
+        rootViewController.present(presentation)
+    }
+    
+    public func dismiss(animated: Bool, completion: (() -> Void)?) {
+        rootViewController.dismiss(animated: animated, completion: completion)
+    }
 }
 
-open class UIWindowCoordinator<Route: ViewRoute>: BaseViewCoordinator<Route> {
+open class UIWindowCoordinator<Route: ViewRoute>: BaseViewCoordinator<Route>, DynamicViewPresenter {
     public var window: UIWindow
+    
+    override open var name: ViewName? {
+        window.name
+    }
+    
+    open var presented: DynamicViewPresentable? {
+        window.presented
+    }
     
     public init(window: UIWindow) {
         self.window = window
@@ -48,6 +72,14 @@ open class UIWindowCoordinator<Route: ViewRoute>: BaseViewCoordinator<Route> {
             .triggerPublisher(in: window, coordinator: self)
             .handleSubscription({ _ in self.window.makeKeyAndVisible() })
             .eraseToAnyPublisher()
+    }
+    
+    public func present(_ presentation: AnyModalPresentation) {
+        window.present(presentation)
+    }
+    
+    public func dismiss(animated: Bool, completion: (() -> Void)?) {
+        window.dismiss(animated: animated, completion: completion)
     }
 }
 

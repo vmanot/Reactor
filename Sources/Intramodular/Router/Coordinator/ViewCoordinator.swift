@@ -17,6 +17,10 @@ open class OpaqueBaseViewCoordinator: DynamicViewPresentable {
     
     open var environmentBuilder = EnvironmentBuilder()
     
+    open var name: ViewName? {
+        return nil
+    }
+    
     open fileprivate(set) var presenter: DynamicViewPresenter?
     open fileprivate(set) var children: [DynamicViewPresentable] = []
     

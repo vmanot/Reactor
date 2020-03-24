@@ -6,12 +6,8 @@ import Merge
 import Foundation
 import SwiftUIX
 
-open class AnyViewCoordinator<Route: ViewRoute>: ViewCoordinator {
+public final class AnyViewCoordinator<Route: ViewRoute>: ViewCoordinator {
     public let base: DynamicViewPresentable
-    
-    public var presenter: DynamicViewPresenter? {
-        return base.presenter
-    }
     
     public var environmentBuilder: EnvironmentBuilder {
         get {
@@ -19,6 +15,14 @@ open class AnyViewCoordinator<Route: ViewRoute>: ViewCoordinator {
         } set {
             base.environmentBuilder = newValue
         }
+    }
+    
+    public var name: ViewName? {
+        base.name
+    }
+    
+    public var presenter: DynamicViewPresenter? {
+        base.presenter
     }
     
     private let transitionImpl: (Route) -> ViewTransition

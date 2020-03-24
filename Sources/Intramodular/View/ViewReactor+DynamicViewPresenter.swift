@@ -15,8 +15,8 @@ extension ViewReactor where Self: DynamicViewPresenter {
         environment.dynamicViewPresenter!.presented
     }
     
-    public var presentedViewName: ViewName? {
-        environment.dynamicViewPresenter!.presentedViewName
+    public var name: ViewName? {
+        environment.dynamicViewPresenter!.name
     }
     
     /// Present a view.
@@ -27,18 +27,6 @@ extension ViewReactor where Self: DynamicViewPresenter {
     /// Dismiss the view owned by `self`.
     public func dismiss(animated: Bool, completion: (() -> Void)?) {
         environment.dynamicViewPresenter!.dismiss(animated: animated, completion: completion)
-    }
-    
-    public func dismissView(
-        named name: ViewName,
-        completion: @escaping () -> Void
-    ) {
-        environment.dynamicViewPresenter!.dismissView(named: name, completion: completion)
-    }
-    
-    /// Dismiss the view with the given name.
-    public func dismissView(named name: Subview) {
-        environment.dynamicViewPresenter!.dismissView(named: name)
     }
 }
 
