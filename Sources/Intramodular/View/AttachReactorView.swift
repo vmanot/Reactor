@@ -37,7 +37,7 @@ public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
 // MARK: - API -
 
 extension View {
-    @inline(never)
+    @_optimize(none)
     public func attach<R: ViewReactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {

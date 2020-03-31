@@ -18,7 +18,7 @@ public protocol ReactorView: NamedView where Body == _SynthesizedReactorViewBody
 // MARK: - Implementation -
 
 extension ReactorView {
-    @inline(never)
+    @_optimize(none)
     public var body: Body {
         .init(reactor: reactor, content: makeBody)
     }
@@ -34,7 +34,7 @@ public struct _SynthesizedReactorViewBody<Reactor: ViewReactor, Content: View>: 
         self.content = content(reactor)
     }
     
-    @inline(never)
+    @_optimize(none)
     public var body: some View {
         content
     }
