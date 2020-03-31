@@ -17,13 +17,16 @@ public protocol ReactorDependentView: View {
 
 extension ReactorDependentView {
     @_optimize(none)
+    @inline(never)
     public var body: some View {
         _SynthesizedReactorDependentViewBody(content: makeBody)
     }
     
     @_optimize(none)
+    @inline(never)
     public func instantiate(from reactor: Reactor) -> some View {
-        _SynthesizedReactorViewBody(reactor: reactor, content: makeBody)
+        makeBody(reactor: reactor)
+            .attach(reactor)
     }
 }
 

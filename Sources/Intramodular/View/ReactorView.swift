@@ -6,7 +6,7 @@ import Merge
 import SwiftUIX
 import SwiftUI
 
-public protocol ReactorView: NamedView where Body == _SynthesizedReactorViewBody<Reactor, ReactorViewBody> {
+public protocol ReactorView: NamedView {
     associatedtype Reactor: ViewReactor
     associatedtype ReactorViewBody: View
     
@@ -19,23 +19,9 @@ public protocol ReactorView: NamedView where Body == _SynthesizedReactorViewBody
 
 extension ReactorView {
     @_optimize(none)
-    public var body: Body {
-        .init(reactor: reactor, content: makeBody)
-    }
-}
-
-// MARK: - Auxiliary Implementation -
-
-@_frozen
-public struct _SynthesizedReactorViewBody<Reactor: ViewReactor, Content: View>: View {
-    private let content: Content
-    
-    public init(reactor: Reactor, content: (Reactor) -> Content) {
-        self.content = content(reactor)
-    }
-    
-    @_optimize(none)
+    @inline(never)
     public var body: some View {
-        content
+        makeBody(reactor: reactor)
+            .attach(self.reactor)
     }
 }
