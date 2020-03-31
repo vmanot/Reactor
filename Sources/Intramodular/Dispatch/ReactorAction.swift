@@ -41,6 +41,7 @@ public struct ReactorDispatchActionButton<Label: View>: View {
 
 extension ViewReactor {
     @_optimize(none)
+    @inline(never)
     public func taskButton<Label: View>(
         for action: Action,
         @ViewBuilder label: () -> Label
