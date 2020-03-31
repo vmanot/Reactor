@@ -16,14 +16,15 @@ public protocol ReactorDependentView: View {
 // MARK: - API -
 
 extension ReactorDependentView {
+    @inline(never)
     public var body: some View {
         EnvironmentValueAccessView(\.viewReactors) { viewReactors in
             self.instantiate(from: viewReactors[Reactor.self]!)
         }
     }
     
+    @inline(never)
     public func instantiate(from reactor: Reactor) -> some View {
-        makeBody(reactor: reactor)
-            .attach(reactor)
+        _SynthesizedReactorViewBody(reactor: reactor, content: makeBody)
     }
 }

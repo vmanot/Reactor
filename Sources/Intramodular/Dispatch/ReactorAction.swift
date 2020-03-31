@@ -17,14 +17,18 @@ public protocol ReactorAction: opaque_ReactorAction, ReactorDispatchItem {
 // MARK: - Helpers -
 
 /// A control which dispatches a reactor action when triggered.
-public struct ReactorActionDispatchButton<R: ViewReactor, Label: View>: View {
-    private let action: R.Action
+public struct ReactorDispatchActionButton<Label: View>: View {
+    private let action: TaskName
     private let dispatch: () -> Task<Void, Error>
     
     private let label: Label
     
-    public init(action: R.Action, reactor: R, label: () -> Label) {
-        self.action = action
+    public init<R: ViewReactor>(
+        action: R.Action,
+        reactor: R,
+        label: () -> Label
+    ) {
+        self.action = action.createTaskName()
         self.dispatch = { reactor.dispatch(action) }
         self.label = label()
     }
@@ -36,10 +40,11 @@ public struct ReactorActionDispatchButton<R: ViewReactor, Label: View>: View {
 }
 
 extension ViewReactor {
+    @inline(__always)
     public func taskButton<Label: View>(
         for action: Action,
         @ViewBuilder label: () -> Label
     ) -> some View {
-        ReactorActionDispatchButton(action: action, reactor: self, label: label)
+        ReactorDispatchActionButton(action: action, reactor: self, label: label)
     }
 }

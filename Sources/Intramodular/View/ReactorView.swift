@@ -4,20 +4,38 @@
 
 import Merge
 import SwiftUIX
+import SwiftUI
 
-public protocol ReactorView: ReactorDependentView, NamedView {
+public protocol ReactorView: NamedView where Body == _SynthesizedReactorViewBody<Reactor, ReactorViewBody> {
+    associatedtype Reactor: ViewReactor
+    associatedtype ReactorViewBody: View
+    
     var reactor: Reactor { get }
+    
+    func makeBody(reactor: Reactor) -> ReactorViewBody
 }
 
+// MARK: - Implementation -
+
 extension ReactorView {
-    public var environmentReactors: ViewReactors {
-        return reactor.environment.environmentReactors
+    @inline(never)
+    public var body: Body {
+        .init(reactor: reactor, content: makeBody)
     }
 }
 
-extension ReactorView {
+// MARK: - Auxiliary Implementation -
+
+@_frozen
+public struct _SynthesizedReactorViewBody<Reactor: ViewReactor, Content: View>: View {
+    private let content: Content
+    
+    public init(reactor: Reactor, content: (Reactor) -> Content) {
+        self.content = content(reactor)
+    }
+    
+    @inline(never)
     public var body: some View {
-        makeBody(reactor: reactor)
-            .attach(self.reactor)
+        content
     }
 }

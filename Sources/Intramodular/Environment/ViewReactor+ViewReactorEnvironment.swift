@@ -22,6 +22,12 @@ extension ViewReactor {
     }
 }
 
+extension ReactorView {
+    public var environmentReactors: ViewReactors {
+        reactor.environment.environmentReactors
+    }
+}
+
 extension ViewReactor {
     public func activeTaskID(of action: Action) -> some Hashable {
         environment
