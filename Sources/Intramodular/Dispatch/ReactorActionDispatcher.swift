@@ -40,7 +40,7 @@ extension ViewReactor {
     
     @discardableResult
     public func dispatch(_ action: Action) -> Task<Void, Error> {
-        return dispatcher(for: action).dispatch()
+        dispatcher(for: action).dispatch()
     }
 }
 
