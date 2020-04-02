@@ -8,7 +8,11 @@ import SwiftUIX
 final public class ReactorDispatchGlobal: ObservableObject {
     public static let shared = ReactorDispatchGlobal()
     
-    public let objectWillChange = PassthroughSubject<opaque_ReactorAction, Error>()
+    private let _objectWillChange = PassthroughSubject<opaque_ReactorAction, Error>()
+    
+    public var objectWillChange: some Publisher {
+        _objectWillChange
+    }
     
     private init() {
         
@@ -16,7 +20,7 @@ final public class ReactorDispatchGlobal: ObservableObject {
 }
 
 extension ReactorDispatchGlobal {
-    public class func send(_ input: opaque_ReactorAction) {
-        shared.objectWillChange.send(input)
+    public static func send(_ value: opaque_ReactorAction) {
+        shared._objectWillChange.send(value)
     }
 }
