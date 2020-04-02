@@ -14,3 +14,9 @@ final public class ReactorDispatchGlobal: ObservableObject {
         
     }
 }
+
+extension ReactorDispatchGlobal {
+    public class func send(_ input: opaque_ReactorAction) {
+        shared.objectWillChange.send(input)
+    }
+}
