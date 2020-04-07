@@ -7,17 +7,21 @@ import SwiftUIX
 import Task
 
 public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
-    fileprivate let reactorReference: ReactorReference<Reactor>
-    fileprivate let content: Content
-      
+    @usableFromInline
+    let reactorReference: ReactorReference<Reactor>
+    
+    @usableFromInline
+    let content: Content
+    
     public var reactor: Reactor {
         reactorReference.wrappedValue
     }
     
+    @inlinable
     public var body: some View {
         if !reactor.environment.isSetup { // FIXME?
             DispatchQueue.main.async {
-                self.reactor.environment.$isSetup.wrappedValue = true
+                self.reactor.environment.isSetup = true
                 self.reactor.setup()
             }
         }

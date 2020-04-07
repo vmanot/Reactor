@@ -10,12 +10,16 @@ import Task
 
 @propertyWrapper
 public struct ViewReactorEnvironment: ReactorEnvironment, ViewReactorComponent {
-    @Environment(\.viewReactors) public var environmentReactors
+    @Environment(\.viewReactors) var viewReactors
     @Environment(\.dynamicViewPresenter) var dynamicViewPresenter
     
+    @usableFromInline
     @ObservedObject var taskPipeline: TaskPipeline
     
+    @usableFromInline
     @State var environmentBuilder = EnvironmentBuilder()
+    
+    @usableFromInline
     @State var isSetup: Bool = false
     
     public var wrappedValue: Self {

@@ -31,6 +31,7 @@ public protocol ViewRouter: ObservableObject, DynamicViewPresentable {
 // MARK: - API -
 
 extension ReactorActionTask {
+    @inlinable
     public static func trigger<Router: ViewRouter>(
         _ route: Router.Route,
         in router: Router
@@ -42,6 +43,7 @@ extension ReactorActionTask {
 }
 
 extension ReactorActionTask where R: ViewReactor {
+    @inlinable
     public static func trigger(_ route: R.Router.Route) -> Self {
         Self.action {
             $0.withParameter {

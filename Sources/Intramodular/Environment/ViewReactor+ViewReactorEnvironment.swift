@@ -18,13 +18,13 @@ extension ViewReactor {
 
 extension ViewReactor {
     public var environmentReactors: ViewReactors {
-        environment.environmentReactors
+        environment.viewReactors
     }
 }
 
 extension ReactorView {
     public var environmentReactors: ViewReactors {
-        reactor.environment.environmentReactors
+        reactor.environment.viewReactors
     }
 }
 

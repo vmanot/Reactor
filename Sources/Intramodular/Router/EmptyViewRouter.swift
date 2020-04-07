@@ -25,7 +25,7 @@ public class EmptyViewRouter: ViewRouter {
         
     }
     
-    public func trigger(_: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
+    public func trigger(_ : Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         
     }
 }
