@@ -10,7 +10,10 @@ import Task
 
 @propertyWrapper
 public struct ViewReactorEnvironment: ReactorEnvironment, ViewReactorComponent {
+    @usableFromInline
     @Environment(\.viewReactors) var viewReactors
+    
+    @usableFromInline
     @Environment(\.dynamicViewPresenter) var dynamicViewPresenter
     
     @usableFromInline

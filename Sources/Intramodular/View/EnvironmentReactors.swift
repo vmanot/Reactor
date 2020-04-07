@@ -28,6 +28,7 @@ public struct EnvironmentReactor<Reactor: ViewReactor>: DynamicProperty {
 }
 
 extension View {
+    @inlinable
     public func environmentReactor<R: ViewReactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {
@@ -37,6 +38,7 @@ extension View {
         .mergeEnvironmentBuilder(reactor().environmentBuilder)
     }
     
+    @inlinable
     public func environmentReactors(
         _ reactors: ViewReactors
     ) -> some View {
