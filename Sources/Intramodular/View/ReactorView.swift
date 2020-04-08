@@ -18,8 +18,7 @@ public protocol ReactorView: NamedView {
 // MARK: - Implementation -
 
 extension ReactorView {
-    @_optimize(none)
-    @inline(never)
+    @inlinable
     public var body: some View {
         makeBody(reactor: reactor)
             .attach(self.reactor)

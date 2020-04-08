@@ -18,11 +18,16 @@ public protocol ReactorAction: opaque_ReactorAction, ReactorDispatchItem {
 
 /// A control which dispatches a reactor action when triggered.
 public struct ReactorDispatchActionButton<Label: View>: View {
-    private let action: TaskName
-    private let dispatch: () -> Task<Void, Error>
+    @usableFromInline
+    let action: TaskName
     
-    private let label: Label
+    @usableFromInline
+    let dispatch: () -> Task<Void, Error>
     
+    @usableFromInline
+    let label: Label
+    
+    @inlinable
     public init<R: ViewReactor>(
         action: R.Action,
         reactor: R,
@@ -33,6 +38,7 @@ public struct ReactorDispatchActionButton<Label: View>: View {
         self.label = label()
     }
     
+    @inlinable
     public var body: some View {
         TaskButton(action: dispatch, label: { label })
             .taskName(action)
@@ -40,8 +46,7 @@ public struct ReactorDispatchActionButton<Label: View>: View {
 }
 
 extension ViewReactor {
-    @_optimize(none)
-    @inline(never)
+    @inlinable
     public func taskButton<Label: View>(
         for action: Action,
         @ViewBuilder label: () -> Label

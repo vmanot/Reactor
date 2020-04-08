@@ -13,6 +13,12 @@ public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
     @usableFromInline
     let content: Content
     
+    @usableFromInline
+    init(reactorReference: ReactorReference<Reactor>, content: Content) {
+        self.reactorReference = reactorReference
+        self.content = content
+    }
+    
     public var reactor: Reactor {
         reactorReference.wrappedValue
     }
@@ -41,7 +47,7 @@ public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
 // MARK: - API -
 
 extension View {
-    @_optimize(none)
+    @inlinable
     public func attach<R: ViewReactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {

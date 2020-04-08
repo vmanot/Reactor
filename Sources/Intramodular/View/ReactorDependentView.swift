@@ -16,14 +16,12 @@ public protocol ReactorDependentView: View {
 // MARK: - API -
 
 extension ReactorDependentView {
-    @_optimize(none)
-    @inline(never)
+    @inlinable
     public var body: some View {
         _SynthesizedReactorDependentViewBody(content: makeBody)
     }
     
-    @_optimize(none)
-    @inline(never)
+    @inlinable
     public func instantiate(from reactor: Reactor) -> some View {
         makeBody(reactor: reactor)
             .attach(reactor)
@@ -34,15 +32,17 @@ extension ReactorDependentView {
 
 @_frozen
 public struct _SynthesizedReactorDependentViewBody<Reactor: ViewReactor, Content: View>: View {
-    @EnvironmentReactor private var reactor: Reactor
+    @usableFromInline
+    @EnvironmentReactor var reactor: Reactor
     
-    private let content: (Reactor) -> Content
+    @usableFromInline
+    let content: (Reactor) -> Content
     
     public init(content: @escaping (Reactor) -> Content) {
         self.content = content
     }
     
-    @_optimize(none)
+    @inlinable
     public var body: some View {
         content(reactor)
     }
