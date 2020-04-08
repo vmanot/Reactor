@@ -23,11 +23,12 @@ public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
         reactorReference.wrappedValue
     }
     
-    @inlinable
+    @_optimize(none)
+    @inline(never)
     public var body: some View {
         if !reactor.environment.isSetup { // FIXME?
             DispatchQueue.main.async {
-                self.reactor.environment.isSetup = true
+                self.reactor.environment.$isSetup.wrappedValue = true
                 self.reactor.setup()
             }
         }
