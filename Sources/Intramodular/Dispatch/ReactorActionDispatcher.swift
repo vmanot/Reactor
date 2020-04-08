@@ -42,6 +42,11 @@ extension ViewReactor {
     public func dispatch(_ action: Action) -> Task<Void, Error> {
         dispatcher(for: action).dispatch()
     }
+    
+    @discardableResult
+    public func dispatch(super action: opaque_ReactorAction) -> Task<Void, Error> {
+        viewReactors.dispatch(action)
+    }
 }
 
 extension ViewReactor where Plan == EmptyReactorPlan {
