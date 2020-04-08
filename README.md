@@ -2,31 +2,44 @@
 A state management framework for SwiftUI.
 
 ```swift
-public struct ExampleView: ReactorView {
-    public let reactor: Reactor
+struct ExampleView: ReactorView {
+    let reactor: Reactor
     
-    public init(reactor: Reactor) {
+    init(reactor: Reactor) {
         self.reactor = reactor
     }
     
-    public func makeBody(reactor: Reactor) -> some View {
-        Text("Hello world!")
+    func makeBody(reactor: Reactor) -> some View {
+        Group {
+            if reactor.status(of: .foo) == .active {
+                ActivityIndicator()
+            } else {
+                reactor.taskButton(for: .foo) {
+                    Text("Run foo!")
+                }
+            }
+        }
     }
 }
 
 extension ExampleView {
-    public struct Reactor: ViewReactor {
-        public enum Action: ReactorAction {
-            
+    struct Reactor: ViewReactor {
+        enum Action: ReactorAction {
+            case foo
         }
         
-        @ViewReactorEnvironment() public var environment
+        @ViewReactorEnvironment() var environment
     }
 }
 
 extension ExampleView.Reactor {
-    public func task(for action: Action) -> ActionTask {
-        
+    func task(for action: Action) -> ActionTask {
+        switch action {
+            case .foo:
+                return Just(())
+                    .delay(for: .seconds(1), scheduler: DispatchQueue.main)
+                    .eraseToActionTask()
+        }
     }
 }
 ```
