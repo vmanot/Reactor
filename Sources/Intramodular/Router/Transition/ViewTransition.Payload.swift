@@ -7,7 +7,9 @@ import Foundation
 import SwiftUIX
 
 extension ViewTransition {
+    @usableFromInline
     enum Payload {
+        @usableFromInline
         typealias View = EnvironmentalAnyView
         
         case present(View)
@@ -34,6 +36,7 @@ extension ViewTransition {
 }
 
 extension ViewTransition.Payload {
+    @usableFromInline
     var view: EnvironmentalAnyView? {
         get {
             switch self {

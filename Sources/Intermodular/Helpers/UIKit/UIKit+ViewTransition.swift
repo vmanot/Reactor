@@ -7,6 +7,7 @@ import SwiftUIX
 #if os(iOS) || os(tvOS) || targetEnvironment(macCatalyst)
 
 extension UIViewController {
+    @inlinable
     public func trigger(
         _ transition: ViewTransition,
         animated: Bool,
@@ -209,6 +210,7 @@ extension UIViewController {
 }
 
 extension ViewTransition {
+    @usableFromInline
     func triggerPublisher<VC: ViewCoordinator>(
         in window: UIWindow,
         coordinator: VC
@@ -245,6 +247,7 @@ extension ViewTransition {
 }
 
 extension ViewTransition {
+    @usableFromInline
     func triggerPublisher<VC: ViewCoordinator>(in controller: UIViewController, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         let transition = mergeCoordinator(coordinator)
         

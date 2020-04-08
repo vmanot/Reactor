@@ -25,6 +25,7 @@ public struct ViewTransition {
         }
     }
     
+    @usableFromInline
     var payload: Payload {
         var result = _payload
         
@@ -35,11 +36,19 @@ public struct ViewTransition {
         return result
     }
     
+    @usableFromInline
     var animated: Bool = true
+    
+    @usableFromInline
     var payloadViewName: ViewName?
+    
+    @usableFromInline
     var payloadViewType: Any.Type
+    
+    @usableFromInline
     var environmentBuilder: EnvironmentBuilder
     
+    @usableFromInline
     init<V: View>(payload: ViewTransition.Payload, view: V) {
         self._payload = payload
         self.payloadViewName = (view as? opaque_NamedView)?.name
@@ -47,6 +56,7 @@ public struct ViewTransition {
         self.environmentBuilder = .init()
     }
     
+    @usableFromInline
     init(payload: ViewTransition.Payload) {
         self.init(payload: payload, view: EmptyView())
     }
@@ -55,6 +65,7 @@ public struct ViewTransition {
 // MARK: - Protocol Implementations -
 
 extension ViewTransition: ViewTransitionContext {
+    @inlinable
     public var view: EnvironmentalAnyView? {
         payload.view
     }
@@ -63,68 +74,84 @@ extension ViewTransition: ViewTransitionContext {
 // MARK: - API -
 
 extension ViewTransition {
+    @inlinable
     public static func present<V: View>(_ view: V) -> ViewTransition {
         .init(payload: .present(.init(view)), view: view)
     }
     
+    @inlinable
     public static func replacePresented<V: View>(with view: V) -> ViewTransition {
         .init(payload: .replacePresented(with: .init(view)), view: view)
     }
     
+    @inlinable
     public static var dismiss: ViewTransition {
         .init(payload: .dismiss)
     }
     
+    @inlinable
     public static func dismissView<H: Hashable>(named name: H) -> ViewTransition {
         .init(payload: .dismissView(named: .init(name)))
     }
     
+    @inlinable
     public static func push<V: View>(_ view: V) -> ViewTransition {
         .init(payload: .push(.init(view)), view: view)
     }
     
+    @inlinable
     public static func pushOrPresent<V: View>(_ view: V) -> ViewTransition {
         .init(payload: .pushOrPresent(.init(view)), view: view)
     }
     
+    @inlinable
     public static var pop: ViewTransition {
         .init(payload: .pop)
     }
     
+    @inlinable
     public static var popToRoot: ViewTransition {
         .init(payload: .popToRoot)
     }
     
+    @inlinable
     public static var popOrDismiss: ViewTransition {
         .init(payload: .popOrDismiss)
     }
     
+    @inlinable
     public static func set<V: View>(_ view: V) -> ViewTransition {
         .init(payload: .set(.init(view)), view: view)
     }
     
+    @inlinable
     public static func setRoot<V: View>(_ view: V) -> ViewTransition {
         .init(payload: .setRoot(.init(view)), view: view)
     }
     
+    @inlinable
     public static func setNavigatable<V: View>(_ view: V) -> ViewTransition {
         .init(payload: .setNavigatable(.init(view)), view: view)
     }
     
+    @inlinable
     public static func linear(_ transitions: [ViewTransition]) -> ViewTransition {
         .init(payload: .linear(transitions))
     }
     
+    @inlinable
     public static func linear(_ transitions: ViewTransition...) -> ViewTransition {
         linear(transitions)
     }
     
+    @inlinable
     public static func dynamic(
         _ body: @escaping () -> AnyPublisher<ViewTransitionContext, ViewRouterError>
     ) -> ViewTransition {
         .init(payload: .dynamic(body))
     }
     
+    @inlinable
     public static var none: ViewTransition {
         .init(payload: .none)
     }

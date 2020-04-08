@@ -34,12 +34,14 @@ open class OpaqueBaseViewCoordinator: DynamicViewPresentable {
 }
 
 open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, ViewCoordinator {
+    @inlinable
     public func insertEnvironmentObject<B: ObservableObject>(_ bindable: B) {
         environmentBuilder.insert(bindable)
         
         children.forEach({ $0.insertEnvironmentObject(bindable) })
     }
     
+    @inlinable
     public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) {
         environmentBuilder.merge(builder)
         
@@ -65,15 +67,18 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
         children.forEach({ ($0 as? OpaqueBaseViewCoordinator)?.becomeChild(of: self) })
     }
     
+    @inlinable
     open func transition(for _: Route) -> ViewTransition {
         fatalError()
     }
     
+    @inlinable
     public func triggerPublisher(for route: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         Empty().eraseToAnyPublisher()
     }
     
     @discardableResult
+    @inlinable
     public func trigger(_ route: Route) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         let publisher = triggerPublisher(for: route)
         let result = PassthroughSubject<ViewTransitionContext, ViewRouterError>()
@@ -83,6 +88,7 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
         return result.eraseToAnyPublisher()
     }
     
+    @inlinable
     public func parent<R, C: BaseViewCoordinator<R>>(ofType type: C.Type) -> C? {
         presenter as? C
     }
