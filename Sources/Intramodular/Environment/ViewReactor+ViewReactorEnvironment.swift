@@ -7,12 +7,13 @@ import SwiftUIX
 import Task
 
 extension ViewReactor {
-    @inlinable
+    @_optimize(none)
+    @inline(never)
     public var environmentBuilder: EnvironmentBuilder {
         get {
             environment.environmentBuilder
         } nonmutating set {
-            environment.environmentBuilder = newValue
+            environment.$environmentBuilder.wrappedValue = newValue
         }
     }
 }
