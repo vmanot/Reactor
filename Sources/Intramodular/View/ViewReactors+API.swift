@@ -6,16 +6,19 @@ import Merge
 import SwiftUIX
 
 public struct ViewReactorsView<Content: View>: View {
-    @Environment(\.viewReactors) private var environmentReactors
+    @usableFromInline
+    @Environment(\.viewReactors) var viewReactors
     
     public var content: (ViewReactors) -> Content
     
+    @inlinable
     public init(@ViewBuilder content: @escaping (ViewReactors) -> Content) {
         self.content = content
     }
     
+    @inlinable
     public var body: some View {
-        content(environmentReactors)
+        content(viewReactors)
     }
 }
 
@@ -38,6 +41,7 @@ extension EnvironmentValues {
 // MARK: - API -
 
 extension View {
+    @inlinable
     public func onAppear(dispatch action: opaque_ReactorAction) -> some View {
         ViewReactorsView { reactors in
             self.onAppear {
@@ -46,6 +50,7 @@ extension View {
         }
     }
     
+    @inlinable
     public func onAppear<R: ViewReactor>(dispatch action: R.Action, in reactor: R) -> some View {
         onAppear {
             reactor.dispatch(action)

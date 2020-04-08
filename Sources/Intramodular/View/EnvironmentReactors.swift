@@ -16,10 +16,10 @@ public struct EnvironmentReactors: DynamicProperty {
 
 @propertyWrapper
 public struct EnvironmentReactor<Reactor: ViewReactor>: DynamicProperty {
-    @Environment(\.viewReactors) var environmentReactors
+    @Environment(\.viewReactors) var viewReactors
     
     public var wrappedValue: Reactor {
-        environmentReactors[Reactor.self]!
+        viewReactors[Reactor.self]!
     }
     
     public init() {
@@ -39,7 +39,7 @@ extension View {
     }
     
     @inlinable
-    public func environmentReactors(
+    public func viewReactors(
         _ reactors: ViewReactors
     ) -> some View {
         transformEnvironment(\.viewReactors) {

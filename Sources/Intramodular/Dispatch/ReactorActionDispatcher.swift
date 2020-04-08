@@ -57,6 +57,6 @@ extension ViewReactor where Plan == EmptyReactorPlan {
 
 extension ViewReactor {
     public func environmentDispatch(_ action: opaque_ReactorAction) -> Task<Void, Error> {
-        environmentReactors.dispatch(action)
+        viewReactors.dispatch(action)
     }
 }
