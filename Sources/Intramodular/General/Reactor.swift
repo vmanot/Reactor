@@ -16,10 +16,9 @@ public protocol Reactor: opaque_Reactor, Identifiable {
     
     typealias ActionTask = ReactorActionTask<Self>
     typealias ActionTaskPlan = ReactorActionTaskPlan<Self>
-    
-    /// The inherited environment.
-    var inheritedEnvironmentBuilder: EnvironmentBuilder { get }
-    
+        
+    var environment: ViewReactorEnvironment { get set }
+
     /// Dispatch an action.
     @discardableResult
     func dispatch(_: Action) -> Task<Void, Error>

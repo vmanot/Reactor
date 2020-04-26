@@ -10,7 +10,7 @@ public protocol opaque_ViewReactor: opaque_Reactor {
     
 }
 
-public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, Reactor, ViewReactorComponent {
+public protocol ViewReactor: opaque_ViewReactor, DynamicProperty, DynamicViewPresenter, Reactor {
     associatedtype Repository: ViewReactorRepository = EmptyRepository
     associatedtype Router: ViewRouter = EmptyViewRouter
     associatedtype Subview: Hashable = Never
@@ -27,12 +27,6 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, Reactor, 
 }
 
 // MARK: - Implementation -
-
-extension ViewReactor {
-    public var inheritedEnvironmentBuilder: EnvironmentBuilder {
-        router.environmentBuilder
-    }
-}
 
 extension ViewReactor  {
     public func setup() {

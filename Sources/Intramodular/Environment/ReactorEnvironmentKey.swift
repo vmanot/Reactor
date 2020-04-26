@@ -12,14 +12,10 @@ public struct ReactorEnvironmentKey<R: Reactor>: EnvironmentKey {
 
 extension EnvironmentValues {
     public subscript<R: Reactor>(_ reactor: R.Type) -> R? {
-        self[ReactorEnvironmentKey<R>]?.wrappedValue
-    }
-
-    public subscript<R: ViewReactor>(_ reactor: R.Type) -> R? {
         self[ReactorEnvironmentKey<R>]?.wrappedValue ?? viewReactors[R.self]
     }
     
-    public mutating func insertReactor<R: ViewReactor>(
+    public mutating func insertReactor<R: Reactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) {
         self[ReactorEnvironmentKey<R>] = ReactorReference(wrappedValue: reactor)

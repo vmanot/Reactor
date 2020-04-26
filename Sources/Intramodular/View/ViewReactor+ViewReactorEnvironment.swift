@@ -20,14 +20,14 @@ extension ViewReactor {
 
 extension ViewReactor {
     @inlinable
-    public var viewReactors: ViewReactors {
+    public var viewReactors: ReactorSet {
         environment.viewReactors
     }
 }
 
 extension ReactorView {
     @inlinable
-    public var viewReactors: ViewReactors {
+    public var viewReactors: ReactorSet {
         reactor.environment.viewReactors
     }
 }

@@ -9,7 +9,7 @@ import SwiftUI
 import Task
 
 @propertyWrapper
-public struct ViewReactorEnvironment: ReactorEnvironment, ViewReactorComponent {
+public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
     @usableFromInline
     @Environment(\.viewReactors) var viewReactors
     
