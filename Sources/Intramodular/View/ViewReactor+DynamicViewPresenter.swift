@@ -9,35 +9,41 @@ import Task
 extension ViewReactor where Self: DynamicViewPresenter {
     @inlinable
     public var presenter: DynamicViewPresenter? {
-        environment.dynamicViewPresenter?.presenter
+        environment.environment.dynamicViewPresenter?.presenter
     }
     
     @inlinable
     public var presented: DynamicViewPresentable? {
-        environment.dynamicViewPresenter?.presented
+        environment.environment.dynamicViewPresenter?.presented
     }
     
     @inlinable
     public var name: ViewName? {
-        environment.dynamicViewPresenter?.name
+        environment.environment.dynamicViewPresenter?.name
     }
     
     /// Present a view.
     @inlinable
     public func present(_ modal: AnyModalPresentation) {
-        guard let dynamicViewPresenter = environment.dynamicViewPresenter else {
+        guard let dynamicViewPresenter = environment.environment.dynamicViewPresenter else {
             assertionFailure()
             
             return
         }
         
-        dynamicViewPresenter.present(modal.mergeEnvironmentBuilder(router.environmentBuilder))
+        var modal = modal
+        
+        if let router = router as? EnvironmentProvider {
+            modal.mergeEnvironmentBuilderInPlace(router.environmentBuilder)
+        }
+        
+        dynamicViewPresenter.present(modal)
     }
     
     /// Dismiss the view owned by `self`.
     @inlinable
     public func dismiss(animated: Bool, completion: (() -> Void)?) {
-        guard let dynamicViewPresenter = environment.dynamicViewPresenter else {
+        guard let dynamicViewPresenter = environment.environment.dynamicViewPresenter else {
             assertionFailure()
             
             return
@@ -47,7 +53,7 @@ extension ViewReactor where Self: DynamicViewPresenter {
     }
     
     public func dismiss(_ subview: Subview) {
-        guard let dynamicViewPresenter = environment.dynamicViewPresenter else {
+        guard let dynamicViewPresenter = environment.environment.dynamicViewPresenter else {
             assertionFailure()
             
             return

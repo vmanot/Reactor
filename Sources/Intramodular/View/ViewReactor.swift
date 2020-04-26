@@ -6,39 +6,39 @@ import Merge
 import SwiftUIX
 import Task
 
-public protocol opaque_ViewReactor: opaque_Reactor {
-    
-}
-
-public protocol ViewReactor: opaque_ViewReactor, DynamicProperty, DynamicViewPresenter, Reactor {
+public protocol ViewReactor: opaque_ViewReactor, DynamicProperty, DynamicViewPresenter, Reactor where _Environment == ViewReactorEnvironment {
     associatedtype Repository: ViewReactorRepository = EmptyRepository
     associatedtype Router: ViewRouter = EmptyViewRouter
     associatedtype Subview: Hashable = Never
     
-    var environment: ViewReactorEnvironment { get set }
     var repository: Repository { get }
     var router: Router { get }
     
     /// Perform any necessary setup after the reactor has been initialized.
     func setup()
-    
-    /// Produce a task for a given action.
-    func task(for _: Action) -> ActionTask
 }
 
 // MARK: - Implementation -
-
-extension ViewReactor  {
-    public func setup() {
-        
-    }
-}
 
 extension ViewReactor where Self: DynamicProperty {
     public mutating func update() {
         let reactor = self
         
         environment.update(reactor: .init(wrappedValue: reactor))
+    }
+}
+
+extension ViewReactor  {
+    public var environmentBuilder: EnvironmentBuilder {
+        get {
+            environment.environmentBuilder
+        } nonmutating set {
+            environment.environmentBuilder = newValue
+        }
+    }
+
+    public func setup() {
+        
     }
 }
 

@@ -6,7 +6,7 @@ import Merge
 import Foundation
 import SwiftUIX
 
-public protocol ViewCoordinator: ViewRouter {
+public protocol ViewCoordinator: EnvironmentProvider, ViewRouter {    
     func transition(for: Route) -> ViewTransition
 }
 

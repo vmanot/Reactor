@@ -24,9 +24,7 @@ public struct ReactorSet {
             }
         }
     }
-}
 
-extension ReactorSet {
     public mutating func insert<R: Reactor>(_ reactor: @escaping () -> R)  {
         value[ObjectIdentifier(R.self)] = reactor
     }
@@ -34,9 +32,7 @@ extension ReactorSet {
     public mutating func insert(_ reactors: ReactorSet) {
         value.merge(reactors.value, uniquingKeysWith: { x, y in x })
     }
-}
 
-extension ReactorSet {
     @discardableResult
     public func dispatch(_ action: opaque_ReactorAction) -> Task<Void, Error>! {
         let result = value.values.compactMap({ $0().opaque_dispatch(action) })

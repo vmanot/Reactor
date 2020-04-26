@@ -5,16 +5,8 @@
 import Merge
 import SwiftUIX
 
-public final class AnyViewCoordinator<Route: ViewRoute>: ViewCoordinator {
+public final class AnyViewRouter<Route: ViewRoute>: ViewRouter {
     public let base: DynamicViewPresentable
-    
-    public var environmentBuilder: EnvironmentBuilder {
-        get {
-            base.environmentBuilder
-        } set {
-            base.environmentBuilder = newValue
-        }
-    }
     
     public var name: ViewName? {
         base.name

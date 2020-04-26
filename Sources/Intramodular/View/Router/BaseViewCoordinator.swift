@@ -31,19 +31,23 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
     public func insertEnvironmentObject<B: ObservableObject>(_ bindable: B) {
         environmentBuilder.insert(bindable)
         
-        children.forEach({ $0.insertEnvironmentObject(bindable) })
+        children.forEach({
+            ($0 as? EnvironmentProvider)?.insertEnvironmentObject(bindable)
+        })
     }
     
     @inlinable
     public func mergeEnvironmentBuilder(_ builder: EnvironmentBuilder) {
         environmentBuilder.merge(builder)
         
-        children.forEach({ $0.mergeEnvironmentBuilder(builder) })
+        children.forEach({
+            ($0 as? EnvironmentProvider)?.mergeEnvironmentBuilder(builder)
+        })
     }
     
     open func addChild(_ presentable: DynamicViewPresentable) {
-        presentable.insertEnvironmentObject(AnyViewCoordinator(self))
-        presentable.mergeEnvironmentBuilder(environmentBuilder)
+        (presentable as? DynamicViewPresenter)?.insertEnvironmentObject(AnyViewCoordinator(self))
+        (presentable as? EnvironmentProvider)?.mergeEnvironmentBuilder(environmentBuilder)
         
         (presentable as? OpaqueBaseViewCoordinator)?.becomeChild(of: self)
         
@@ -53,7 +57,7 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
     override open func becomeChild(of parent: OpaqueBaseViewCoordinator) {
         presenter = parent as? DynamicViewPresenter // FIXME!!!
         
-        parent.insertEnvironmentObject(AnyViewCoordinator(self))
+        (parent as? EnvironmentProvider)?.insertEnvironmentObject(AnyViewCoordinator(self))
         
         mergeEnvironmentBuilder(parent.environmentBuilder)
         

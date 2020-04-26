@@ -6,19 +6,19 @@ import Merge
 import SwiftUIX
 import Task
 
-public protocol opaque_Reactor {
-    func opaque_dispatch(_ action: opaque_ReactorAction) -> Task<Void, Error>?
-}
-
 public protocol Reactor: opaque_Reactor, Identifiable {
+    associatedtype _Environment: ReactorEnvironment
     associatedtype Action: ReactorAction
     associatedtype Plan: ReactorPlan = EmptyReactorPlan
     
     typealias ActionTask = ReactorActionTask<Self>
     typealias ActionTaskPlan = ReactorActionTaskPlan<Self>
-        
-    var environment: ViewReactorEnvironment { get set }
-
+    
+    var environment: _Environment { get set }
+    
+    /// Produce a task for a given action.
+    func task(for _: Action) -> ActionTask
+    
     /// Dispatch an action.
     @discardableResult
     func dispatch(_: Action) -> Task<Void, Error>
@@ -30,16 +30,11 @@ public protocol Reactor: opaque_Reactor, Identifiable {
     @discardableResult
     func dispatch(_: Plan) -> Task<Void, Error>
     
+    /// Handle a status produced by a given action.
     func handleStatus(_: ActionTask.Status, for _: Action)
 }
 
 // MARK: - Implementation -
-
-extension opaque_Reactor where Self: Reactor {
-    public func opaque_dispatch(_ action: opaque_ReactorAction) -> Task<Void, Error>? {
-        (action as? Action).map(dispatch)
-    }
-}
 
 extension Reactor where Self: Identifiable {
     public var id: ObjectIdentifier {

@@ -23,3 +23,11 @@ extension EnvironmentValues {
         viewReactors.insert(reactor)
     }
 }
+
+extension EnvironmentBuilder {
+    public mutating func insertReactor<R: ViewReactor>(
+        _ reactor: ReactorReference<R>
+    ) {
+        transformEnvironment({ $0.insertReactor(reactor.wrappedValue) }, withKey: ObjectIdentifier(R.self))
+    }
+}

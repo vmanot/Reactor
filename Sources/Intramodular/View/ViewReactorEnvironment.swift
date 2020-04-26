@@ -11,10 +11,7 @@ import Task
 @propertyWrapper
 public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
     @usableFromInline
-    @Environment(\.viewReactors) var viewReactors
-    
-    @usableFromInline
-    @Environment(\.dynamicViewPresenter) var dynamicViewPresenter
+    @Environment(\.self) var environment
     
     @usableFromInline
     @ObservedObject var taskPipeline: TaskPipeline
@@ -40,21 +37,12 @@ public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
 
 extension ViewReactorEnvironment {
     func update<R: ViewReactor>(reactor: ReactorReference<R>) {
-        if !isSetup {
-            reactor.wrappedValue
-                .router
-                .environmentBuilder
-                .insertEnvironmentReactor(reactor)
+        guard !isSetup else {
+            return
         }
-    }
-}
-
-// MARK: - Auxiliary Implementation -
-
-extension EnvironmentBuilder {
-    public mutating func insertEnvironmentReactor<R: ViewReactor>(
-        _ reactor: ReactorReference<R>
-    ) {
-        transformEnvironment({ $0.viewReactors.insert({ reactor.wrappedValue }) })
+        
+        if let router = (reactor.wrappedValue.router as? EnvironmentProvider) {
+            router.environmentBuilder.insertReactor(reactor)
+        }
     }
 }
