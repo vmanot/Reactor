@@ -5,7 +5,7 @@
 import Merge
 import SwiftUIX
 
-public struct ViewReactorsView<Content: View>: View {
+public struct ViewReactorsAccessView<Content: View>: View {
     @usableFromInline
     @Environment(\.viewReactors) var viewReactors
     
@@ -22,28 +22,12 @@ public struct ViewReactorsView<Content: View>: View {
     }
 }
 
-extension ViewReactors {
-    public struct EnvironmentKey: SwiftUI.EnvironmentKey {
-        public static let defaultValue = ViewReactors()
-    }
-}
-
-extension EnvironmentValues {
-    public var viewReactors: ViewReactors {
-        get {
-            self[ViewReactors.EnvironmentKey.self]
-        } set {
-            self[ViewReactors.EnvironmentKey.self] = newValue
-        }
-    }
-}
-
 // MARK: - API -
 
 extension View {
     @inlinable
     public func onAppear(dispatch action: opaque_ReactorAction) -> some View {
-        ViewReactorsView { reactors in
+        ViewReactorsAccessView { reactors in
             self.onAppear {
                 reactors.dispatch(action)
             }

@@ -16,4 +16,8 @@ public struct ReactorReference<R: Reactor>: DynamicProperty {
     public init(wrappedValue: @autoclosure @escaping () -> R) {
         self._wrappedValue = wrappedValue
     }
+    
+    public init(wrappedValue: @escaping () -> R) {
+        self._wrappedValue = wrappedValue
+    }
 }

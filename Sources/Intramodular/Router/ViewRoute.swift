@@ -6,5 +6,5 @@ import Merge
 import SwiftUIX
 
 public protocol ViewRoute {
-    associatedtype Router: ViewRouter 
+    
 }

@@ -15,42 +15,20 @@ public struct ViewTransition {
         case cannotSetRoot
     }
     
-    private var _payload: Payload
-    
-    private var _payloadView: EnvironmentalAnyView? {
-        get {
-            _payload.view
-        } set {
-            _payload.view = newValue
-        }
-    }
-    
-    @usableFromInline
-    var payload: Payload {
-        var result = _payload
-        
-        result.mutateViewInPlace({
-            $0.mergeEnvironmentBuilderInPlace(environmentBuilder)
-        })
-        
-        return result
-    }
+    private var payload: Payload
     
     @usableFromInline
     var animated: Bool = true
-    
     @usableFromInline
     var payloadViewName: ViewName?
-    
     @usableFromInline
-    var payloadViewType: Any.Type
-    
+    var payloadViewType: Any.Type?
     @usableFromInline
     var environmentBuilder: EnvironmentBuilder
     
     @usableFromInline
-    init<V: View>(payload: ViewTransition.Payload, view: V) {
-        self._payload = payload
+    init<V: View>(payload: (EnvironmentalAnyView) -> ViewTransition.Payload, view: V) {
+        self.payload = payload(.init(view))
         self.payloadViewName = (view as? opaque_NamedView)?.name
         self.payloadViewType = type(of: view)
         self.environmentBuilder = .init()
@@ -58,7 +36,58 @@ public struct ViewTransition {
     
     @usableFromInline
     init(payload: ViewTransition.Payload) {
-        self.init(payload: payload, view: EmptyView())
+        self.payload = payload
+        self.payloadViewName = nil
+        self.payloadViewType = nil
+        self.environmentBuilder = .init()
+    }
+    
+    @usableFromInline
+    func finalize() -> Payload {
+        var result = payload
+        
+        result.mutateViewInPlace({
+            $0.mergeEnvironmentBuilderInPlace(environmentBuilder)
+        })
+        
+        return result
+    }
+}
+
+extension ViewTransition {
+    public var revert: ViewTransition? {
+        switch payload {
+            case .present:
+                return .dismiss
+            case .replacePresented:
+                return nil
+            case .dismiss:
+                return nil
+            case .dismissView:
+                return nil
+            case .push:
+                return .pop
+            case .pushOrPresent:
+                return .popOrDismiss
+            case .pop:
+                return nil
+            case .popToRoot:
+                return nil
+            case .popOrDismiss:
+                return nil
+            case .set:
+                return nil
+            case .setRoot:
+                return nil
+            case .setNavigatable:
+                return nil
+            case .linear:
+                return nil
+            case .dynamic:
+                return nil
+            case .none:
+                return ViewTransition.none
+        }
     }
 }
 
@@ -66,8 +95,13 @@ public struct ViewTransition {
 
 extension ViewTransition: ViewTransitionContext {
     @inlinable
+    public var animation: ViewTransitionAnimation {
+        DefaultViewTransitionAnimation()
+    }
+    
+    @inlinable
     public var view: EnvironmentalAnyView? {
-        payload.view
+        finalize().view
     }
 }
 
@@ -76,12 +110,12 @@ extension ViewTransition: ViewTransitionContext {
 extension ViewTransition {
     @inlinable
     public static func present<V: View>(_ view: V) -> ViewTransition {
-        .init(payload: .present(.init(view)), view: view)
+        .init(payload: ViewTransition.Payload.present, view: view)
     }
     
     @inlinable
     public static func replacePresented<V: View>(with view: V) -> ViewTransition {
-        .init(payload: .replacePresented(with: .init(view)), view: view)
+        .init(payload: ViewTransition.Payload.replacePresented, view: view)
     }
     
     @inlinable
@@ -96,12 +130,12 @@ extension ViewTransition {
     
     @inlinable
     public static func push<V: View>(_ view: V) -> ViewTransition {
-        .init(payload: .push(.init(view)), view: view)
+        .init(payload: ViewTransition.Payload.push, view: view)
     }
     
     @inlinable
     public static func pushOrPresent<V: View>(_ view: V) -> ViewTransition {
-        .init(payload: .pushOrPresent(.init(view)), view: view)
+        .init(payload: ViewTransition.Payload.pushOrPresent, view: view)
     }
     
     @inlinable
@@ -121,17 +155,17 @@ extension ViewTransition {
     
     @inlinable
     public static func set<V: View>(_ view: V) -> ViewTransition {
-        .init(payload: .set(.init(view)), view: view)
+        .init(payload: ViewTransition.Payload.set, view: view)
     }
     
     @inlinable
     public static func setRoot<V: View>(_ view: V) -> ViewTransition {
-        .init(payload: .setRoot(.init(view)), view: view)
+        .init(payload: ViewTransition.Payload.setRoot, view: view)
     }
     
     @inlinable
     public static func setNavigatable<V: View>(_ view: V) -> ViewTransition {
-        .init(payload: .setNavigatable(.init(view)), view: view)
+        .init(payload: ViewTransition.Payload.setNavigatable, view: view)
     }
     
     @inlinable
@@ -198,9 +232,9 @@ extension ViewTransition.Payload {
 
 extension ViewTransition {
     mutating func mutateViewInPlace(_ body: (inout EnvironmentalAnyView) -> Void) {
-        switch _payload {
+        switch payload {
             case .linear(let transitions):
-                _payload = .linear(transitions.map({
+                payload = .linear(transitions.map({
                     var transition = $0
                     
                     transition.mutateViewInPlace(body)
@@ -211,7 +245,7 @@ extension ViewTransition {
                 if var view = payload.view {
                     body(&view)
                     
-                    _payload.view = view
+                    payload.view = view
                 }
             }
         }

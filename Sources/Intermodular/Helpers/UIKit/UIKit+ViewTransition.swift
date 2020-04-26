@@ -13,7 +13,7 @@ extension UIViewController {
         animated: Bool,
         completion: @escaping () -> ()
     ) throws {
-        switch transition.payload {
+        switch transition.finalize() {
             case .present(let view): do {
                 presentOnTop(view, named: transition.payloadViewName, animated: animated) {
                     completion()
@@ -217,12 +217,12 @@ extension ViewTransition {
     ) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         let transition = mergeCoordinator(coordinator)
         let animated = transition.animated
-        if case .dynamic(let trigger) = transition.payload {
+        if case .dynamic(let trigger) = transition.finalize() {
             return trigger()
         }
         
         return Future { attemptToFulfill in
-            switch transition.payload {
+            switch transition.finalize() {
                 case .set(let view): do {
                     window.rootViewController = CocoaHostingController(rootView: view)
                 }
@@ -251,7 +251,7 @@ extension ViewTransition {
     func triggerPublisher<VC: ViewCoordinator>(in controller: UIViewController, animated: Bool, coordinator: VC) -> AnyPublisher<ViewTransitionContext, ViewRouterError> {
         let transition = mergeCoordinator(coordinator)
         
-        if case .dynamic(let trigger) = transition.payload {
+        if case .dynamic(let trigger) = transition.finalize() {
             return trigger()
         }
         

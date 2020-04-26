@@ -14,21 +14,57 @@ public struct ViewReactors {
     }
     
     public subscript<R: ViewReactor>(_ reactorType: R.Type) -> R? {
-        value[ObjectIdentifier(R.self)]?() as? R
+        get {
+            value[ObjectIdentifier(R.self)]?() as? R
+        } set {
+            if let newValue = newValue {
+                value[ObjectIdentifier(R.self)] = { newValue }
+            } else {
+                value[ObjectIdentifier(R.self)] = nil
+            }
+        }
     }
-    
+}
+
+extension ViewReactors {
     public mutating func insert<R: ViewReactor>(_ reactor: @escaping () -> R)  {
         value[ObjectIdentifier(R.self)] = reactor
     }
     
     public mutating func insert(_ reactors: ViewReactors) {
-        for (key, value) in reactors.value {
-            self.value[key] = value
-        }
+        value.merge(reactors.value, uniquingKeysWith: { x, y in x })
     }
-    
+}
+
+extension ViewReactors {
     @discardableResult
     public func dispatch(_ action: opaque_ReactorAction) -> Task<Void, Error>! {
-        value.values.compactMap({ $0().opaque_dispatch(action) }).first
+        let result = value.values.compactMap({ $0().opaque_dispatch(action) })
+        
+        if result.isEmpty {
+            debugPrint("\(action) was not sufficiently handled.")
+        } else if result.count > 1 {
+            assertionFailure("\(action) was handled more than once.")
+        }
+        
+        return result.first
+    }
+}
+
+// MARK: - Auxiliary Implementation -
+
+extension ViewReactors {
+    public struct EnvironmentKey: SwiftUI.EnvironmentKey {
+        public static let defaultValue = ViewReactors()
+    }
+}
+
+extension EnvironmentValues {
+    public var viewReactors: ViewReactors {
+        get {
+            self[ViewReactors.EnvironmentKey.self]
+        } set {
+            self[ViewReactors.EnvironmentKey.self] = newValue
+        }
     }
 }

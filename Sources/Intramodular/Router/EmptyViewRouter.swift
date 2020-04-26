@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Merge
 import SwiftUIX
 
 public enum EmptyViewRoute: ViewRoute {

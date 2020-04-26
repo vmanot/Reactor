@@ -28,6 +28,12 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicViewPresenter, Reactor, 
 
 // MARK: - Implementation -
 
+extension ViewReactor {
+    public var inheritedEnvironmentBuilder: EnvironmentBuilder {
+        router.environmentBuilder
+    }
+}
+
 extension ViewReactor  {
     public func setup() {
         

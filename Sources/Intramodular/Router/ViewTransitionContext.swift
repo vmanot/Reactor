@@ -2,10 +2,9 @@
 // Copyright (c) Vatsal Manot
 //
 
-import Merge
-import Foundation
-import SwiftUIX
+import SwiftUI
 
 public protocol ViewTransitionContext {
+    var animation: ViewTransitionAnimation { get }
     var view: EnvironmentalAnyView? { get }
 }

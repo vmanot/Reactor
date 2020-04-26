@@ -3,7 +3,6 @@
 //
 
 import Merge
-import Foundation
 import SwiftUIX
 
 public final class AnyViewCoordinator<Route: ViewRoute>: ViewCoordinator {

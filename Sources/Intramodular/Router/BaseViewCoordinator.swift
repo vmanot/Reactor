@@ -3,14 +3,7 @@
 //
 
 import Merge
-import Foundation
 import SwiftUIX
-
-public protocol ViewCoordinator: ViewRouter {
-    func transition(for: Route) -> ViewTransition
-}
-
-// MARK: - Implementation -
 
 open class OpaqueBaseViewCoordinator: DynamicViewPresentable {
     public let cancellables = Cancellables()
@@ -21,8 +14,8 @@ open class OpaqueBaseViewCoordinator: DynamicViewPresentable {
         return nil
     }
     
-    open fileprivate(set) var presenter: DynamicViewPresenter?
-    open fileprivate(set) var children: [DynamicViewPresentable] = []
+    open internal(set) var presenter: DynamicViewPresenter?
+    open internal(set) var children: [DynamicViewPresentable] = []
     
     public init() {
         
@@ -91,41 +84,5 @@ open class BaseViewCoordinator<Route: ViewRoute>: OpaqueBaseViewCoordinator, Vie
     @inlinable
     public func parent<R, C: BaseViewCoordinator<R>>(ofType type: C.Type) -> C? {
         presenter as? C
-    }
-}
-
-// MARK: - Auxiliary Implementation -
-
-@propertyWrapper
-public struct ReactorRouter<C: ViewCoordinator>: DynamicProperty {
-    @Environment(\.viewReactors) var viewReactors
-    
-    @OptionalEnvironmentObject public var _wrappedValue0: AnyViewCoordinator<C.Route>?
-    @OptionalEnvironmentObject public var _wrappedValue1: C?
-    
-    public var wrappedValue: C {
-        let result = _wrappedValue0?.base ?? _wrappedValue1!
-        
-        result.environmentBuilder.transformEnvironment {
-            $0.viewReactors.insert(self.viewReactors)
-        }
-        
-        return result as! C
-    }
-    
-    public init() {
-        
-    }
-}
-
-// MARK: - Helpers -
-
-extension ActionLabelView {
-    public init<Coordinator: ViewCoordinator>(
-        trigger route: Coordinator.Route,
-        in coordinator: Coordinator,
-        @ViewBuilder label: () -> Label
-    ) {
-        self.init(action: { coordinator.trigger(route) }, label: label)
     }
 }
