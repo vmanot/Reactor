@@ -18,7 +18,7 @@ extension EnvironmentValues {
     public mutating func insertReactor<R: Reactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) {
-        self[ReactorEnvironmentKey<R>] = ReactorReference(wrappedValue: reactor)
+        self[ReactorEnvironmentKey<R>] = ReactorReference(_wrappedValue: reactor)
         
         viewReactors.insert(reactor)
     }

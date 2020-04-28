@@ -17,7 +17,7 @@ public struct ReactorReference<R: Reactor> {
         self._wrappedValue = wrappedValue
     }
     
-    public init(wrappedValue: @escaping () -> R) {
-        self._wrappedValue = wrappedValue
+    public init(_wrappedValue: @escaping () -> R) {
+        self._wrappedValue = _wrappedValue
     }
 }
