@@ -37,11 +37,6 @@ public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
             .environmentReactor(self.reactor)
             .environment(\.taskPipeline, reactor.environment.taskPipeline)
             .environmentObject(reactor.environment.taskPipeline)
-            .onReceive(ReactorDispatchGlobal.shared.objectWillChange, perform: { action in
-                if let action = action as? Reactor.Action {
-                    self.reactor.dispatch(action)
-                }
-            })
     }
 }
 
