@@ -23,4 +23,8 @@ extension ReactorDispatchGlobal {
             shared.objectWillChange.send(value)
         }
     }
+    
+    public static func message<R: Reactor>(_: R.Type, _ action: R.Action) {
+        send(action)
+    }
 }
