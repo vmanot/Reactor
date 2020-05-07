@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Coordinator
 import Merge
 import SwiftUIX
 import Task
@@ -36,7 +37,7 @@ extension ViewReactor  {
             environment.environmentBuilder = newValue
         }
     }
-
+    
     public func setup() {
         
     }

@@ -14,6 +14,7 @@ let package = Package(
         .library(name: "Reactor", targets: ["Reactor"])
     ],
     dependencies: [
+        .package(url: "git@github.com:SwiftUIX/Coordinator.git", .branch("master")),
         .package(url: "git@github.com:vmanot/Merge.git", .branch("master")),
         .package(url: "git@github.com:vmanot/Task.git", .branch("master")),
         .package(url: "git@github.com:SwiftUIX/SwiftUIX.git", .branch("master")),
@@ -22,6 +23,7 @@ let package = Package(
         .target(
             name: "Reactor",
             dependencies: [
+                "Coordinator",
                 "Merge",
                 "Task",
                 "SwiftUIX",

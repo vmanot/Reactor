@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import Coordinator
 import SwiftUIX
 
 @propertyWrapper
