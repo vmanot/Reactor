@@ -15,8 +15,15 @@ public struct ReactorRouter<Router: ViewRouter>: DynamicProperty {
     @OptionalEnvironmentObject public var _wrappedValue1: AnyViewRouter<Router.Route>?
     @OptionalEnvironmentObject public var _wrappedValue2: AnyViewCoordinator<Router.Route>?
     
+    @inline(never)
     public var wrappedValue: Router {
-        let result: Any = _wrappedValue0 ?? _wrappedValue1?.base ?? _wrappedValue2!.base
+        let result: Any = nil
+            ?? _wrappedValue0
+            ?? _wrappedValue1?.base
+            ?? _wrappedValue2?.base
+            ?? OpaqueBaseViewCoordinator
+                ._runtimeLookupCache[ObjectIdentifier(Router.self)]!
+                .takeUnretainedValue()
         
         if let result = result as? EnvironmentProvider {
             result.environmentBuilder.transformEnvironment({
