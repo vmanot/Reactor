@@ -20,10 +20,15 @@ public struct ReactorActionDispatcher<R: ViewReactor>: Publisher {
     }
     
     public func dispatch() -> Task<Void, Error> {
-        let task = reactor.task(for: action)
+        var task = reactor.task(for: action)
         
-        task.setName(action.createTaskName())
-        task.insert(into: reactor.environment.taskPipeline)
+        if let override = reactor.environment.dispatchOverrides.last(where: { $0.filter(action) }) {
+            task = override.provide(for: action, task: task)
+        }
+        
+        task.name = action.createTaskName()
+        task.pipeline = reactor.environment.taskPipeline
+        
         task.receive(.init(wrappedValue: self.reactor))
         task.start()
         

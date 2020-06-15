@@ -13,15 +13,18 @@ public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
     @usableFromInline
     @Environment(\.self) var environment
     
-    @usableFromInline
-    @ObservedObject var taskPipeline: TaskPipeline
+    @inlinable
+    @ObservedObject public internal(set) var taskPipeline: TaskPipeline
     
+    @inlinable
+    @State public internal(set) var dispatchOverrides: [ReactorDispatchOverride] = []
+
     @usableFromInline
     @State var environmentBuilder = EnvironmentBuilder()
     
     @usableFromInline
     @State var isSetup: Bool = false
-    
+        
     public var wrappedValue: Self {
         get {
             self

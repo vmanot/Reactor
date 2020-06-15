@@ -1,5 +1,9 @@
 # Reactor
-A state management framework for SwiftUI.
+A state management framework for SwiftUI. 
+
+## Why
+
+Reactor is a Flux-inspired, reactive state management 
 
 ```swift
 struct ExampleView: ReactorView {

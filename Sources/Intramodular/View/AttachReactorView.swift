@@ -19,6 +19,7 @@ public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
         self.content = content
     }
     
+    @inlinable
     public var reactor: Reactor {
         reactorReference.wrappedValue
     }
@@ -26,9 +27,9 @@ public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
     @_optimize(none)
     @inline(never)
     public var body: some View {
-        if !reactor.environment.isSetup { // FIXME?
+        if !reactor.environment.isSetup {
             DispatchQueue.main.async {
-                self.reactor.environment.$isSetup.wrappedValue = true
+                self.reactor.environment.isSetup = true
                 self.reactor.setup()
             }
         }
@@ -37,6 +38,9 @@ public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
             .environmentReactor(self.reactor)
             .environment(\.taskPipeline, reactor.environment.taskPipeline)
             .environmentObject(reactor.environment.taskPipeline)
+            .onPreferenceChange(ReactorDispatchOverride.PreferenceKey.self, perform: {
+                self.reactor.environment.dispatchOverrides = $0
+            })
     }
 }
 

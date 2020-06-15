@@ -12,6 +12,8 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicProperty, DynamicViewPre
     associatedtype Router: ViewRouter = EmptyViewRouter
     associatedtype Subview: Hashable = Never
     
+    typealias ReactorEnvironment = ViewReactorEnvironment
+    
     var repository: Repository { get }
     var router: Router { get }
     
@@ -20,6 +22,12 @@ public protocol ViewReactor: opaque_ViewReactor, DynamicProperty, DynamicViewPre
 }
 
 // MARK: - Implementation -
+
+extension ViewReactor {
+    public func action(_ action: Action) -> Action {
+        action
+    }
+}
 
 extension ViewReactor where Self: DynamicProperty {
     public mutating func update() {
