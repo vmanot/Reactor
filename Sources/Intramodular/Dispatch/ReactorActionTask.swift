@@ -13,7 +13,9 @@ public final class ReactorActionTask<R: Reactor>: ParametrizedTask<ReactorRefere
     
     override public func didSend(status: Status) {
         withParameter {
-            $0.wrappedValue.handleStatus(status, for: name._cast(to: R.Action.self)!)
+            if let action = name._cast(to: R.Action.self) {
+                $0.wrappedValue.handleStatus(status, for: action)
+            }
         }
     }
 }
