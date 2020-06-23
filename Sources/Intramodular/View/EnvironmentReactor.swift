@@ -20,7 +20,7 @@ public struct EnvironmentReactor<R: Reactor>: DynamicProperty {
 
 extension View {
     @inlinable
-    public func environmentReactor<R: ReactorObject>(
+    public func environmentReactor<R: ObjectReactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {
         transformEnvironment(\.self, transform: { $0.insertReactor(reactor()) })
