@@ -84,6 +84,19 @@ extension View {
     @inlinable
     public func prehook<A: ReactorAction>(
         _ action: A,
+        perform task: @escaping () -> Task<Void, Error>
+    ) -> some View {
+        modifier(
+            _OverrideReactorActionViewModifier(
+                filter: { $0.createTaskName() == action.createTaskName() },
+                value: { task().concatenate(with: $1) }
+            )
+        )
+    }
+    
+    @inlinable
+    public func prehook<A: ReactorAction>(
+        _ action: A,
         perform task: @escaping () -> Void
     ) -> some View {
         prehook(action, perform: MutableTask(action: task))
@@ -102,6 +115,19 @@ extension View {
         )
     }
     
+    @inlinable
+    public func posthook<A: ReactorAction>(
+        _ action: A,
+        perform task: @escaping () -> Task<Void, Error>
+    ) -> some View {
+        modifier(
+            _OverrideReactorActionViewModifier(
+                filter: { $0.createTaskName() == action.createTaskName() },
+                value: { $1.concatenate(with: task()) }
+            )
+        )
+    }
+
     @inlinable
     public func posthook<A: ReactorAction>(
         _ action: A,
