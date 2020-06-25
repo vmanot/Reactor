@@ -18,45 +18,35 @@ extension ViewReactor where Self: DynamicViewPresenter {
     }
     
     @inlinable
-    public var name: ViewName? {
-        environment.environment.dynamicViewPresenter?.name
+    public var presentationName: ViewName? {
+        environment.environment.dynamicViewPresenter?.presentationName
     }
     
     /// Present a view.
     @inlinable
-    public func present(_ modal: AnyModalPresentation) {
+    public func present(_ item: AnyModalPresentation) {
         guard let dynamicViewPresenter = environment.environment.dynamicViewPresenter else {
-            assertionFailure()
-            
-            return
+            return assertionFailure()
         }
         
-        var modal = modal
-        
-        if let router = router as? EnvironmentProvider {
-            modal.mergeEnvironmentBuilderInPlace(router.environmentBuilder)
-        }
-        
-        dynamicViewPresenter.present(modal)
+        dynamicViewPresenter.present(item.mergeEnvironmentBuilder((router as? EnvironmentProvider)?.environmentBuilder ?? .init()))
     }
     
     /// Dismiss the view owned by `self`.
     @inlinable
     public func dismiss(animated: Bool, completion: (() -> Void)?) {
         guard let dynamicViewPresenter = environment.environment.dynamicViewPresenter else {
-            assertionFailure()
-            
-            return
+            return assertionFailure()
         }
         
         dynamicViewPresenter.dismiss(animated: animated, completion: completion)
     }
     
+    /// Dismisses a given subview.
+    @inlinable
     public func dismiss(_ subview: Subview) {
         guard let dynamicViewPresenter = environment.environment.dynamicViewPresenter else {
-            assertionFailure()
-            
-            return
+            return assertionFailure()
         }
         
         dynamicViewPresenter.dismissView(named: subview)
