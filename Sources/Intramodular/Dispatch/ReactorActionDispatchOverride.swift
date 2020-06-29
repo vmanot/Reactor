@@ -127,7 +127,7 @@ extension View {
             )
         )
     }
-
+    
     @inlinable
     public func posthook<A: ReactorAction>(
         _ action: A,
