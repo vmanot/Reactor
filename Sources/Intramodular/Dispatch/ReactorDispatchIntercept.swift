@@ -7,9 +7,9 @@ import Merge
 import SwiftUIX
 import Task
 
-public struct ReactorDispatchOverride: Equatable {
+public struct ReactorDispatchIntercept: Equatable {
     @usableFromInline
-    typealias Value = (opaque_ReactorDispatchItem, Task<Void, Error>) -> Task<Void, Error>
+    typealias Value = (opaque_ReactorDispatchItem, AnyTask<Void, Error>) -> AnyTask<Void, Error>
     
     @usableFromInline
     let id: UUID
@@ -22,7 +22,7 @@ public struct ReactorDispatchOverride: Equatable {
     
     @usableFromInline
     func provide<R: Reactor>(for action: R.Action, task: ReactorActionTask<R>) -> ReactorActionTask<R> {
-        value(action, task).eraseToActionTask() // FIXME!!
+        value(action, task.eraseToAnyTask()).eraseToActionTask() // FIXME!!
     }
     
     @inlinable
@@ -31,9 +31,9 @@ public struct ReactorDispatchOverride: Equatable {
     }
 }
 
-extension ReactorDispatchOverride {
+extension ReactorDispatchIntercept {
     @usableFromInline
-    final class PreferenceKey: ArrayReducePreferenceKey<ReactorDispatchOverride> {
+    final class PreferenceKey: ArrayReducePreferenceKey<ReactorDispatchIntercept> {
         
     }
 }
@@ -47,12 +47,12 @@ struct _OverrideReactorActionViewModifier: ViewModifier {
     let filter: (opaque_ReactorDispatchItem) -> Bool
     
     @usableFromInline
-    let value: ReactorDispatchOverride.Value
+    let value: ReactorDispatchIntercept.Value
     
     @usableFromInline
     init(
         filter: @escaping (opaque_ReactorDispatchItem) -> Bool,
-        value: @escaping ReactorDispatchOverride.Value
+        value: @escaping ReactorDispatchIntercept.Value
     ) {
         self.filter = filter
         self.value = value
@@ -61,7 +61,7 @@ struct _OverrideReactorActionViewModifier: ViewModifier {
     @usableFromInline
     func body(content: Content)  -> some View {
         content.preference(
-            key: ReactorDispatchOverride.PreferenceKey.self,
+            key: ReactorDispatchIntercept.PreferenceKey.self,
             value: [.init(id: id, filter: filter, value: value)]
         )
     }
@@ -71,7 +71,7 @@ extension View {
     @inlinable
     public func prehook<A: ReactorAction>(
         _ action: A,
-        perform task: Task<Void, Error>
+        perform task: AnyTask<Void, Error>
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
@@ -84,7 +84,7 @@ extension View {
     @inlinable
     public func prehook<A: ReactorAction>(
         _ action: A,
-        perform task: @escaping () -> Task<Void, Error>
+        perform task: @escaping () -> AnyTask<Void, Error>
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
@@ -99,13 +99,13 @@ extension View {
         _ action: A,
         perform task: @escaping () -> Void
     ) -> some View {
-        prehook(action, perform: MutableTask(action: task))
+        prehook(action, perform: PassthroughTask(action: task).eraseToAnyTask())
     }
     
     @inlinable
     public func posthook<A: ReactorAction>(
         _ action: A,
-        perform task: Task<Void, Error>
+        perform task: AnyTask<Void, Error>
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
@@ -118,7 +118,7 @@ extension View {
     @inlinable
     public func posthook<A: ReactorAction>(
         _ action: A,
-        perform task: @escaping () -> Task<Void, Error>
+        perform task: @escaping () -> AnyTask<Void, Error>
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
@@ -133,6 +133,6 @@ extension View {
         _ action: A,
         perform task: @escaping () -> Void
     ) -> some View {
-        posthook(action, perform: MutableTask(action: task))
+        posthook(action, perform: PassthroughTask(action: task).eraseToAnyTask())
     }
 }

@@ -18,7 +18,7 @@ extension ReactorActionTask {
         _ route: Router.Route,
         in router: Router
     ) -> Self {
-        Self.action {
+        .action {
             router.trigger(route)
         }
     }
@@ -27,7 +27,7 @@ extension ReactorActionTask {
 extension ReactorActionTask where R: ViewReactor {
     @inlinable
     public static func trigger(_ route: R.Router.Route) -> Self {
-        Self.action {
+        .action {
             $0.withParameter {
                 $0.wrappedValue.router.trigger(route)
             }

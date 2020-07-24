@@ -9,5 +9,5 @@ import Task
 
 public protocol ReactorEnvironment {
     var taskPipeline: TaskPipeline { get }
-    var dispatchOverrides: [ReactorDispatchOverride] { get }
+    var dispatchOverrides: [ReactorDispatchIntercept] { get }
 }

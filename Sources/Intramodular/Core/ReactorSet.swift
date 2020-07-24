@@ -34,7 +34,7 @@ public struct ReactorSet {
     }
 
     @discardableResult
-    public func dispatch(_ action: opaque_ReactorAction) -> Task<Void, Error>! {
+    public func dispatch(_ action: opaque_ReactorAction) -> AnyTask<Void, Error>! {
         let result = value.values.compactMap({ $0().opaque_dispatch(action) })
         
         if result.isEmpty {

@@ -17,7 +17,7 @@ public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
     @ObservedObject public internal(set) var taskPipeline: TaskPipeline
     
     @inlinable
-    @State public internal(set) var dispatchOverrides: [ReactorDispatchOverride] = []
+    @State public internal(set) var dispatchOverrides: [ReactorDispatchIntercept] = []
 
     @usableFromInline
     @State var environmentBuilder = EnvironmentBuilder()

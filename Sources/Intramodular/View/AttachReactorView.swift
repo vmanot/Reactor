@@ -44,7 +44,7 @@ public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
             .environmentReactor(self.reactor)
             .environment(\.taskPipeline, reactor.environment.taskPipeline)
             .environmentObject(reactor.environment.taskPipeline)
-            .onPreferenceChange(ReactorDispatchOverride.PreferenceKey.self, perform: {
+            .onPreferenceChange(ReactorDispatchIntercept.PreferenceKey.self, perform: {
                 self.reactor.environment.dispatchOverrides = $0
             })
     }

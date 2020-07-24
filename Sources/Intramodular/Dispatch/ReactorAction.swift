@@ -22,7 +22,7 @@ public struct ReactorDispatchActionButton<Label: View>: View {
     let action: TaskName
     
     @usableFromInline
-    let dispatch: () -> Task<Void, Error>
+    let dispatch: () -> AnyTask<Void, Error>
     
     @usableFromInline
     let label: Label

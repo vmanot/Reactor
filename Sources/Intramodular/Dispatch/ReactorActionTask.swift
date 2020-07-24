@@ -6,7 +6,7 @@ import Merge
 import SwiftUIX
 import Task
 
-public final class ReactorActionTask<R: Reactor>: ParametrizedTask<ReactorReference<R>, Void, Error>, ExpressibleByNilLiteral {
+public final class ReactorActionTask<R: Reactor>: ParametrizedPassthroughTask<ReactorReference<R>, Void, Error>, ExpressibleByNilLiteral {
     public required convenience init(nilLiteral: ()) {
         self.init(action: { })
     }
@@ -22,7 +22,7 @@ public final class ReactorActionTask<R: Reactor>: ParametrizedTask<ReactorRefere
 
 // MARK: - API -
 
-extension ParametrizedTask {
+extension ParametrizedPassthroughTask {
     public func withReactor<R: Reactor>(
         _ body: (R) -> ()
     ) -> Void where Parameter == ReactorReference<R> {
@@ -36,7 +36,9 @@ extension ParametrizedTask {
 
 extension ReactorActionTask {
     public class func error(description: String) -> Self {
-        error(ViewError(description: description))
+        .init { attemptToFulfill in
+            attemptToFulfill(.failure(ViewError(description: description)))
+        }
     }
 }
 

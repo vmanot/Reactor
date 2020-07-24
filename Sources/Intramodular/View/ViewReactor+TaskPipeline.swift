@@ -22,21 +22,14 @@ extension ReactorView {
 
 extension ViewReactor {
     @inlinable
-    public func activeTaskID(of action: Action) -> some Hashable {
-        environment
-            .taskPipeline[action.createTaskName()]?
-            .id
-    }
-    
-    @inlinable
-    public func status(of action: Action) -> OpaqueTask.StatusDescription? {
+    public func status(of action: Action) -> TaskStatusDescription? {
         environment
             .taskPipeline[action.createTaskName()]?
             .statusDescription
     }
     
     @inlinable
-    public func lastStatus(of action: Action) -> OpaqueTask.StatusDescription? {
+    public func lastStatus(of action: Action) -> TaskStatusDescription? {
         environment.taskPipeline.lastStatus(for: action.createTaskName())
     }
     

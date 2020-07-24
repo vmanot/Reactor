@@ -7,8 +7,8 @@ import SwiftUIX
 import Task
 
 public struct ReactorActionDispatcher<R: ViewReactor>: Publisher {
-    public typealias Output = Task<Void, Error>.Output
-    public typealias Failure = Task<Void, Error>.Failure
+    public typealias Output = AnyTask<Void, Error>.Output
+    public typealias Failure = AnyTask<Void, Error>.Failure
     
     public let reactor: R
     public let action: R.Action
@@ -19,7 +19,7 @@ public struct ReactorActionDispatcher<R: ViewReactor>: Publisher {
         dispatch().receive(subscriber: subscriber)
     }
     
-    public func dispatch() -> Task<Void, Error> {
+    public func dispatch() -> AnyTask<Void, Error> {
         var task = reactor.task(for: action)
         
         task.receive(.init(wrappedValue: self.reactor))
@@ -33,11 +33,16 @@ public struct ReactorActionDispatcher<R: ViewReactor>: Publisher {
         }
         
         task.name = action.createTaskName()
-        task.pipeline = reactor.environment.taskPipeline
+        
+        do {
+            try task.attach(to: reactor.environment.taskPipeline)
+        } catch {
+            return AnyPublisher.failure(error).eraseToTask()
+        }
         
         task.start()
         
-        return task
+        return task.eraseToAnyTask()
     }
 }
 
@@ -49,12 +54,12 @@ extension ViewReactor {
     }
     
     @discardableResult
-    public func dispatch(_ action: Action) -> Task<Void, Error> {
+    public func dispatch(_ action: Action) -> AnyTask<Void, Error> {
         dispatcher(for: action).dispatch()
     }
     
     @discardableResult
-    public func dispatch(super action: opaque_ReactorAction) -> Task<Void, Error> {
+    public func dispatch(super action: opaque_ReactorAction) -> AnyTask<Void, Error> {
         viewReactors.dispatch(action)
     }
 }
@@ -65,13 +70,13 @@ extension ViewReactor where Plan == EmptyReactorPlan {
     }
     
     @discardableResult
-    public func dispatch(_ plan: Plan) -> Task<Void, Error> {
+    public func dispatch(_ plan: Plan) -> AnyTask<Void, Error> {
         
     }
 }
 
 extension ViewReactor {
-    public func environmentDispatch(_ action: opaque_ReactorAction) -> Task<Void, Error> {
+    public func environmentDispatch(_ action: opaque_ReactorAction) -> AnyTask<Void, Error> {
         viewReactors.dispatch(action)
     }
 }

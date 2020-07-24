@@ -21,14 +21,14 @@ public protocol Reactor: opaque_Reactor, Identifiable {
     
     /// Dispatch an action.
     @discardableResult
-    func dispatch(_: Action) -> Task<Void, Error>
+    func dispatch(_: Action) -> AnyTask<Void, Error>
     
     /// Produce a task plan for a given plan.
     func taskPlan(for _: Plan) -> ActionTaskPlan
     
     /// Dispatch an action plan.
     @discardableResult
-    func dispatch(_: Plan) -> Task<Void, Error>
+    func dispatch(_: Plan) -> AnyTask<Void, Error>
     
     /// Handle a status produced by a given action.
     func handleStatus(_: ActionTask.Status, for _: Action)
