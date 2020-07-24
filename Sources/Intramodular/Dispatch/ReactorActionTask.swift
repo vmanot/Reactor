@@ -37,15 +37,22 @@ extension ParametrizedPassthroughTask {
 extension ReactorActionTask {
     public class func error(description: String) -> Self {
         .init { attemptToFulfill in
-            attemptToFulfill(.failure(ViewError(description: description)))
+            attemptToFulfill(.failure(ReactorActionTaskError.custom(description)))
         }
     }
 }
 
-// MARK: - Helpers -
+// MARK: - API -
 
 extension Publisher {
     public func eraseToActionTask<R: Reactor>() -> ReactorActionTask<R> {
         .init(mapTo(()).eraseError())
     }
+}
+
+// MARK: - Auxiliary Implementation -
+
+@usableFromInline
+enum ReactorActionTaskError: Error {
+    case custom(String)
 }
