@@ -28,7 +28,7 @@ extension ReactorActionTask where R: ViewReactor {
     @inlinable
     public static func trigger(_ route: R.Router.Route) -> Self {
         .action {
-            $0.withParameter {
+            $0.withInput {
                 $0.wrappedValue.router.trigger(route)
             }
         }

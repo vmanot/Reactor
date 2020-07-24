@@ -12,7 +12,7 @@ public final class ReactorActionTask<R: Reactor>: ParametrizedPassthroughTask<Re
     }
     
     override public func didSend(status: Status) {
-        withParameter {
+        withInput {
             if let action = name._cast(to: R.Action.self) {
                 $0.wrappedValue.handleStatus(status, for: action)
             }
@@ -25,9 +25,9 @@ public final class ReactorActionTask<R: Reactor>: ParametrizedPassthroughTask<Re
 extension ParametrizedPassthroughTask {
     public func withReactor<R: Reactor>(
         _ body: (R) -> ()
-    ) -> Void where Parameter == ReactorReference<R> {
-        if let parameter = parameter {
-            body(parameter.wrappedValue)
+    ) -> Void where Input == ReactorReference<R> {
+        if let input = input {
+            body(input.wrappedValue)
         } else {
             assertionFailure()
         }
