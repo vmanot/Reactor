@@ -24,22 +24,16 @@ public struct ReactorActionDispatcher<R: ViewReactor>: Publisher {
         
         task.receive(.init(wrappedValue: self.reactor))
         
-        let filteredOverrides = reactor.environment.dispatchOverrides.filter({ $0.filter(action) })
-        
-        for override in filteredOverrides{
-            task = override.provide(for: action, task: task)
-            
-            task.receive(.init(wrappedValue: self.reactor))
-        }
+        reactor
+            .environment
+            .intercepts(for: action)
+            .forEach { override in
+                task = override.provide(for: action, task: task)
+                task.receive(.init(wrappedValue: self.reactor))
+            }
         
         task.name = action.createTaskName()
-        
-        do {
-            try task.attach(to: reactor.environment.taskPipeline)
-        } catch {
-            return AnyPublisher.failure(error).eraseToTask()
-        }
-        
+        reactor.environment.taskPipeline.track(task)
         task.start()
         
         return task.eraseToAnyTask()

@@ -17,7 +17,7 @@ public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
     @ObservedObject public internal(set) var taskPipeline: TaskPipeline
     
     @inlinable
-    @State public internal(set) var dispatchOverrides: [ReactorDispatchIntercept] = []
+    @State public internal(set) var dispatchIntercepts: [ReactorDispatchIntercept] = []
 
     @usableFromInline
     @State var environmentBuilder = EnvironmentBuilder()
@@ -35,6 +35,12 @@ public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
     
     public init() {
         taskPipeline = .init()
+    }
+}
+
+extension ViewReactorEnvironment {
+    public func intercepts(for item: opaque_ReactorDispatchItem) -> [ReactorDispatchIntercept] {
+        dispatchIntercepts.filter({ $0.filter(item) })
     }
 }
 
