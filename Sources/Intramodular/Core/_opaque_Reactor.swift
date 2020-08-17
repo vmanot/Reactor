@@ -7,16 +7,16 @@ import Swift
 
 /// An opaque mirror for `Reactor` used by various runtime mechanisms.
 /// You will never need to implement this.
-public protocol opaque_Reactor {
-    func opaque_dispatch(_ action: opaque_ReactorAction) -> AnyTask<Void, Error>?
+public protocol _opaque_Reactor {
+    func _opaque_dispatch(_ action: _opaque_ReactorAction) -> AnyTask<Void, Error>?
     
     func toAnyObservableObject() -> AnyObservableObject<Void, Never>?
 }
 
 // MARK: - Implementation -
 
-extension opaque_Reactor where Self: Reactor {
-    public func opaque_dispatch(_ action: opaque_ReactorAction) -> AnyTask<Void, Error>? {
+extension _opaque_Reactor where Self: Reactor {
+    public func _opaque_dispatch(_ action: _opaque_ReactorAction) -> AnyTask<Void, Error>? {
         (action as? Action).map(dispatch)
     }
     
@@ -25,7 +25,7 @@ extension opaque_Reactor where Self: Reactor {
     }
 }
 
-extension opaque_Reactor where Self: ObjectReactor {
+extension _opaque_Reactor where Self: ObjectReactor {
     public func toAnyObservableObject() -> AnyObservableObject<Void, Never>? {
         nil
     }

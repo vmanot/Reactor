@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.2
 
 import PackageDescription
 
@@ -14,10 +14,10 @@ let package = Package(
         .library(name: "Reactor", targets: ["Reactor"])
     ],
     dependencies: [
-        .package(url: "git@github.com:SwiftUIX/Coordinator.git", .branch("master")),
-        .package(url: "git@github.com:vmanot/Merge.git", .branch("master")),
-        .package(url: "git@github.com:vmanot/Task.git", .branch("master")),
-        .package(url: "git@github.com:SwiftUIX/SwiftUIX.git", .branch("master")),
+        .package(url: "https://github.com/SwiftUIX/Coordinator.git", .branch("master")),
+        .package(url: "https://github.com/vmanot/Merge.git", .branch("master")),
+        .package(url: "https://github.com/vmanot/Task.git", .branch("master")),
+        .package(url: "https://github.com/SwiftUIX/SwiftUIX.git", .branch("master")),
     ],
     targets: [
         .target(
@@ -30,8 +30,5 @@ let package = Package(
             ],
             path: "Sources"
         ),
-    ],
-    swiftLanguageVersions: [
-        .version("5.1")
     ]
 )

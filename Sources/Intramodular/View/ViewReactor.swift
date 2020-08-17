@@ -7,7 +7,7 @@ import Merge
 import SwiftUIX
 import Task
 
-public protocol ViewReactor: opaque_ViewReactor, DynamicProperty, DynamicViewPresenter, Reactor where _Environment == ViewReactorEnvironment {
+public protocol ViewReactor: _opaque_ViewReactor, DynamicProperty, DynamicViewPresenter, Reactor where _Environment == ViewReactorEnvironment {
     associatedtype Repository: ViewReactorRepository = EmptyRepository
     associatedtype Router: ViewRouter = EmptyViewRouter
     associatedtype Subview: Hashable = Never

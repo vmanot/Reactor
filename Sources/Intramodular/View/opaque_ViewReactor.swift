@@ -4,6 +4,6 @@
 
 import Swift
 
-public protocol opaque_ViewReactor: opaque_Reactor {
+public protocol _opaque_ViewReactor: _opaque_Reactor {
     
 }

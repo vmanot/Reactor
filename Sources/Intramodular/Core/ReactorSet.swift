@@ -7,7 +7,7 @@ import SwiftUIX
 import Task
 
 public struct ReactorSet {
-    private var value: [ObjectIdentifier: () -> opaque_Reactor] = [:]
+    private var value: [ObjectIdentifier: () -> _opaque_Reactor] = [:]
     
     public init() {
         
@@ -34,8 +34,8 @@ public struct ReactorSet {
     }
 
     @discardableResult
-    public func dispatch(_ action: opaque_ReactorAction) -> AnyTask<Void, Error>! {
-        let result = value.values.compactMap({ $0().opaque_dispatch(action) })
+    public func dispatch(_ action: _opaque_ReactorAction) -> AnyTask<Void, Error>! {
+        let result = value.values.compactMap({ $0()._opaque_dispatch(action) })
         
         if result.isEmpty {
             debugPrint("\(action) was not sufficiently handled.")
@@ -86,7 +86,7 @@ public struct ReactorSetAccessView<Content: View>: View {
 
 extension View {
     @inlinable
-    public func onAppear(dispatch action: opaque_ReactorAction) -> some View {
+    public func onAppear(dispatch action: _opaque_ReactorAction) -> some View {
         ReactorSetAccessView { reactors in
             self.onAppear {
                 reactors.dispatch(action)

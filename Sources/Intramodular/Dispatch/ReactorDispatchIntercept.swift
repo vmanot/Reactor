@@ -9,13 +9,13 @@ import Task
 
 public struct ReactorDispatchIntercept: Equatable {
     @usableFromInline
-    typealias Value = (opaque_ReactorDispatchItem, AnyTask<Void, Error>) -> AnyTask<Void, Error>
+    typealias Value = (_opaque_ReactorDispatchItem, AnyTask<Void, Error>) -> AnyTask<Void, Error>
     
     @usableFromInline
     let id: UUID
     
     @usableFromInline
-    let filter: (opaque_ReactorDispatchItem) -> Bool
+    let filter: (_opaque_ReactorDispatchItem) -> Bool
     
     @usableFromInline
     let value: Value
@@ -44,14 +44,14 @@ struct _OverrideReactorActionViewModifier: ViewModifier {
     @State var id: UUID = .init()
     
     @usableFromInline
-    let filter: (opaque_ReactorDispatchItem) -> Bool
+    let filter: (_opaque_ReactorDispatchItem) -> Bool
     
     @usableFromInline
     let value: ReactorDispatchIntercept.Value
     
     @usableFromInline
     init(
-        filter: @escaping (opaque_ReactorDispatchItem) -> Bool,
+        filter: @escaping (_opaque_ReactorDispatchItem) -> Bool,
         value: @escaping ReactorDispatchIntercept.Value
     ) {
         self.filter = filter

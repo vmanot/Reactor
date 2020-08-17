@@ -6,11 +6,11 @@ import Merge
 import SwiftUIX
 import Task
 
-public protocol opaque_ReactorAction: opaque_ReactorDispatchItem {
+public protocol _opaque_ReactorAction: _opaque_ReactorDispatchItem {
     
 }
 
-public protocol ReactorAction: opaque_ReactorAction, ReactorDispatchItem {
+public protocol ReactorAction: _opaque_ReactorAction, ReactorDispatchItem {
     
 }
 

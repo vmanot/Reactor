@@ -6,7 +6,7 @@ import Merge
 import SwiftUIX
 import Task
 
-public protocol Reactor: opaque_Reactor, Identifiable {
+public protocol Reactor: _opaque_Reactor, Identifiable {
     associatedtype _Environment: ReactorEnvironment
     associatedtype Action: ReactorAction
     associatedtype Plan: ReactorPlan = EmptyReactorPlan

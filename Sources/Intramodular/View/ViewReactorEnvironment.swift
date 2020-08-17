@@ -39,7 +39,7 @@ public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
 }
 
 extension ViewReactorEnvironment {
-    public func intercepts(for item: opaque_ReactorDispatchItem) -> [ReactorDispatchIntercept] {
+    public func intercepts(for item: _opaque_ReactorDispatchItem) -> [ReactorDispatchIntercept] {
         dispatchIntercepts.filter({ $0.filter(item) })
     }
 }

@@ -22,7 +22,7 @@ public struct ReactorRouter<Router: ViewRouter>: DynamicProperty {
             ?? _wrappedValue1?.base
             ?? _wrappedValue2?.base
             ?? OpaqueBaseViewCoordinator
-                ._runtimeLookupCache[ObjectIdentifier(Router.self)]!
+                ._runtimeLookup[ObjectIdentifier(Router.self)]!
                 .takeUnretainedValue()
         
         if let result = result as? EnvironmentProvider {
