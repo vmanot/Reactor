@@ -6,23 +6,24 @@ import Merge
 import SwiftUIX
 import Task
 
-extension ViewReactor where Self: DynamicViewPresenter {
+extension ViewReactor where Self: DynamicViewPresentable {
     @inlinable
     public var presenter: DynamicViewPresenter? {
         environment.environment.presenter?.presenter
     }
     
     @inlinable
+    public var presentationName: ViewName? {
+        environment.environment.presenter?.presentationName
+    }
+}
+
+extension ViewReactor where Self: DynamicViewPresenter {
+    @inlinable
     public var presented: DynamicViewPresentable? {
         environment.environment.presenter?.presented
     }
     
-    @inlinable
-    public var presentationName: ViewName? {
-        environment.environment.presenter?.presentationName
-    }
-    
-    /// Present a view.
     @inlinable
     public func present(_ item: AnyModalPresentation) {
         guard let presenter = environment.environment.presenter else {
@@ -32,14 +33,26 @@ extension ViewReactor where Self: DynamicViewPresenter {
         presenter.present(item.mergeEnvironmentBuilder((router as? EnvironmentProvider)?.environmentBuilder ?? .init()))
     }
     
-    /// Dismiss the view owned by `self`.
-    @inlinable
-    public func dismiss(animated: Bool, completion: (() -> Void)?) {
+    @discardableResult
+    func dismiss(withAnimation animation: Animation?) -> Future<Bool, Never> {
         guard let presenter = environment.environment.presenter else {
-            return assertionFailure()
+            assertionFailure()
+            
+            return .init({ $0(.success(false)) })
         }
         
-        presenter.dismiss(animated: animated, completion: completion)
+        return presenter.dismiss(withAnimation: animation)
+    }
+    
+    @discardableResult
+    func dismissSelf(withAnimation animation: Animation?) -> Future<Bool, Never> {
+        guard let presenter = environment.environment.presenter else {
+            assertionFailure()
+            
+            return .init({ $0(.success(false)) })
+        }
+        
+        return presenter.dismissSelf(withAnimation: animation)
     }
     
     /// Dismisses a given subview.
