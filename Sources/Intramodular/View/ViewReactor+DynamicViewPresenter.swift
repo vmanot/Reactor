@@ -34,7 +34,8 @@ extension ViewReactor where Self: DynamicViewPresenter {
     }
     
     @discardableResult
-    func dismiss(withAnimation animation: Animation?) -> Future<Bool, Never> {
+    @inlinable
+    public func dismiss(withAnimation animation: Animation?) -> Future<Bool, Never> {
         guard let presenter = environment.environment.presenter else {
             assertionFailure()
             
@@ -45,7 +46,8 @@ extension ViewReactor where Self: DynamicViewPresenter {
     }
     
     @discardableResult
-    func dismissSelf(withAnimation animation: Animation?) -> Future<Bool, Never> {
+    @inlinable
+    public func dismissSelf(withAnimation animation: Animation?) -> Future<Bool, Never> {
         guard let presenter = environment.environment.presenter else {
             assertionFailure()
             
