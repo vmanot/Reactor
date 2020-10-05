@@ -18,13 +18,13 @@ public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
     
     @inlinable
     @State public internal(set) var dispatchIntercepts: [ReactorDispatchIntercept] = []
-
+    
     @usableFromInline
     @State var environmentBuilder = EnvironmentBuilder()
     
     @usableFromInline
     @State var isSetup: Bool = false
-        
+    
     public var wrappedValue: Self {
         get {
             self
@@ -50,8 +50,6 @@ extension ViewReactorEnvironment {
             return
         }
         
-        if let router = (reactor.wrappedValue.router as? EnvironmentProvider) {
-            router.environmentBuilder.insertReactor(reactor)
-        }
+        reactor.wrappedValue.coordinator.environmentBuilder.insertReactor(reactor)
     }
 }

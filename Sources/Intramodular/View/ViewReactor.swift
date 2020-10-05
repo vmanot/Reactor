@@ -8,12 +8,12 @@ import SwiftUIX
 import Task
 
 public protocol ViewReactor: _opaque_ViewReactor, DynamicProperty, DynamicViewPresenter, Reactor where _Environment == ViewReactorEnvironment {
-    associatedtype Router: ViewRouter = EmptyViewRouter
+    associatedtype Coordinator: ViewCoordinator = EmptyViewCoordinator
     associatedtype Subview: Hashable = Never
     
     typealias ReactorEnvironment = ViewReactorEnvironment
     
-    var router: Router { get }
+    var coordinator: Coordinator { get }
     
     /// Perform any necessary setup after the reactor has been initialized.
     func setup()
@@ -49,8 +49,8 @@ extension ViewReactor  {
     }
 }
 
-extension ViewReactor where Router == EmptyViewRouter {
-    public var router: EmptyViewRouter {
+extension ViewReactor where Coordinator == EmptyViewCoordinator {
+    public var coordinator: EmptyViewCoordinator {
         .init()
     }
 }
