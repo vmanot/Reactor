@@ -9,6 +9,8 @@ import Task
 
 public struct ReactorDispatchIntercept: Equatable {
     @usableFromInline
+    typealias PreferenceKey = ArrayReducePreferenceKey<ReactorDispatchIntercept>
+    @usableFromInline
     typealias Value = (_opaque_ReactorDispatchItem, AnyTask<Void, Error>) -> AnyTask<Void, Error>
     
     @usableFromInline
@@ -28,13 +30,6 @@ public struct ReactorDispatchIntercept: Equatable {
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.id == rhs.id
-    }
-}
-
-extension ReactorDispatchIntercept {
-    @usableFromInline
-    final class PreferenceKey: ArrayReducePreferenceKey<ReactorDispatchIntercept> {
-        
     }
 }
 
