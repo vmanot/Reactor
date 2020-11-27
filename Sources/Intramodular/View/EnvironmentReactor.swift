@@ -12,7 +12,7 @@ public struct EnvironmentReactor<R: Reactor>: DynamicProperty {
     public var wrappedValue: R {
         environment[R]!
     }
-
+    
     public init() {
         
     }

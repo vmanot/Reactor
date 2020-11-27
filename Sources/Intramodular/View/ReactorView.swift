@@ -6,7 +6,7 @@ import Merge
 import SwiftUIX
 import SwiftUI
 
-public protocol ReactorView: NamedView {
+public protocol ReactorView: View {
     associatedtype Reactor: ViewReactor
     associatedtype ReactorViewBody: View
     

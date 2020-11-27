@@ -75,6 +75,11 @@ extension ReactorActionTask where R: ViewReactor {
     }
     
     @inlinable
+    public static func presentOnTop<V: View>(_ view: V) -> Self {
+        .action({ $0.withReactor({ $0.presentOnTop(view) }) })
+    }
+    
+    @inlinable
     public static func dismiss() -> Self {
         .action({ $0.withReactor({ $0.dismiss() }) })
     }
