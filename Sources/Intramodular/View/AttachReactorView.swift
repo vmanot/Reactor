@@ -4,7 +4,6 @@
 
 import Merge
 import SwiftUIX
-import Task
 
 public struct ObservedReactor<R: Reactor>: DynamicProperty {
     @ObservedObject var observedObject: AnyObservableObject<Void, Never>

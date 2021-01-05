@@ -4,7 +4,6 @@
 
 import Merge
 import SwiftUIX
-import Task
 
 public protocol Reactor: _opaque_Reactor, Identifiable {
     associatedtype _Environment: ReactorEnvironment

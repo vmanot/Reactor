@@ -4,7 +4,6 @@
 
 import Merge
 import SwiftUIX
-import Task
 
 public struct ReactorSet {
     private var value: [ObjectIdentifier: () -> _opaque_Reactor] = [:]

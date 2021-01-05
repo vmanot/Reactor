@@ -6,7 +6,6 @@ import Combine
 import Merge
 import SwiftUIX
 import SwiftUI
-import Task
 
 @propertyWrapper
 public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {

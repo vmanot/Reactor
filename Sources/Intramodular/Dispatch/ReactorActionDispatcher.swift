@@ -4,7 +4,6 @@
 
 import Merge
 import SwiftUIX
-import Task
 
 public struct ReactorActionDispatcher<R: ViewReactor>: Publisher {
     public typealias Output = AnyTask<Void, Error>.Output

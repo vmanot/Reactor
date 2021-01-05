@@ -4,7 +4,6 @@
 
 import Merge
 import SwiftUIX
-import Task
 
 public final class ReactorActionTask<R: Reactor>: ParametrizedPassthroughTask<ReactorReference<R>, Void, Error>, ExpressibleByNilLiteral {
     public required convenience init(nilLiteral: ()) {
@@ -12,7 +11,7 @@ public final class ReactorActionTask<R: Reactor>: ParametrizedPassthroughTask<Re
     }
     
     override public func didSend(status: Status) {
-        withInput {
+        try! withInput {
             if let action = name._cast(to: R.Action.self) {
                 $0.wrappedValue.handleStatus(status, for: action)
             }
@@ -46,7 +45,7 @@ extension ReactorActionTask {
 
 extension Publisher {
     public func eraseToActionTask<R: Reactor>() -> ReactorActionTask<R> {
-        .init(mapTo(()).eraseError())
+        .init(publisher: mapTo(()).eraseError())
     }
 }
 

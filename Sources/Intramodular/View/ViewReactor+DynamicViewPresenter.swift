@@ -4,7 +4,6 @@
 
 import Merge
 import SwiftUIX
-import Task
 
 extension ViewReactor where Self: DynamicViewPresentable {
     @inlinable

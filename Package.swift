@@ -16,7 +16,6 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/SwiftUIX/Coordinator.git", .branch("master")),
         .package(url: "https://github.com/vmanot/Merge.git", .branch("master")),
-        .package(url: "https://github.com/vmanot/Task.git", .branch("master")),
         .package(url: "https://github.com/SwiftUIX/SwiftUIX.git", .branch("master")),
     ],
     targets: [
@@ -25,8 +24,7 @@ let package = Package(
             dependencies: [
                 "Coordinator",
                 "Merge",
-                "Task",
-                "SwiftUIX",
+                "SwiftUIX"
             ],
             path: "Sources"
         ),

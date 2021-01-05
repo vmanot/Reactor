@@ -28,7 +28,7 @@ extension ReactorActionTask where R: ViewReactor {
     @inlinable
     public static func trigger(_ route: R.Coordinator.Route) -> Self {
         .action {
-            $0.withInput {
+            try! $0.withInput {
                 $0.wrappedValue.coordinator.trigger(route)
             }
         }

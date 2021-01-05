@@ -5,7 +5,6 @@
 import Coordinator
 import Merge
 import SwiftUIX
-import Task
 
 public protocol ViewReactor: _opaque_ViewReactor, DynamicProperty, DynamicViewPresenter, Reactor where _Environment == ViewReactorEnvironment {
     associatedtype Coordinator: ViewCoordinator = EmptyViewCoordinator

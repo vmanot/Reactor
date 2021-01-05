@@ -5,7 +5,6 @@
 import Coordinator
 import Merge
 import SwiftUIX
-import Task
 
 public struct ReactorDispatchIntercept: Equatable {
     @usableFromInline
