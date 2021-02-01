@@ -30,7 +30,6 @@ extension ReactorDependentView {
 
 // MARK: - Auxiliary Implementation -
 
-@_frozen
 public struct _SynthesizedReactorDependentViewBody<Reactor: ViewReactor, Content: View>: View {
     @usableFromInline
     @EnvironmentReactor var reactor: Reactor
