@@ -12,7 +12,7 @@ public protocol ReactorPlan: Hashable {
 // MARK: - Extensions -
 
 extension ReactorPlan {
-    public func createTaskName() -> TaskName {
+    public func createTaskIdentifier() -> TaskIdentifier {
         return .init(self)
     }
 }

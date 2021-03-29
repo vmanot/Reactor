@@ -69,7 +69,7 @@ extension View {
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
-                filter: { $0.createTaskName() == action.createTaskName() },
+                filter: { $0.createTaskIdentifier() == action.createTaskIdentifier() },
                 value: { task.concatenate(with: $1) }
             )
         )
@@ -82,7 +82,7 @@ extension View {
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
-                filter: { $0.createTaskName() == action.createTaskName() },
+                filter: { $0.createTaskIdentifier() == action.createTaskIdentifier() },
                 value: { task().concatenate(with: $1) }
             )
         )
@@ -103,7 +103,7 @@ extension View {
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
-                filter: { $0.createTaskName() == action.createTaskName() },
+                filter: { $0.createTaskIdentifier() == action.createTaskIdentifier() },
                 value: { $1.concatenate(with: task) }
             )
         )
@@ -116,7 +116,7 @@ extension View {
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
-                filter: { $0.createTaskName() == action.createTaskName() },
+                filter: { $0.createTaskIdentifier() == action.createTaskIdentifier() },
                 value: { $1.concatenate(with: task()) }
             )
         )

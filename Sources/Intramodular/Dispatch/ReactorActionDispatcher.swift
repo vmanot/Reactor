@@ -31,7 +31,7 @@ public struct ReactorActionDispatcher<R: ViewReactor>: Publisher {
                 task.receive(.init(wrappedValue: self.reactor))
             }
         
-        task.name = action.createTaskName()
+        task.taskIdentifier = action.createTaskIdentifier()
         reactor.environment.taskPipeline.track(task)
         task.start()
         

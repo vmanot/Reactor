@@ -69,13 +69,13 @@ extension ViewReactor where Self: DynamicViewPresenter {
 
 extension ReactorActionTask where R: ViewReactor {
     @inlinable
-    public static func present<V: View>(_ view: V) -> Self {
-        .action({ $0.withReactor({ $0.present(view) }) })
+    public static func present<V: View>(_ view: @autoclosure @escaping () throws -> V) -> Self {
+        .action({ try $0.withReactor({ $0.present(try view()) }) })
     }
     
     @inlinable
-    public static func presentOnTop<V: View>(_ view: V) -> Self {
-        .action({ $0.withReactor({ $0.presentOnTop(view) }) })
+    public static func presentOnTop<V: View>(_ view: @autoclosure @escaping () throws -> V) -> Self {
+        .action({ try $0.withReactor({ $0.presentOnTop(try view()) }) })
     }
     
     @inlinable

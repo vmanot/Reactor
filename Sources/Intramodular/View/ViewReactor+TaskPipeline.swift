@@ -23,18 +23,18 @@ extension ViewReactor {
     @inlinable
     public func status(of action: Action) -> TaskStatusDescription? {
         environment
-            .taskPipeline[action.createTaskName()]?
+            .taskPipeline[action.createTaskIdentifier()]?
             .statusDescription
     }
     
     @inlinable
     public func lastStatus(of action: Action) -> TaskStatusDescription? {
-        environment.taskPipeline.lastStatus(for: action.createTaskName())
+        environment.taskPipeline.lastStatus(for: action.createTaskIdentifier())
     }
     
     @inlinable
     public func cancel(action: Action) {
-        environment.taskPipeline[action.createTaskName()]?.cancel()
+        environment.taskPipeline[action.createTaskIdentifier()]?.cancel()
     }
     
     @inlinable
