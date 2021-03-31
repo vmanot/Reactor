@@ -11,6 +11,8 @@ public final class ReactorActionTask<R: Reactor>: ParametrizedPassthroughTask<Re
     }
     
     override public func didSend(status: Status) {
+        super.didSend(status: status)
+        
         try! withInput {
             if let action = taskIdentifier._cast(to: R.Action.self) {
                 $0.wrappedValue.handleStatus(status, for: action)
