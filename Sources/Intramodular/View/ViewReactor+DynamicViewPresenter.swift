@@ -29,7 +29,11 @@ extension ViewReactor where Self: DynamicViewPresenter {
             return assertionFailure()
         }
         
-        presenter.present(item.mergeEnvironmentBuilder(coordinator.environmentBuilder))
+        var item = item
+        
+        item.content.mergeEnvironmentBuilderInPlace(coordinator.environmentBuilder)
+        
+        presenter.present(item)
     }
     
     @discardableResult

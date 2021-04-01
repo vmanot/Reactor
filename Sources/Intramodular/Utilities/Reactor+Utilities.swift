@@ -7,7 +7,7 @@ import Merge
 import SwiftUIX
 
 extension ViewReactor {
-    public func trigger(_ route: Coordinator.Route)  {
+    public func trigger(_ route: PrimaryCoordinator.Route)  {
         coordinator.trigger(route)
     }
 }
@@ -26,7 +26,7 @@ extension ReactorActionTask {
 
 extension ReactorActionTask where R: ViewReactor {
     @inlinable
-    public static func trigger(_ route: R.Coordinator.Route) -> Self {
+    public static func trigger(_ route: R.PrimaryCoordinator.Route) -> Self {
         .action {
             try! $0.withInput {
                 $0.wrappedValue.coordinator.trigger(route)
