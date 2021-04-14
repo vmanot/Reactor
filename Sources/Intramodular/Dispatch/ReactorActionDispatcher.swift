@@ -5,7 +5,7 @@
 import Merge
 import SwiftUIX
 
-public struct ReactorActionDispatcher<R: ViewReactor>: Publisher {
+public struct ReactorActionDispatcher<R: Reactor>: Publisher {
     public typealias Output = AnyTask<Void, Error>.Output
     public typealias Failure = AnyTask<Void, Error>.Failure
     
@@ -41,7 +41,7 @@ public struct ReactorActionDispatcher<R: ViewReactor>: Publisher {
 
 // MARK: - Auxiliary Implementation -
 
-extension ViewReactor {
+extension Reactor {
     public func dispatcher(for action: Action) -> ReactorActionDispatcher<Self> {
         ReactorActionDispatcher(reactor: self, action: action)
     }
@@ -50,14 +50,16 @@ extension ViewReactor {
     public func dispatch(_ action: Action) -> AnyTask<Void, Error> {
         dispatcher(for: action).dispatch()
     }
-    
+}
+
+extension ViewReactor {
     @discardableResult
-    public func dispatch(super action: _opaque_ReactorAction) -> AnyTask<Void, Error> {
-        viewReactors.dispatch(action)
+    public func dispatch(super action: _opaque_ReactorAction) -> AnyTask<Void, Error>  {
+        environment.environment.viewReactors.dispatch(action)
     }
 }
 
-extension ViewReactor where Plan == EmptyReactorPlan {
+extension Reactor where Plan == EmptyReactorPlan {
     public func dispatcher(for plan: Plan) -> ReactorActionDispatcher<Self> {
         
     }
@@ -70,6 +72,6 @@ extension ViewReactor where Plan == EmptyReactorPlan {
 
 extension ViewReactor {
     public func environmentDispatch(_ action: _opaque_ReactorAction) -> AnyTask<Void, Error> {
-        viewReactors.dispatch(action)
+        environment.environment.viewReactors.dispatch(action)
     }
 }

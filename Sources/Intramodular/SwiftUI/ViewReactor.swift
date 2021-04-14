@@ -6,7 +6,7 @@ import Coordinator
 import Merge
 import SwiftUIX
 
-public protocol ViewReactor: _opaque_ViewReactor, DynamicProperty, DynamicViewPresenter, Reactor where _Environment == ViewReactorEnvironment {
+public protocol ViewReactor: DynamicProperty, DynamicViewPresenter, Reactor where _Environment == ViewReactorEnvironment {
     associatedtype PrimaryCoordinator: ViewCoordinator = EmptyViewCoordinator
     associatedtype Subview: Hashable = Never
     
@@ -23,18 +23,6 @@ public protocol ViewReactor: _opaque_ViewReactor, DynamicProperty, DynamicViewPr
 // MARK: - Implementation -
 
 extension ViewReactor {
-    public var environmentBuilder: EnvironmentBuilder {
-        get {
-            environment.environmentBuilder
-        } nonmutating set {
-            environment.environmentBuilder = newValue
-        }
-    }
-    
-    public func action(_ action: Action) -> Action {
-        action
-    }
-    
     public mutating func update() {
         let reactor = self
         
@@ -49,5 +37,14 @@ extension ViewReactor {
 extension ViewReactor where PrimaryCoordinator == EmptyViewCoordinator {
     public var coordinator: EmptyViewCoordinator {
         .init()
+    }
+}
+
+// MARK: - Extensions -
+
+extension ViewReactor {
+    @inlinable
+    public func trigger(_ route: PrimaryCoordinator.Route)  {
+        coordinator.trigger(route)
     }
 }

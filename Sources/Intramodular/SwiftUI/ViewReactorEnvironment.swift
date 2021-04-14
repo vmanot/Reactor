@@ -31,15 +31,7 @@ public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
     public init() {
         taskPipeline = .init()
     }
-}
 
-extension ViewReactorEnvironment {
-    public func intercepts(for item: _opaque_ReactorDispatchItem) -> [ReactorDispatchIntercept] {
-        dispatchIntercepts.filter({ $0.filter(item) })
-    }
-}
-
-extension ViewReactorEnvironment {
     func update<R: ViewReactor>(reactor: ReactorReference<R>) {
         guard !isSetup else {
             return

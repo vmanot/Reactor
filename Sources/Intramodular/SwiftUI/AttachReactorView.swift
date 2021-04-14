@@ -5,12 +5,6 @@
 import Merge
 import SwiftUIX
 
-public struct ObservedReactor<R: Reactor>: DynamicProperty {
-    @ObservedObject var observedObject: AnyObservableObject<Void, Never>
-    
-    public let reactor: R
-}
-
 public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
     @usableFromInline
     let reactorReference: ReactorReference<Reactor>

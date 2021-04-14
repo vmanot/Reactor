@@ -32,18 +32,11 @@ public struct ReactorDispatchIntercept: Equatable {
     }
 }
 
-@usableFromInline
 struct _OverrideReactorActionViewModifier: ViewModifier {
-    @usableFromInline
     @State var id: UUID = .init()
-    
-    @usableFromInline
     let filter: (_opaque_ReactorDispatchItem) -> Bool
-    
-    @usableFromInline
     let value: ReactorDispatchIntercept.Value
     
-    @usableFromInline
     init(
         filter: @escaping (_opaque_ReactorDispatchItem) -> Bool,
         value: @escaping ReactorDispatchIntercept.Value
@@ -52,7 +45,6 @@ struct _OverrideReactorActionViewModifier: ViewModifier {
         self.value = value
     }
     
-    @usableFromInline
     func body(content: Content)  -> some View {
         content.preference(
             key: ReactorDispatchIntercept.PreferenceKey.self,
@@ -62,7 +54,6 @@ struct _OverrideReactorActionViewModifier: ViewModifier {
 }
 
 extension View {
-    @inlinable
     public func prehook<A: ReactorAction>(
         _ action: A,
         perform task: AnyTask<Void, Error>
@@ -75,7 +66,6 @@ extension View {
         )
     }
     
-    @inlinable
     public func prehook<A: ReactorAction>(
         _ action: A,
         perform task: @escaping () -> AnyTask<Void, Error>
@@ -88,7 +78,6 @@ extension View {
         )
     }
     
-    @inlinable
     public func prehook<A: ReactorAction>(
         _ action: A,
         perform task: @escaping () -> Void
@@ -96,7 +85,6 @@ extension View {
         prehook(action, perform: PassthroughTask(action: task).eraseToAnyTask())
     }
     
-    @inlinable
     public func posthook<A: ReactorAction>(
         _ action: A,
         perform task: AnyTask<Void, Error>
@@ -109,7 +97,6 @@ extension View {
         )
     }
     
-    @inlinable
     public func posthook<A: ReactorAction>(
         _ action: A,
         perform task: @escaping () -> AnyTask<Void, Error>
@@ -122,11 +109,32 @@ extension View {
         )
     }
     
-    @inlinable
     public func posthook<A: ReactorAction>(
         _ action: A,
         perform task: @escaping () -> Void
     ) -> some View {
         posthook(action, perform: PassthroughTask(action: task).eraseToAnyTask())
+    }
+}
+
+extension ReactorObject {
+    public func prehook(
+        _ action: Action,
+        perform task: @escaping () -> AnyTask<Void, Error>
+    ) {
+        environment.dispatchIntercepts.append(
+            .init(
+                id: UUID(),
+                filter: { ($0 as? Action) == action },
+                value: { task().concatenate(with: $1) }
+            )
+        )
+    }
+    
+    public func prehook(
+        _ action: Action,
+        perform task: @escaping () -> Void
+    ) {
+        prehook(action, perform: { PassthroughTask(action: task).eraseToAnyTask() })
     }
 }

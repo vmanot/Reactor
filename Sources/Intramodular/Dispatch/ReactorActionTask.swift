@@ -41,6 +41,25 @@ extension ReactorActionTask {
             attemptToFulfill(.failure(ReactorActionTaskError.custom(description)))
         }
     }
+
+    @inlinable
+    public static func trigger<Coordinator: ViewCoordinator>(
+        _ route: Coordinator.Route,
+        in router: Coordinator
+    ) -> Self {
+        .action {
+            router.trigger(route)
+        }
+    }
+    
+    @inlinable
+    public static func trigger(_ route: R.PrimaryCoordinator.Route) -> Self where R: ViewReactor {
+        .action {
+            try! $0.withInput {
+                $0.wrappedValue.coordinator.trigger(route)
+            }
+        }
+    }
 }
 
 // MARK: - API -

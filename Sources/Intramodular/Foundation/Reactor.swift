@@ -13,7 +13,7 @@ public protocol Reactor: _opaque_Reactor, Identifiable {
     typealias ActionTask = ReactorActionTask<Self>
     typealias ActionTaskPlan = ReactorActionTaskPlan<Self>
     
-    var environment: _Environment { get set }
+    var environment: _Environment { get }
     
     /// Produce a task for a given action.
     func task(for _: Action) -> ActionTask
@@ -35,18 +35,46 @@ public protocol Reactor: _opaque_Reactor, Identifiable {
 
 // MARK: - Implementation -
 
+extension Reactor {
+    public func handleStatus(_ status: ActionTask.Status, for action: Action) {
+        
+    }
+}
+
 extension Reactor where Self: Identifiable {
     public var id: ObjectIdentifier {
         ObjectIdentifier(type(of: self))
     }
 }
 
+extension Reactor where Self: AnyObject & Identifiable {
+    public var id: ObjectIdentifier {
+        ObjectIdentifier(self)
+    }
+}
+
+// MARK: - Extensions -
+
 extension Reactor {
-    public var inheritedEnvironmentBuilder: EnvironmentBuilder {
-        .init()
+    @inlinable
+    public func status(of action: Action) -> TaskStatusDescription? {
+        environment
+            .taskPipeline[action.createTaskIdentifier()]?
+            .statusDescription
     }
     
-    public func handleStatus(_ status: ActionTask.Status, for action: Action) {
-        
+    @inlinable
+    public func lastStatus(of action: Action) -> TaskStatusDescription? {
+        environment.taskPipeline.lastStatus(for: action.createTaskIdentifier())
+    }
+    
+    @inlinable
+    public func cancel(action: Action) {
+        environment.taskPipeline[action.createTaskIdentifier()]?.cancel()
+    }
+    
+    @inlinable
+    public func cancelAllTasks() {
+        environment.taskPipeline.cancelAllTasks()
     }
 }
