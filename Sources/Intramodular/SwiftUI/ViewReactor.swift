@@ -23,6 +23,16 @@ public protocol ViewReactor: DynamicProperty, DynamicViewPresenter, Reactor wher
 // MARK: - Implementation -
 
 extension ViewReactor {
+    public var environmentBuilder: EnvironmentBuilder {
+        get {
+            environment.environmentBuilder
+        } nonmutating set {
+            environment.environmentBuilder = newValue
+        }
+    }
+}
+
+extension ViewReactor {
     public mutating func update() {
         let reactor = self
         
