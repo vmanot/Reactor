@@ -3,6 +3,7 @@
 //
 
 import Merge
+import Swallow
 import SwiftUIX
 
 public final class ReactorActionTask<R: Reactor>: ParametrizedPassthroughTask<ReactorReference<R>, Void, Error>, ExpressibleByNilLiteral {
@@ -38,7 +39,7 @@ extension ParametrizedPassthroughTask {
 extension ReactorActionTask {
     public class func error(description: String) -> Self {
         .init { attemptToFulfill in
-            attemptToFulfill(.failure(ReactorActionTaskError.custom(description)))
+            attemptToFulfill(.failure(CustomStringError(description: description)))
         }
     }
 
@@ -68,11 +69,4 @@ extension Publisher {
     public func eraseToActionTask<R: Reactor>() -> ReactorActionTask<R> {
         .init(publisher: mapTo(()).eraseError())
     }
-}
-
-// MARK: - Auxiliary Implementation -
-
-@usableFromInline
-enum ReactorActionTaskError: Error {
-    case custom(String)
 }
