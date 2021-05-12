@@ -6,25 +6,31 @@ import Merge
 import SwiftUIX
 
 extension ViewReactor where Self: DynamicViewPresentable {
-    @inlinable
     public var presenter: DynamicViewPresenter? {
         environment.environment.presenter?.presenter
     }
     
-    @inlinable
     public var presentationName: ViewName? {
         environment.environment.presenter?.presentationName
     }
 }
 
 extension ViewReactor where Self: DynamicViewPresenter {
-    @inlinable
+    public var _cocoaPresentationCoordinator: CocoaPresentationCoordinator {
+        guard let presenter = environment.environment.presenter else {
+            assertionFailure()
+            
+            return .init()
+        }
+        
+        return presenter._cocoaPresentationCoordinator
+    }
+    
     public var presented: DynamicViewPresentable? {
         environment.environment.presenter?.presented
     }
     
-    @inlinable
-    public func present(_ item: AnyModalPresentation) {
+    public func present(_ item: AnyModalPresentation, completion: @escaping () -> Void) {
         guard let presenter = environment.environment.presenter else {
             return assertionFailure()
         }
@@ -33,11 +39,10 @@ extension ViewReactor where Self: DynamicViewPresenter {
         
         item.content.mergeEnvironmentBuilderInPlace(coordinator.environmentBuilder)
         
-        presenter.present(item)
+        presenter.present(item, completion: completion)
     }
     
     @discardableResult
-    @inlinable
     public func dismiss(withAnimation animation: Animation?) -> Future<Bool, Never> {
         guard let presenter = environment.environment.presenter else {
             assertionFailure()
@@ -49,7 +54,6 @@ extension ViewReactor where Self: DynamicViewPresenter {
     }
     
     @discardableResult
-    @inlinable
     public func dismissSelf(withAnimation animation: Animation?) -> Future<Bool, Never> {
         guard let presenter = environment.environment.presenter else {
             assertionFailure()
