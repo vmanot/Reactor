@@ -41,13 +41,13 @@ extension Reactor {
     }
 }
 
-extension Reactor where Self: Identifiable {
+extension Reactor {
     public var id: ObjectIdentifier {
         ObjectIdentifier(type(of: self))
     }
 }
 
-extension Reactor where Self: AnyObject & Identifiable {
+extension Reactor where Self: AnyObject  {
     public var id: ObjectIdentifier {
         ObjectIdentifier(self)
     }

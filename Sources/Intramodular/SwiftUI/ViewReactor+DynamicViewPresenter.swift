@@ -5,7 +5,7 @@
 import Merge
 import SwiftUIX
 
-extension ViewReactor where Self: DynamicViewPresentable {
+extension ViewReactor {
     public var presenter: DynamicViewPresenter? {
         environment.environment.presenter?.presenter
     }
@@ -13,9 +13,7 @@ extension ViewReactor where Self: DynamicViewPresentable {
     public var presentationName: ViewName? {
         environment.environment.presenter?.presentationName
     }
-}
 
-extension ViewReactor where Self: DynamicViewPresenter {
     public var _cocoaPresentationCoordinator: CocoaPresentationCoordinator {
         guard let presenter = environment.environment.presenter else {
             assertionFailure()
