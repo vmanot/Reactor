@@ -29,13 +29,13 @@ extension EnvironmentValues {
     }
     
     public subscript<R: Reactor>(_ reactor: R.Type) -> R? {
-        self[ReactorEnvironmentKey<R>]?.wrappedValue ?? viewReactors[R.self]
+        self[ReactorEnvironmentKey<R>.self]?.wrappedValue ?? viewReactors[R.self]
     }
     
     public mutating func insertReactor<R: Reactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) {
-        self[ReactorEnvironmentKey<R>] = ReactorReference(_wrappedValue: reactor)
+        self[ReactorEnvironmentKey<R>.self] = ReactorReference(_wrappedValue: reactor)
         
         viewReactors.insert(reactor)
     }
