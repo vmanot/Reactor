@@ -37,6 +37,12 @@ extension ParametrizedPassthroughTask {
 }
 
 extension ReactorActionTask {
+    public class func failure(_ error: Error) -> Self {
+        .init { attemptToFulfill in
+            attemptToFulfill(.failure(error))
+        }
+    }
+
     public class func error(description: String) -> Self {
         .init { attemptToFulfill in
             attemptToFulfill(.failure(CustomStringError(description: description)))
