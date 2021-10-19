@@ -10,7 +10,7 @@ extension ViewReactor {
         environment.environment.presenter?.presenter
     }
     
-    public var presentationName: ViewName? {
+    public var presentationName: AnyHashable? {
         environment.environment.presenter?.presentationName
     }
 
