@@ -20,19 +20,24 @@ public struct ReactorActionDispatcher<R: Reactor>: Publisher {
     
     public func dispatch() -> AnyTask<Void, Error> {
         var task = reactor.task(for: action)
-        
-        task.receive(.init(wrappedValue: self.reactor))
+
+        task.reactor = reactor
+        task.action = action
         
         reactor
             .environment
             .intercepts(for: action)
             .forEach { override in
                 task = override.provide(for: action, task: task)
-                task.receive(.init(wrappedValue: self.reactor))
+                
+                task.reactor = reactor
+                task.action = action
+                
+                // FIXME!!!: How are the overrides called
             }
         
-        task.taskIdentifier = action.createTaskIdentifier()
-        reactor.environment.taskPipeline.track(task)
+        reactor.environment.taskPipeline.track(task, withCustomIdentifier: action)
+        
         task.start()
         
         return task.eraseToAnyTask()

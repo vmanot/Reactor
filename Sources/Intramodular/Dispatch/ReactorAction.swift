@@ -18,7 +18,7 @@ public protocol ReactorAction: _opaque_ReactorAction, ReactorDispatchItem {
 /// A control which dispatches a reactor action when triggered.
 public struct ReactorDispatchActionButton<Label: View>: View {
     @usableFromInline
-    let action: TaskIdentifier
+    let action: AnyHashable
     
     @usableFromInline
     let dispatch: () -> AnyTask<Void, Error>
@@ -32,7 +32,7 @@ public struct ReactorDispatchActionButton<Label: View>: View {
         reactor: R,
         label: () -> Label
     ) {
-        self.action = action.createTaskIdentifier()
+        self.action = action
         self.dispatch = { reactor.dispatch(action) }
         self.label = label()
     }
@@ -40,7 +40,6 @@ public struct ReactorDispatchActionButton<Label: View>: View {
     @inlinable
     public var body: some View {
         TaskButton(action: dispatch, label: { label })
-            .taskName(action)
     }
 }
 

@@ -6,7 +6,10 @@ import Merge
 import Swallow
 import SwiftUIX
 
-public final class ReactorActionTask<R: Reactor>: ParametrizedPassthroughTask<ReactorReference<R>, Void, Error>, ExpressibleByNilLiteral {
+public final class ReactorActionTask<R: Reactor>: PassthroughTask<Void, Error>, ExpressibleByNilLiteral {
+    var reactor: R?
+    var action: R.Action?
+    
     public required convenience init(nilLiteral: ()) {
         self.init(action: { })
     }
@@ -14,22 +17,8 @@ public final class ReactorActionTask<R: Reactor>: ParametrizedPassthroughTask<Re
     override public func didSend(status: Status) {
         super.didSend(status: status)
         
-        try! withInput {
-            if let action = taskIdentifier._cast(to: R.Action.self) {
-                $0.wrappedValue.handleStatus(status, for: action)
-            }
-        }
-    }
-}
-
-// MARK: - API -
-
-extension ParametrizedPassthroughTask {
-    public func withReactor<R: Reactor>(
-        _ body: (R) throws -> ()
-    ) rethrows -> Void where Input == ReactorReference<R> {
-        if let input = input {
-            try body(input.wrappedValue)
+        if let reactor = reactor, let action = action {
+            reactor.handleStatus(status, for: action)
         } else {
             assertionFailure()
         }
@@ -42,7 +31,7 @@ extension ReactorActionTask {
             attemptToFulfill(.failure(error))
         }
     }
-
+    
     public class func error(description: String) -> Self {
         .init { attemptToFulfill in
             attemptToFulfill(.failure(CustomStringError(description: description)))
@@ -56,15 +45,6 @@ extension ReactorActionTask {
     ) -> Self {
         .action {
             router.trigger(route)
-        }
-    }
-    
-    @inlinable
-    public static func trigger(_ route: R.PrimaryCoordinator.Route) -> Self where R: ViewReactor {
-        .action {
-            try! $0.withInput {
-                $0.wrappedValue.coordinator.trigger(route)
-            }
         }
     }
 }

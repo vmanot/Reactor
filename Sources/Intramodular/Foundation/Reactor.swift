@@ -59,18 +59,18 @@ extension Reactor {
     @inlinable
     public func status(of action: Action) -> TaskStatusDescription? {
         environment
-            .taskPipeline[action.createTaskIdentifier()]?
+            .taskPipeline[customTaskIdentifier: action]?
             .statusDescription
     }
     
     @inlinable
     public func lastStatus(of action: Action) -> TaskStatusDescription? {
-        environment.taskPipeline.lastStatus(for: action.createTaskIdentifier())
+        environment.taskPipeline.lastStatus(forCustomTaskIdentifier: action)
     }
     
     @inlinable
     public func cancel(action: Action) {
-        environment.taskPipeline[action.createTaskIdentifier()]?.cancel()
+        environment.taskPipeline[customTaskIdentifier: action]?.cancel()
     }
     
     @inlinable

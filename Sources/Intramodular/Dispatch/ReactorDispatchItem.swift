@@ -3,10 +3,11 @@
 //
 
 import Merge
+import Swallow
 import SwiftUIX
 
-public protocol _opaque_ReactorDispatchItem {
-    func createTaskIdentifier() -> TaskIdentifier
+public protocol _opaque_ReactorDispatchItem: _opaque_Hashable {
+
 }
 
 public protocol ReactorDispatchItem: _opaque_ReactorDispatchItem, Hashable {
@@ -16,7 +17,5 @@ public protocol ReactorDispatchItem: _opaque_ReactorDispatchItem, Hashable {
 // MARK: - Implementation -
 
 extension ReactorDispatchItem {
-    public func createTaskIdentifier() -> TaskIdentifier {
-        return .init(self)
-    }
+
 }

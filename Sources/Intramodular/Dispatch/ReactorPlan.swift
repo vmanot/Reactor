@@ -9,14 +9,6 @@ public protocol ReactorPlan: Hashable {
     
 }
 
-// MARK: - Extensions -
-
-extension ReactorPlan {
-    public func createTaskIdentifier() -> TaskIdentifier {
-        return .init(self)
-    }
-}
-
 // MARK: - Helpers -
 
 public enum EmptyReactorPlan: ReactorPlan {
