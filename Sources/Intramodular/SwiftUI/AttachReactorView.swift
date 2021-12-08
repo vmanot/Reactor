@@ -5,34 +5,30 @@
 import Merge
 import SwiftUIX
 
-public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
-    @usableFromInline
+/// A container view that attaches a reactor to its content.
+struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
     let reactorReference: ReactorReference<Reactor>
-    
-    @usableFromInline
     let content: Content
-    
-    @usableFromInline
+
+    private var reactor: Reactor {
+        reactorReference.wrappedValue
+    }
+
     init(reactorReference: ReactorReference<Reactor>, content: Content) {
         self.reactorReference = reactorReference
         self.content = content
     }
-    
-    @inlinable
-    public var reactor: Reactor {
-        reactorReference.wrappedValue
-    }
-    
+
     @_optimize(none)
     @inline(never)
-    public var body: some View {
+    var body: some View {
         if !reactor.environment.isSetup {
             DispatchQueue.main.async {
                 self.reactor.environment.isSetup = true
                 self.reactor.setup()
             }
         }
-        
+
         return content
             .environmentReactor(self.reactor)
             .environment(\.taskPipeline, reactor.environment.taskPipeline)
@@ -46,7 +42,9 @@ public struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
 // MARK: - API -
 
 extension View {
-    @inlinable
+    /// Attaches a given reactor to the view hierarchy.
+    ///
+    /// The given reactor is propagated to all the children of this view through the environment.
     public func attach<R: ViewReactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {
