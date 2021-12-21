@@ -6,7 +6,7 @@ import Merge
 import SwiftUIX
 
 /// A container view that attaches a reactor to its content.
-struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
+public struct _AttachReactorView<Reactor: ViewReactor, Content: View>: View {
     let reactorReference: ReactorReference<Reactor>
     let content: Content
 
@@ -19,9 +19,7 @@ struct AttachReactorView<Reactor: ViewReactor, Content: View>: View {
         self.content = content
     }
 
-    @_optimize(none)
-    @inline(never)
-    var body: some View {
+    public var body: some View {
         if !reactor.environment.isSetup {
             DispatchQueue.main.async {
                 self.reactor.environment.isSetup = true
@@ -48,6 +46,6 @@ extension View {
     public func attach<R: ViewReactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {
-        AttachReactorView(reactorReference: .init(wrappedValue: reactor()), content: self)
+        _AttachReactorView(reactorReference: .init(wrappedValue: reactor()), content: self)
     }
 }
