@@ -36,7 +36,5 @@ public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
         guard !isSetup else {
             return
         }
-        
-        reactor.wrappedValue.coordinator.environmentBuilder.insertReactor(reactor)
     }
 }

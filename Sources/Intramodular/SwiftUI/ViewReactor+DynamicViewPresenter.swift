@@ -32,11 +32,7 @@ extension ViewReactor {
         guard let presenter = environment.environment.presenter else {
             return assertionFailure()
         }
-        
-        var item = item
-        
-        item.content.mergeEnvironmentBuilderInPlace(coordinator.environmentBuilder)
-        
+                        
         presenter.present(item, completion: completion)
     }
     
