@@ -6,8 +6,8 @@ import Merge
 import SwiftUIX
 
 public struct ReactorActionDispatcher<R: Reactor>: Publisher {
-    public typealias Output = AnyTask<Void, Error>.Output
-    public typealias Failure = AnyTask<Void, Error>.Failure
+    public typealias Output = ObservableTaskOutputPublisher<AnyTask<Void, Error>>.Output
+    public typealias Failure = ObservableTaskOutputPublisher<AnyTask<Void, Error>>.Failure
     
     public let reactor: R
     public let action: R.Action
@@ -15,7 +15,7 @@ public struct ReactorActionDispatcher<R: Reactor>: Publisher {
     public func receive<S: Subscriber>(
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
-        dispatch().receive(subscriber: subscriber)
+        dispatch().outputPublisher.receive(subscriber: subscriber)
     }
     
     public func dispatch() -> AnyTask<Void, Error> {

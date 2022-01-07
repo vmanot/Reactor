@@ -52,13 +52,20 @@ extension ReactorActionTask {
 // MARK: - API -
 
 extension Publisher {
+    /// Convert and erase this publisher to a reactor action task.
     public func eraseToActionTask<R: Reactor>() -> ReactorActionTask<R> {
         .init(publisher: reduceAndMapTo(()).eraseError())
     }
+
+    /// Convert and erase this publisher to a reactor action task.
+    public func eraseToActionTask<R: Reactor>() -> ReactorActionTask<R> where Self: SingleOutputPublisher {
+        .init(publisher: mapTo(()).eraseError())
+    }
 }
 
-extension SingleOutputPublisher {
+extension ObservableTask {
+    /// Convert and erase this task to a reactor action task.
     public func eraseToActionTask<R: Reactor>() -> ReactorActionTask<R> {
-        .init(publisher: mapTo(()).eraseError())
+        successPublisher.eraseToActionTask()
     }
 }
