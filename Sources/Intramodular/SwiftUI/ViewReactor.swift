@@ -6,7 +6,7 @@ import Coordinator
 import Merge
 import SwiftUIX
 
-public protocol ViewReactor: DynamicProperty, DynamicViewPresenter, Reactor where _Environment == ViewReactorEnvironment {
+public protocol ViewReactor: DynamicProperty, Reactor where _Environment == ViewReactorEnvironment {
     associatedtype Subview: Hashable = Never
     
     typealias ReactorEnvironment = ViewReactorEnvironment
