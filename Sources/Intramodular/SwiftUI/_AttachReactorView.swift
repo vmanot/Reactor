@@ -31,9 +31,9 @@ public struct _AttachReactorView<Reactor: ViewReactor, Content: View>: View {
             .environmentReactor(self.reactor)
             .environment(\.taskPipeline, reactor.environment.taskPipeline)
             .environmentObject(reactor.environment.taskPipeline)
-            .onPreferenceChange(ReactorDispatchIntercept.PreferenceKey.self, perform: {
+            .onPreferenceChange(ReactorDispatchIntercept.PreferenceKey.self) {
                 self.reactor.environment.dispatchIntercepts = $0
-            })
+            }
     }
 }
 
