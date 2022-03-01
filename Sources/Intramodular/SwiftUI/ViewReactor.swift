@@ -15,11 +15,11 @@ public protocol ViewReactor: DynamicProperty, Reactor where _Environment == View
 // MARK: - Implementation -
 
 extension ViewReactor {
-    public var environmentBuilder: EnvironmentBuilder {
+    public var environmentInsertions: EnvironmentInsertions {
         get {
-            environment.environmentBuilder
+            environment.environmentInsertions
         } nonmutating set {
-            environment.environmentBuilder = newValue
+            environment.environmentInsertions = newValue
         }
     }
 }

@@ -16,7 +16,7 @@ public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
     @inlinable
     @State public internal(set) var dispatchIntercepts: [ReactorDispatchIntercept] = []
     @usableFromInline
-    @State var environmentBuilder = EnvironmentBuilder()
+    @State var environmentInsertions = EnvironmentInsertions()
     @usableFromInline
     @State var isSetup: Bool = false
     

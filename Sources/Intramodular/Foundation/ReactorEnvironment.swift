@@ -41,7 +41,7 @@ extension EnvironmentValues {
     }
 }
 
-extension EnvironmentBuilder {
+extension EnvironmentInsertions {
     public mutating func insertReactor<R: ViewReactor>(
         _ reactor: ReactorReference<R>
     ) {
