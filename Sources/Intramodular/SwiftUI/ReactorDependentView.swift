@@ -28,7 +28,7 @@ extension ReactorDependentView {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 public struct _SynthesizedReactorDependentViewBody<Reactor: ViewReactor, Content: View>: View {
     @usableFromInline
