@@ -9,7 +9,7 @@ public protocol ReactorPlan: Hashable {
     
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 public enum EmptyReactorPlan: ReactorPlan {
     

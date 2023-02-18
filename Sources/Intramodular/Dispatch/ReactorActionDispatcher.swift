@@ -44,7 +44,7 @@ public struct ReactorActionDispatcher<R: Reactor>: Publisher {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension Reactor {
     public func dispatcher(for action: Action) -> ReactorActionDispatcher<Self> {

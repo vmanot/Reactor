@@ -13,7 +13,7 @@ public protocol ReactorAction: _opaque_ReactorAction, ReactorDispatchItem {
     
 }
 
-// MARK: - Helpers -
+// MARK: - Helpers
 
 /// A control which dispatches a reactor action when triggered.
 public struct ReactorDispatchActionButton<Label: View>: View {

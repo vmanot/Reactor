@@ -49,7 +49,7 @@ extension ReactorActionTask {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension Publisher {
     /// Convert and erase this publisher to a reactor action task.

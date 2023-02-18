@@ -12,7 +12,7 @@ public protocol ViewReactor: DynamicProperty, Reactor where _Environment == View
     typealias ReactorEnvironment = ViewReactorEnvironment
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 extension ViewReactor {
     public var environmentInsertions: EnvironmentInsertions {

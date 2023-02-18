@@ -8,7 +8,7 @@ public protocol ReactorObject: CancellablesHolder, ObservableObject, Reactor whe
     
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 private var reactorEnvironmentKey: UInt8 = 0
 

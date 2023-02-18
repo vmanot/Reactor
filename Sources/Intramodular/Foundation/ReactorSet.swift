@@ -46,7 +46,7 @@ public struct ReactorSet {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension ReactorSet {
     public struct EnvironmentKey: SwiftUI.EnvironmentKey {

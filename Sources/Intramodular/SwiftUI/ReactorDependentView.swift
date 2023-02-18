@@ -13,7 +13,7 @@ public protocol ReactorDependentView: View {
     func makeBody(reactor: Reactor) -> ReactorViewBody
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension ReactorDependentView {
     @inlinable
@@ -28,7 +28,7 @@ extension ReactorDependentView {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 public struct _SynthesizedReactorDependentViewBody<Reactor: ViewReactor, Content: View>: View {
     @usableFromInline

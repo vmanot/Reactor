@@ -14,7 +14,7 @@ public protocol ReactorDispatchItem: _opaque_ReactorDispatchItem, Hashable {
     
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 extension ReactorDispatchItem {
 

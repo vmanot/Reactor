@@ -37,7 +37,7 @@ public struct _AttachReactorView<Reactor: ViewReactor, Content: View>: View {
     }
 }
 
-// MARK: - API -
+// MARK: - API
 
 extension View {
     /// Attaches a given reactor to the view hierarchy.

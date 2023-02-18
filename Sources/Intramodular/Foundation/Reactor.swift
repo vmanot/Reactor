@@ -33,7 +33,7 @@ public protocol Reactor: _opaque_Reactor, Identifiable {
     func handleStatus(_: ActionTask.Status, for _: Action)
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 extension Reactor {
     public func handleStatus(_ status: ActionTask.Status, for action: Action) {
@@ -53,7 +53,7 @@ extension Reactor where Self: AnyObject  {
     }
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension Reactor {
     @inlinable

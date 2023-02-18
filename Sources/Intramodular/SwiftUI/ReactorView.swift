@@ -15,7 +15,7 @@ public protocol ReactorView: View {
     func makeBody(reactor: Reactor) -> ReactorViewBody
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 extension ReactorView {
     @inlinable

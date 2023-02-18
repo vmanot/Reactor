@@ -19,7 +19,7 @@ extension ReactorEnvironment {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension EnvironmentValues {
     public struct ReactorEnvironmentKey<R: Reactor>: EnvironmentKey {

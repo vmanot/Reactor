@@ -11,7 +11,7 @@ public protocol _opaque_Reactor {
     func _opaque_dispatch(_ action: _opaque_ReactorAction) -> AnyTask<Void, Error>?
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 extension _opaque_Reactor where Self: Reactor {
     public func _opaque_dispatch(_ action: _opaque_ReactorAction) -> AnyTask<Void, Error>? {
