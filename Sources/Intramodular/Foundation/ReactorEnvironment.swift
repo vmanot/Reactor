@@ -12,8 +12,9 @@ public protocol ReactorEnvironment {
 }
 
 extension ReactorEnvironment {
+    /// The intercepts for a given dispatch item.
     public func intercepts(
-        for item: _opaque_ReactorDispatchItem
+        for item: any ReactorDispatchable
     ) -> [ReactorDispatchIntercept] {
         dispatchIntercepts.filter({ $0.filter(item) })
     }
@@ -29,15 +30,22 @@ extension EnvironmentValues {
     }
     
     public subscript<R: Reactor>(_ reactor: R.Type) -> R? {
-        self[ReactorEnvironmentKey<R>.self]?.wrappedValue ?? viewReactors[R.self]
+        self[ReactorEnvironmentKey<R>.self]?.wrappedValue ?? reactors[R.self]
     }
     
-    public mutating func insertReactor<R: Reactor>(
-        _ reactor: @autoclosure @escaping () -> R
+    public mutating func insert<R: Reactor>(
+        reactor: @autoclosure @escaping () -> R
     ) {
         self[ReactorEnvironmentKey<R>.self] = ReactorReference(_wrappedValue: reactor)
         
-        viewReactors.insert(reactor)
+        reactors.insert(reactor)
+    }
+    
+    @available(*, deprecated, renamed: "insert(reactor:)")
+    public mutating func insertReactor<R: Reactor>(
+        _ reactor: @autoclosure @escaping () -> R
+    ) {
+        insert(reactor: reactor())
     }
 }
 
@@ -45,9 +53,6 @@ extension EnvironmentInsertions {
     public mutating func insertReactor<R: ViewReactor>(
         _ reactor: ReactorReference<R>
     ) {
-        transformEnvironment(
-            { $0.insertReactor(reactor.wrappedValue) },
-            withKey: ObjectIdentifier(R.self)
-        )
+        transformEnvironment({ $0.insert(reactor: reactor.wrappedValue) }, withKey: ObjectIdentifier(R.self))
     }
 }

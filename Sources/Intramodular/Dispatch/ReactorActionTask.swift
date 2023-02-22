@@ -38,7 +38,6 @@ extension ReactorActionTask {
         }
     }
     
-    @inlinable
     public static func trigger<Coordinator: ViewCoordinator>(
         _ route: Coordinator.Route,
         in router: Coordinator
@@ -56,7 +55,7 @@ extension Publisher {
     public func eraseToActionTask<R: Reactor>() -> ReactorActionTask<R> {
         .init(publisher: reduceAndMapTo(()).eraseError())
     }
-
+    
     /// Convert and erase this publisher to a reactor action task.
     public func eraseToActionTask<R: Reactor>() -> ReactorActionTask<R> where Self: SingleOutputPublisher {
         .init(publisher: mapTo(()).eraseError())

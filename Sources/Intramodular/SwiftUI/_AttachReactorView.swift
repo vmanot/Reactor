@@ -28,7 +28,7 @@ public struct _AttachReactorView<Reactor: ViewReactor, Content: View>: View {
         }
 
         return content
-            .environmentReactor(self.reactor)
+            .reactor(self.reactor)
             .environment(\.taskPipeline, reactor.environment.taskPipeline)
             .environmentObject(reactor.environment.taskPipeline)
             .onPreferenceChange(ReactorDispatchIntercept.PreferenceKey.self) {
@@ -44,7 +44,7 @@ extension View {
     ///
     /// The given reactor is propagated to all the children of this view through the environment.
     public func attach<R: ViewReactor>(
-        _ reactor: @autoclosure @escaping () -> R
+        reactor: @autoclosure @escaping () -> R
     ) -> some View {
         _AttachReactorView(reactorReference: .init(wrappedValue: reactor()), content: self)
     }

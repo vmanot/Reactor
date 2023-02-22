@@ -5,8 +5,9 @@
 import Merge
 import SwiftUIX
 
+/// A set of `Reactor`s.
 public struct ReactorSet {
-    private var value: [ObjectIdentifier: () -> _opaque_Reactor] = [:]
+    private var value: [ObjectIdentifier: () -> any Reactor] = [:]
     
     public init() {
         
@@ -23,7 +24,7 @@ public struct ReactorSet {
             }
         }
     }
-
+    
     public mutating func insert<R: Reactor>(_ reactor: @escaping () -> R)  {
         value[ObjectIdentifier(R.self)] = reactor
     }
@@ -31,9 +32,9 @@ public struct ReactorSet {
     public mutating func insert(_ reactors: ReactorSet) {
         value.merge(reactors.value, uniquingKeysWith: { x, y in x })
     }
-
+    
     @discardableResult
-    public func dispatch(_ action: _opaque_ReactorAction) -> AnyTask<Void, Error>! {
+    public func dispatch(_ action: any ReactorAction) -> AnyTask<Void, Error>! {
         let result = value.values.compactMap({ $0()._opaque_dispatch(action) })
         
         if result.isEmpty {
@@ -48,44 +49,39 @@ public struct ReactorSet {
 
 // MARK: - Auxiliary
 
-extension ReactorSet {
-    public struct EnvironmentKey: SwiftUI.EnvironmentKey {
-        public static let defaultValue = ReactorSet()
-    }
-}
-
 extension EnvironmentValues {
-    public var viewReactors: ReactorSet {
+    struct ReactorsKey: SwiftUI.EnvironmentKey {
+        static let defaultValue = ReactorSet()
+    }
+    
+    public var reactors: ReactorSet {
         get {
-            self[ReactorSet.EnvironmentKey.self]
+            self[ReactorsKey.self]
         } set {
-            self[ReactorSet.EnvironmentKey.self] = newValue
+            self[ReactorsKey.self] = newValue
         }
     }
 }
 
 public struct ReactorSetAccessView<Content: View>: View {
     @usableFromInline
-    @Environment(\.viewReactors) var viewReactors
+    @Environment(\.reactors) var reactors
     
     public var content: (ReactorSet) -> Content
     
-    @inlinable
     public init(@ViewBuilder content: @escaping (ReactorSet) -> Content) {
         self.content = content
     }
     
-    @inlinable
     public var body: some View {
-        content(viewReactors)
+        content(reactors)
     }
 }
 
 // MARK: - Usage -
 
 extension View {
-    @inlinable
-    public func onAppear(dispatch action: _opaque_ReactorAction) -> some View {
+    public func onAppear(dispatch action: any ReactorAction) -> some View {
         ReactorSetAccessView { reactors in
             self.onAppear {
                 reactors.dispatch(action)
@@ -93,7 +89,6 @@ extension View {
         }
     }
     
-    @inlinable
     public func onAppear<R: ViewReactor>(dispatch action: R.Action, in reactor: R) -> some View {
         onAppear {
             reactor.dispatch(action)

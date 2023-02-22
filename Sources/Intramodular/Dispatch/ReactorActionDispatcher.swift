@@ -20,7 +20,7 @@ public struct ReactorActionDispatcher<R: Reactor>: Publisher {
     
     public func dispatch() -> AnyTask<Void, Error> {
         var task = reactor.task(for: action)
-
+        
         task.reactor = reactor
         task.action = action
         
@@ -59,24 +59,13 @@ extension Reactor {
 
 extension ViewReactor {
     @discardableResult
-    public func dispatch(super action: _opaque_ReactorAction) -> AnyTask<Void, Error>  {
-        environment.environment.viewReactors.dispatch(action)
-    }
-}
-
-extension Reactor where Plan == EmptyReactorPlan {
-    public func dispatcher(for plan: Plan) -> ReactorActionDispatcher<Self> {
-        
-    }
-    
-    @discardableResult
-    public func dispatch(_ plan: Plan) -> AnyTask<Void, Error> {
-        
+    public func dispatch(super action: any ReactorAction) -> AnyTask<Void, Error>  {
+        environment.environment.reactors.dispatch(action)
     }
 }
 
 extension ViewReactor {
-    public func environmentDispatch(_ action: _opaque_ReactorAction) -> AnyTask<Void, Error> {
-        environment.environment.viewReactors.dispatch(action)
+    public func environmentDispatch(_ action: any ReactorAction) -> AnyTask<Void, Error> {
+        environment.environment.reactors.dispatch(action)
     }
 }

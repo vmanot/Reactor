@@ -5,13 +5,11 @@
 import Merge
 import SwiftUIX
 
-public protocol Reactor: _opaque_Reactor, Identifiable {
+public protocol Reactor: Identifiable {
     associatedtype _Environment: ReactorEnvironment
     associatedtype Action: ReactorAction
-    associatedtype Plan: ReactorPlan = EmptyReactorPlan
     
     typealias ActionTask = ReactorActionTask<Self>
-    typealias ActionTaskPlan = ReactorActionTaskPlan<Self>
     
     var environment: _Environment { get }
     
@@ -22,18 +20,17 @@ public protocol Reactor: _opaque_Reactor, Identifiable {
     @discardableResult
     func dispatch(_: Action) -> AnyTask<Void, Error>
     
-    /// Produce a task plan for a given plan.
-    func taskPlan(for _: Plan) -> ActionTaskPlan
-    
-    /// Dispatch an action plan.
-    @discardableResult
-    func dispatch(_: Plan) -> AnyTask<Void, Error>
-    
     /// Handle a status produced by a given action.
     func handleStatus(_: ActionTask.Status, for _: Action)
 }
 
 // MARK: - Implementation
+
+extension Reactor {
+    func _opaque_dispatch(_ action: any ReactorAction) -> AnyTask<Void, Error>? {
+        (action as? Action).map(dispatch)
+    }
+}
 
 extension Reactor {
     public func handleStatus(_ status: ActionTask.Status, for action: Action) {
@@ -56,24 +53,20 @@ extension Reactor where Self: AnyObject  {
 // MARK: - Extensions
 
 extension Reactor {
-    @inlinable
     public func status(of action: Action) -> TaskStatusDescription? {
         environment
             .taskPipeline[customTaskIdentifier: action]?
             .statusDescription
     }
     
-    @inlinable
     public func lastStatus(of action: Action) -> TaskStatusDescription? {
         environment.taskPipeline.lastStatus(forCustomTaskIdentifier: action)
     }
     
-    @inlinable
     public func cancel(action: Action) {
         environment.taskPipeline[customTaskIdentifier: action]?.cancel()
     }
     
-    @inlinable
     public func cancelAllTasks() {
         environment.taskPipeline.cancelAllTasks()
     }

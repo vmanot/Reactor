@@ -5,11 +5,7 @@
 import Merge
 import SwiftUIX
 
-public protocol _opaque_ReactorAction: _opaque_ReactorDispatchItem {
-    
-}
-
-public protocol ReactorAction: _opaque_ReactorAction, ReactorDispatchItem {
+public protocol ReactorAction: ReactorDispatchable {
     
 }
 

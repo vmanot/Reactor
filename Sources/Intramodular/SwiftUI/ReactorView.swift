@@ -21,11 +21,11 @@ extension ReactorView {
     @inlinable
     public var body: some View {
         makeBody(reactor: reactor)
-            .attach(self.reactor)
-            .onReceive(ReactorDispatchGlobal.shared.objectWillChange, perform: { action in
+            .attach(reactor: reactor)
+            .onReceive(ReactorDispatchGlobal.shared.objectWillChange) { action in
                 if let action = action as? Reactor.Action {
-                    self.reactor.dispatch(action)
+                    reactor.dispatch(action)
                 }
-            })
+            }
     }
 }

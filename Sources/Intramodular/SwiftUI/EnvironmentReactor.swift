@@ -19,18 +19,30 @@ public struct EnvironmentReactor<R: Reactor>: DynamicProperty {
 }
 
 extension View {
-    @inlinable
-    public func environmentReactor<R: ReactorObject>(
+    public func reactor<R: ReactorObject>(
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {
-        transformEnvironment(\.self, transform: { $0.insertReactor(reactor()) })
+        transformEnvironment(\.self, transform: { $0.insert(reactor: reactor()) })
             .environmentObject(reactor())
     }
     
-    @inlinable
+    public func reactor<R: ViewReactor>(
+        _ reactor: @autoclosure @escaping () -> R
+    ) -> some View {
+        transformEnvironment(\.self, transform: { $0.insert(reactor: reactor()) })
+    }
+    
+    @available(*, deprecated, renamed: "reactor(_:)")
+    public func environmentReactor<R: ReactorObject>(
+        _ reactor: @autoclosure @escaping () -> R
+    ) -> some View {
+        self.reactor(reactor())
+    }
+    
+    @available(*, deprecated, renamed: "reactor(_:)")
     public func environmentReactor<R: ViewReactor>(
         _ reactor: @autoclosure @escaping () -> R
     ) -> some View {
-        transformEnvironment(\.self, transform: { $0.insertReactor(reactor()) })
+        self.reactor(reactor())
     }
 }

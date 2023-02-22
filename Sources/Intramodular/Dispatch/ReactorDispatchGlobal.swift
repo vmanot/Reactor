@@ -6,11 +6,11 @@ import Merge
 import SwiftUIX
 
 final public class ReactorDispatchGlobal: ObservableObject {
-    public typealias ObjectWillChangePublisher = PassthroughSubject<_opaque_ReactorAction, Never>
+    public typealias ObjectWillChangePublisher = PassthroughSubject<any ReactorAction, Never>
     
     public static let shared = ReactorDispatchGlobal()
     
-    public let objectWillChange = PassthroughSubject<_opaque_ReactorAction, Never>()
+    public let objectWillChange = PassthroughSubject<any ReactorAction, Never>()
     
     private init() {
         
@@ -18,7 +18,7 @@ final public class ReactorDispatchGlobal: ObservableObject {
 }
 
 extension ReactorDispatchGlobal {
-    public static func send(_ value: _opaque_ReactorAction) {
+    public static func send(_ value: any ReactorAction) {
         DispatchQueue.asyncOnMainIfNecessary {
             shared.objectWillChange.send(value)
         }

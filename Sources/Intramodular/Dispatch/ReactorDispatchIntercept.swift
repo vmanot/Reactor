@@ -7,26 +7,17 @@ import Merge
 import SwiftUIX
 
 public struct ReactorDispatchIntercept: Equatable {
-    @usableFromInline
     typealias PreferenceKey = ArrayReducePreferenceKey<ReactorDispatchIntercept>
-    @usableFromInline
-    typealias Value = (_opaque_ReactorDispatchItem, AnyTask<Void, Error>) -> AnyTask<Void, Error>
+    typealias Value = (any ReactorDispatchable, AnyTask<Void, Error>) -> AnyTask<Void, Error>
     
-    @usableFromInline
     let id: UUID
-    
-    @usableFromInline
-    let filter: (_opaque_ReactorDispatchItem) -> Bool
-    
-    @usableFromInline
+    let filter: (any ReactorDispatchable) -> Bool
     let value: Value
     
-    @usableFromInline
     func provide<R: Reactor>(for action: R.Action, task: ReactorActionTask<R>) -> ReactorActionTask<R> {
         value(action, task.eraseToAnyTask()).eraseToActionTask() // FIXME!!
     }
     
-    @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.id == rhs.id
     }
@@ -34,11 +25,11 @@ public struct ReactorDispatchIntercept: Equatable {
 
 struct _OverrideReactorActionViewModifier: ViewModifier {
     @State var id: UUID = .init()
-    let filter: (_opaque_ReactorDispatchItem) -> Bool
+    let filter: (any ReactorDispatchable) -> Bool
     let value: ReactorDispatchIntercept.Value
     
     init(
-        filter: @escaping (_opaque_ReactorDispatchItem) -> Bool,
+        filter: @escaping (any ReactorDispatchable) -> Bool,
         value: @escaping ReactorDispatchIntercept.Value
     ) {
         self.filter = filter
@@ -60,7 +51,7 @@ extension View {
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
-                filter: { $0.toAnyHashable() == action.toAnyHashable() },
+                filter: { $0.eraseToAnyHashable() == action.eraseToAnyHashable() },
                 value: { task.concatenate(with: $1) }
             )
         )
@@ -72,7 +63,7 @@ extension View {
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
-                filter: { $0.toAnyHashable() == action.toAnyHashable() },
+                filter: { $0.eraseToAnyHashable() == action.eraseToAnyHashable() },
                 value: { task().concatenate(with: $1) }
             )
         )
@@ -91,7 +82,7 @@ extension View {
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
-                filter: { $0.toAnyHashable() == action.toAnyHashable() },
+                filter: { $0.eraseToAnyHashable() == action.eraseToAnyHashable() },
                 value: { $1.concatenate(with: task) }
             )
         )
@@ -103,7 +94,7 @@ extension View {
     ) -> some View {
         modifier(
             _OverrideReactorActionViewModifier(
-                filter: { $0.toAnyHashable() == action.toAnyHashable() },
+                filter: { $0.eraseToAnyHashable() == action.eraseToAnyHashable() },
                 value: { $1.concatenate(with: task()) }
             )
         )
