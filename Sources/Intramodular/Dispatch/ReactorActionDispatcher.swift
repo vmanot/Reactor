@@ -15,9 +15,12 @@ public struct ReactorActionDispatcher<R: Reactor>: Publisher {
     public func receive<S: Subscriber>(
         subscriber: S
     ) where S.Input == Output, S.Failure == Failure {
-        dispatch().outputPublisher.receive(subscriber: subscriber)
+        Task { @MainActor in
+            dispatch().outputPublisher.receive(subscriber: subscriber)
+        }
     }
     
+    @MainActor
     public func dispatch() -> AnyTask<Void, Error> {
         var task = reactor.task(for: action)
         
@@ -46,26 +49,10 @@ public struct ReactorActionDispatcher<R: Reactor>: Publisher {
 
 // MARK: - Auxiliary
 
-extension Reactor {
-    public func dispatcher(for action: Action) -> ReactorActionDispatcher<Self> {
-        ReactorActionDispatcher(reactor: self, action: action)
-    }
-    
+extension Reactor {    
     @discardableResult
+    @MainActor
     public func dispatch(_ action: Action) -> AnyTask<Void, Error> {
-        dispatcher(for: action).dispatch()
-    }
-}
-
-extension ViewReactor {
-    @discardableResult
-    public func dispatch(super action: any ReactorAction) -> AnyTask<Void, Error>  {
-        environment.environment.reactors.dispatch(action)
-    }
-}
-
-extension ViewReactor {
-    public func environmentDispatch(_ action: any ReactorAction) -> AnyTask<Void, Error> {
-        environment.environment.reactors.dispatch(action)
+        ReactorActionDispatcher(reactor: self, action: action).dispatch()
     }
 }

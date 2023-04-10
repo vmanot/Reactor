@@ -14,14 +14,12 @@ public protocol Reactor: Identifiable {
     var environment: _Environment { get }
     
     /// Produce a task for a given action.
+    @MainActor
     func task(for _: Action) -> ActionTask
     
     /// Dispatch an action.
     @discardableResult
     func dispatch(_: Action) -> AnyTask<Void, Error>
-    
-    /// Handle a status produced by a given action.
-    func handleStatus(_: ActionTask.Status, for _: Action)
 }
 
 // MARK: - Implementation
@@ -32,11 +30,6 @@ extension Reactor {
     }
 }
 
-extension Reactor {
-    public func handleStatus(_ status: ActionTask.Status, for action: Action) {
-        
-    }
-}
 
 extension Reactor {
     public var id: ObjectIdentifier {
