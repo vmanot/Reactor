@@ -30,7 +30,6 @@ extension Reactor {
     }
 }
 
-
 extension Reactor {
     public var id: ObjectIdentifier {
         ObjectIdentifier(type(of: self))
