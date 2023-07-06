@@ -20,19 +20,18 @@ public struct _AttachReactorView<Reactor: ViewReactor, Content: View>: View {
     }
 
     public var body: some View {
-        if !reactor.environment.isSetup {
+        if !reactor.context.isSetup {
             DispatchQueue.main.async {
-                self.reactor.environment.isSetup = true
+                self.reactor.context.isSetup = true
                 self.reactor.setup()
             }
         }
 
         return content
             .reactor(self.reactor)
-            .environment(\.taskPipeline, reactor.environment.taskPipeline)
-            .environmentObject(reactor.environment.taskPipeline)
-            .onPreferenceChange(ReactorDispatchIntercept.PreferenceKey.self) {
-                self.reactor.environment.dispatchIntercepts = $0
+            .environmentObject(reactor.context._taskGraph)
+            .onPreferenceChange(_ReactorActionIntercept.PreferenceKey.self) {
+                self.reactor.context._actionIntercepts = $0
             }
     }
 }

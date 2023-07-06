@@ -8,13 +8,13 @@ import SwiftUIX
 import SwiftUI
 
 @propertyWrapper
-public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
+public struct _ReactorContextDynamicProperty: DynamicProperty, _ReactorContextProtocol {
     @usableFromInline
     @Environment(\.self) var environment
     @inlinable
-    @ObservedObject public internal(set) var taskPipeline: TaskPipeline
+    @ObservedObject public internal(set) var _taskGraph: _ObservableTaskGraph
     @inlinable
-    @State public internal(set) var dispatchIntercepts: [ReactorDispatchIntercept] = []
+    @State public internal(set) var _actionIntercepts: [_ReactorActionIntercept] = []
     @usableFromInline
     @State var environmentInsertions = EnvironmentInsertions()
     @usableFromInline
@@ -29,7 +29,7 @@ public struct ViewReactorEnvironment: DynamicProperty, ReactorEnvironment {
     }
     
     public init() {
-        taskPipeline = .init()
+        _taskGraph = .init()
     }
 
     func update<R: ViewReactor>(reactor: ReactorReference<R>) {

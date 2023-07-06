@@ -28,7 +28,7 @@ struct ExampleView: ReactorView {
 
 extension ExampleView {
     struct Reactor: ViewReactor {
-        enum Action: ReactorAction {
+        enum Action: Hashable {
             case foo
         }
         

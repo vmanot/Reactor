@@ -6,6 +6,7 @@ import Merge
 import SwiftUIX
 import SwiftUI
 
+/// A view that is essentially a function over a reactor.
 public protocol ReactorView: View {
     associatedtype Reactor: ViewReactor
     associatedtype ReactorViewBody: View
@@ -22,7 +23,7 @@ extension ReactorView {
     public var body: some View {
         makeBody(reactor: reactor)
             .attach(reactor: reactor)
-            .onReceive(ReactorDispatchGlobal.shared.objectWillChange) { action in
+            .onReceive(_ReactorRuntime.shared.objectWillChange) { action in
                 if let action = action as? Reactor.Action {
                     reactor.dispatch(action)
                 }

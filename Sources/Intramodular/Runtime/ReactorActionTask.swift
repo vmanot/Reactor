@@ -22,7 +22,9 @@ extension ReactorActionTask {
         }
     }
     
-    public class func error(description: String) -> Self {
+    public class func error(
+        description: String
+    ) -> Self {
         .init { attemptToFulfill in
             attemptToFulfill(.failure(CustomStringError(description: description)))
         }

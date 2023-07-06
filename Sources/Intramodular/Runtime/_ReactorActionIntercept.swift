@@ -6,12 +6,12 @@ import Coordinator
 import Merge
 import SwiftUIX
 
-public struct ReactorDispatchIntercept: Equatable {
-    typealias PreferenceKey = ArrayReducePreferenceKey<ReactorDispatchIntercept>
-    typealias Value = (any ReactorDispatchable, AnyTask<Void, Error>) -> AnyTask<Void, Error>
+public struct _ReactorActionIntercept: Equatable {
+    typealias PreferenceKey = ArrayReducePreferenceKey<_ReactorActionIntercept>
+    typealias Value = (any Hashable, AnyTask<Void, Error>) -> AnyTask<Void, Error>
     
     let id: UUID
-    let filter: (any ReactorDispatchable) -> Bool
+    let filter: (any Hashable) -> Bool
     let value: Value
     
     func provide<R: Reactor>(for action: R.Action, task: ReactorActionTask<R>) -> ReactorActionTask<R> {
@@ -23,14 +23,14 @@ public struct ReactorDispatchIntercept: Equatable {
     }
 }
 
-struct _OverrideReactorActionViewModifier: ViewModifier {
+struct _OverrideHashableViewModifier: ViewModifier {
     @State var id: UUID = .init()
-    let filter: (any ReactorDispatchable) -> Bool
-    let value: ReactorDispatchIntercept.Value
+    let filter: (any Hashable) -> Bool
+    let value: _ReactorActionIntercept.Value
     
     init(
-        filter: @escaping (any ReactorDispatchable) -> Bool,
-        value: @escaping ReactorDispatchIntercept.Value
+        filter: @escaping (any Hashable) -> Bool,
+        value: @escaping _ReactorActionIntercept.Value
     ) {
         self.filter = filter
         self.value = value
@@ -38,69 +38,69 @@ struct _OverrideReactorActionViewModifier: ViewModifier {
     
     func body(content: Content)  -> some View {
         content.preference(
-            key: ReactorDispatchIntercept.PreferenceKey.self,
+            key: _ReactorActionIntercept.PreferenceKey.self,
             value: [.init(id: id, filter: filter, value: value)]
         )
     }
 }
 
 extension View {
-    public func prehook<A: ReactorAction>(
+    public func prehook<A: Hashable>(
         _ action: A,
         perform task: AnyTask<Void, Error>
     ) -> some View {
         modifier(
-            _OverrideReactorActionViewModifier(
+            _OverrideHashableViewModifier(
                 filter: { $0.eraseToAnyHashable() == action.eraseToAnyHashable() },
                 value: { task.concatenate(with: $1) }
             )
         )
     }
     
-    public func prehook<A: ReactorAction>(
+    public func prehook<A: Hashable>(
         _ action: A,
         perform task: @escaping () -> AnyTask<Void, Error>
     ) -> some View {
         modifier(
-            _OverrideReactorActionViewModifier(
+            _OverrideHashableViewModifier(
                 filter: { $0.eraseToAnyHashable() == action.eraseToAnyHashable() },
                 value: { task().concatenate(with: $1) }
             )
         )
     }
     
-    public func prehook<A: ReactorAction>(
+    public func prehook<A: Hashable>(
         _ action: A,
         perform task: @escaping () -> Void
     ) -> some View {
         prehook(action, perform: PassthroughTask(action: task).eraseToAnyTask())
     }
     
-    public func posthook<A: ReactorAction>(
+    public func posthook<A: Hashable>(
         _ action: A,
         perform task: AnyTask<Void, Error>
     ) -> some View {
         modifier(
-            _OverrideReactorActionViewModifier(
+            _OverrideHashableViewModifier(
                 filter: { $0.eraseToAnyHashable() == action.eraseToAnyHashable() },
                 value: { $1.concatenate(with: task) }
             )
         )
     }
     
-    public func posthook<A: ReactorAction>(
+    public func posthook<A: Hashable>(
         _ action: A,
         perform task: @escaping () -> AnyTask<Void, Error>
     ) -> some View {
         modifier(
-            _OverrideReactorActionViewModifier(
+            _OverrideHashableViewModifier(
                 filter: { $0.eraseToAnyHashable() == action.eraseToAnyHashable() },
                 value: { $1.concatenate(with: task()) }
             )
         )
     }
     
-    public func posthook<A: ReactorAction>(
+    public func posthook<A: Hashable>(
         _ action: A,
         perform task: @escaping () -> Void
     ) -> some View {
@@ -108,12 +108,12 @@ extension View {
     }
 }
 
-extension ReactorObject {
+extension Reactor where ReactorContext == _ReactorContext {
     public func prehook(
         _ action: Action,
         perform task: @escaping () -> AnyTask<Void, Error>
     ) {
-        environment.dispatchIntercepts.append(
+        context._actionIntercepts.append(
             .init(
                 id: UUID(),
                 filter: { ($0 as? Action) == action },

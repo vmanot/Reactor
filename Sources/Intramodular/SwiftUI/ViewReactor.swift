@@ -6,15 +6,30 @@ import Coordinator
 import Merge
 import SwiftUIX
 
-public protocol ViewReactor: DynamicProperty, Reactor where _Environment == ViewReactorEnvironment {
+/// A reactor that's meant to be used within a SwiftUI view.
+public protocol ViewReactor: DynamicProperty, Reactor where ReactorContext == _ReactorContextDynamicProperty {
     associatedtype Subview: Hashable = Never
     
-    typealias ReactorEnvironment = ViewReactorEnvironment
+    // @available(*, deprecated, renamed: "ReactorContext")
+    var environment: ReactorContext { get }
+    
+    // @available(*, deprecated, renamed: "ReactorContext")
+    typealias ReactorEnvironment = _ReactorContextDynamicProperty
+}
+
+extension ViewReactor {
+    public var id: ObjectIdentifier {
+        ObjectIdentifier(type(of: self))
+    }
 }
 
 // MARK: - Implementation
 
 extension ViewReactor {
+    public var context: ReactorContext {
+        environment
+    }
+    
     public var environmentInsertions: EnvironmentInsertions {
         get {
             environment.environmentInsertions
