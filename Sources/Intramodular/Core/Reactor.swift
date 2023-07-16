@@ -30,7 +30,7 @@ extension Reactor {
     @discardableResult
     @MainActor
     public func dispatch(_ action: Action) -> AnyTask<Void, Error> {
-        ReactorActionDispatcher(reactor: self, action: action).dispatch()
+        return ReactorActionDispatcher(reactor: self, action: action).dispatch()
     }
     
     @MainActor
@@ -39,7 +39,40 @@ extension Reactor {
     }
 }
 
+
+@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+extension TaskButton where Success == Void, Error == Swift.Error {
+    public init<R: Reactor>(
+        _ reactor: R,
+        _ action: R.Action,
+        @ViewBuilder label: @escaping (TaskStatus<Success, Error>) -> Label
+    ) {
+        let task = (reactor.context._taskGraph[customTaskIdentifier: action]?.base).flatMap {
+            $0 as? any ObservableTask<Success, Error>
+        }
+        
+        self = Self {
+            reactor.dispatch(action)
+        } label: { status in
+            label(status)
+        }
+        ._existingTask(task)
+    }
+}
+
 // MARK: - Extensions
+
+@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+extension Reactor {
+    /// Gets the most recently run task for a given action.
+    public func _runningTask(
+        for action: Action
+    ) -> ActionTask? {
+        (context._taskGraph[customTaskIdentifier: action]?.base).map {
+            $0 as! ActionTask
+        }
+    }
+}
 
 extension Reactor {
     public func status(
