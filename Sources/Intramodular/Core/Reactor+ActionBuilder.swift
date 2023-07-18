@@ -38,7 +38,7 @@ extension Reactor {
     public func _Action(
         @_implicitSelfCapture _ action: @MainActor @escaping () async throws -> Void
     ) -> ActionTask where Error == Swift.Error {
-        ActionTask.action {
+        ActionTask.action { @MainActor in
             try await withDependencies(from: self) {
                 try await action()
             }
