@@ -26,7 +26,8 @@ let package = Package(
                 "Merge",
                 "SwiftUIX"
             ],
-            path: "Sources"
+            path: "Sources",
+            swiftSettings: []
         ),
     ]
 )
