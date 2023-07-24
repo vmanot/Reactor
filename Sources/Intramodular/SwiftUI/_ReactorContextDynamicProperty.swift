@@ -12,7 +12,7 @@ public struct _ReactorContextDynamicProperty: DynamicProperty, _ReactorContextPr
     @usableFromInline
     @Environment(\.self) var environment
     @inlinable
-    @ObservedObject public internal(set) var _taskGraph: _ObservableTaskGraph
+    @ObservedObject public internal(set) var _taskGraph: _ObservableTaskGraph<AnyHashable>
     @inlinable
     @State public internal(set) var _actionIntercepts: [_ReactorActionIntercept] = []
     @usableFromInline

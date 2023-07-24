@@ -7,7 +7,7 @@ import Swift
 import SwiftUIX
 
 public protocol _ReactorContextProtocol {
-    var _taskGraph: _ObservableTaskGraph { get }
+    var _taskGraph: _ObservableTaskGraph<AnyHashable> { get }
     var _actionIntercepts: [_ReactorActionIntercept] { get }
 }
 

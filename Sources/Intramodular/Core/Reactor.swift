@@ -39,7 +39,6 @@ extension Reactor {
     }
 }
 
-
 @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 extension TaskButton where Success == Void, Error == Swift.Error {
     public init<R: Reactor>(
@@ -143,6 +142,8 @@ extension Reactor {
         context._taskGraph.cancelAllTasks()
     }
 }
+
+// MARK: - Auxiliary
 
 public struct _ReactorActionStatusQueryExpression<R: Reactor, Result>: Sendable {
     public typealias Action = R.Action
