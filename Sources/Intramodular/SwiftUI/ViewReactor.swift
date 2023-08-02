@@ -7,7 +7,7 @@ import Merge
 import SwiftUIX
 
 /// A reactor that's meant to be used within a SwiftUI view.
-public protocol ViewReactor: DynamicProperty, Reactor where ReactorContext == _ReactorContextDynamicProperty {
+public protocol ViewReactor: DynamicProperty, Reactor where ReactorContext == _ReactorContextDynamicProperty<Self> {
     associatedtype Subview: Hashable = Never
     
     // @available(*, deprecated, renamed: "ReactorContext")

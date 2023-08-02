@@ -8,16 +8,13 @@ import SwiftUIX
 import SwiftUI
 
 @propertyWrapper
-public struct _ReactorContextDynamicProperty: DynamicProperty, _ReactorContextProtocol {
-    @usableFromInline
+public struct _ReactorContextDynamicProperty<ReactorType: Reactor>: DynamicProperty, _ReactorContextProtocol {
     @Environment(\.self) var environment
-    @inlinable
-    @ObservedObject public internal(set) var _taskGraph: _ObservableTaskGraph<AnyHashable>
-    @inlinable
+    
+    @State public private(set) var cancellables = Cancellables()
+    @PersistentObject public private(set) var _actionTasks = _ObservableTaskGroup<ReactorType.Action>()
     @State public internal(set) var _actionIntercepts: [_ReactorActionIntercept] = []
-    @usableFromInline
     @State var environmentInsertions = EnvironmentInsertions()
-    @usableFromInline
     @State var isSetup: Bool = false
     
     public var wrappedValue: Self {
@@ -29,9 +26,9 @@ public struct _ReactorContextDynamicProperty: DynamicProperty, _ReactorContextPr
     }
     
     public init() {
-        _taskGraph = .init()
+        
     }
-
+    
     func update<R: ViewReactor>(reactor: ReactorReference<R>) {
         guard !isSetup else {
             return

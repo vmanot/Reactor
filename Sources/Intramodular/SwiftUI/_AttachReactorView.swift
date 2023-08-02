@@ -7,18 +7,18 @@ import SwiftUIX
 
 /// A container view that attaches a reactor to its content.
 public struct _AttachReactorView<Reactor: ViewReactor, Content: View>: View {
-    let reactorReference: ReactorReference<Reactor>
+    let _reactor: ReactorReference<Reactor>
     let content: Content
-
+    
     private var reactor: Reactor {
-        reactorReference.wrappedValue
+        _reactor.wrappedValue
     }
-
-    init(reactorReference: ReactorReference<Reactor>, content: Content) {
-        self.reactorReference = reactorReference
+    
+    init(reactor: ReactorReference<Reactor>, content: Content) {
+        self._reactor = reactor
         self.content = content
     }
-
+    
     public var body: some View {
         if !reactor.context.isSetup {
             DispatchQueue.main.async {
@@ -26,10 +26,10 @@ public struct _AttachReactorView<Reactor: ViewReactor, Content: View>: View {
                 self.reactor.setup()
             }
         }
-
+        
         return content
             .reactor(self.reactor)
-            .environmentObject(reactor.context._taskGraph)
+            ._observableTaskGroup(self.reactor.context._actionTasks)
             .onPreferenceChange(_ReactorActionIntercept.PreferenceKey.self) {
                 self.reactor.context._actionIntercepts = $0
             }
@@ -45,6 +45,6 @@ extension View {
     public func attach<R: ViewReactor>(
         reactor: @autoclosure @escaping () -> R
     ) -> some View {
-        _AttachReactorView(reactorReference: .init(wrappedValue: reactor()), content: self)
+        _AttachReactorView(reactor: .init(wrappedValue: reactor()), content: self)
     }
 }

@@ -27,6 +27,17 @@ struct ReactorActionDispatcher<R: Reactor>: Publisher {
         task.reactor = reactor
         task.action = action
         
+        _provideOverrides(for: &task)
+        
+        reactor.context._actionTasks.addTask(task, withCustomIdentifier: action)
+        
+        task.start()
+        
+        return task.eraseToAnyTask()
+    }
+    
+    // TODO: Get rid of.
+    private func _provideOverrides(for task: inout ReactorActionTask<R>) {
         reactor.context.intercepts(for: action)
             .forEach { override in
                 task = override.provide(for: action, task: task)
@@ -36,11 +47,5 @@ struct ReactorActionDispatcher<R: Reactor>: Publisher {
                 
                 // FIXME!!!: How are the overrides called
             }
-        
-        reactor.context._taskGraph.track(task, withCustomIdentifier: action)
-        
-        task.start()
-        
-        return task.eraseToAnyTask()
     }
 }

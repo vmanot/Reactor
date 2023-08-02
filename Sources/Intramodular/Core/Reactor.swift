@@ -7,7 +7,7 @@ import Swallow
 import SwiftUIX
 
 public protocol Reactor: Identifiable {
-    associatedtype ReactorContext: _ReactorContextProtocol
+    associatedtype ReactorContext: _ReactorContextProtocol<Self> where ReactorContext.ReactorType == Self
     associatedtype Action: Hashable
     
     typealias ActionTask = ReactorActionTask<Self>
@@ -46,7 +46,7 @@ extension TaskButton where Success == Void, Error == Swift.Error {
         _ action: R.Action,
         @ViewBuilder label: @escaping (TaskStatus<Success, Error>) -> Label
     ) {
-        let task = (reactor.context._taskGraph[customTaskIdentifier: action]?.base).flatMap {
+        let task = (reactor.context._actionTasks[customIdentifier: action].last?.base).flatMap {
             $0 as? any ObservableTask<Success, Error>
         }
         
@@ -62,17 +62,19 @@ extension TaskButton where Success == Void, Error == Swift.Error {
 // MARK: - Extensions
 
 @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+@MainActor
 extension Reactor {
     /// Gets the most recently run task for a given action.
-    public func _runningTask(
+    public func _mostRecentTask(
         for action: Action
     ) -> ActionTask? {
-        (context._taskGraph[customTaskIdentifier: action]?.base).map {
+        (context._actionTasks[customIdentifier: action].last?.base).map {
             $0 as! ActionTask
         }
     }
 }
 
+@MainActor
 extension Reactor {
     public func status(
         of query: _ReactorActionStatusQueryExpression<Self, TaskStatusDescription?>
@@ -80,66 +82,22 @@ extension Reactor {
         query.rawValue(self)
     }
     
-    public func status(of action: Action) -> TaskStatusDescription {
-        context._taskGraph[customTaskIdentifier: action]?.statusDescription ?? .idle
-    }
-    
-    private func _customTaskID<T>(
-        ofMostRecent action: CasePath<Action, T>
-    ) throws -> AnyHashable?  {
-        return try context._taskGraph.firstAndOnly(where: {
-            guard let customTaskIdentifier = $0.customTaskIdentifier else {
-                return false
-            }
-            
-            guard let _action = customTaskIdentifier.base as? Action else {
-                assertionFailure()
-                
-                return false
-            }
-            
-            return try action._opaque_extract(from: _action) != nil
-        })?.customTaskIdentifier
-    }
-    
     public func status(
-        ofMostRecent action: Action
-    ) -> TaskStatusDescription? {
-        _expectedToNotThrow {
-            if let status = context._taskGraph[customTaskIdentifier: action]?.statusDescription {
-                return status
-            } else {
-                return context._taskGraph.lastStatus(forCustomTaskIdentifier: action)
-            }
-        }
-    }
-
-    public func status<T>(
-        ofMostRecent action: CasePath<Action, T>
-    ) -> TaskStatusDescription? {
-        _expectedToNotThrow {
-            guard let id  = try _customTaskID(ofMostRecent: action) else {
-                return nil
-            }
-            
-            if let status = context._taskGraph[customTaskIdentifier: id]?.statusDescription {
-                return status
-            } else {
-                return context._taskGraph.lastStatus(forCustomTaskIdentifier: id)
-            }
-        }
+        of action: Action
+    ) -> TaskStatusDescription {
+        let tasks = context._actionTasks[customIdentifier: action]
+        
+        assert(tasks.count <= 1)
+        
+        return tasks.last?.statusDescription ?? .idle
     }
     
-    public func lastStatus(of action: Action) -> TaskStatusDescription? {
-        context._taskGraph.lastStatus(forCustomTaskIdentifier: action)
+    public func cancel(_ action: Action) {
+        context._actionTasks.cancelAll(identifiedBy: action)
     }
     
-    public func cancel(action: Action) {
-        context._taskGraph[customTaskIdentifier: action]?.cancel()
-    }
-    
-    public func cancelAllTasks() {
-        context._taskGraph.cancelAllTasks()
+    public func cancelAll() {
+        context._actionTasks.cancelAll()
     }
 }
 
@@ -148,19 +106,68 @@ extension Reactor {
 public struct _ReactorActionStatusQueryExpression<R: Reactor, Result>: Sendable {
     public typealias Action = R.Action
     
-    typealias Query = @Sendable (R) -> Result
+    typealias Query = @MainActor @Sendable (R) -> Result
     
-    let rawValue: @Sendable (R) -> Result
+    let rawValue: @MainActor @Sendable (R) -> Result
     
-    init(rawValue: @escaping @Sendable (R) -> Result) {
+    init(rawValue: @escaping @MainActor @Sendable (R) -> Result) {
         self.rawValue = rawValue
     }
-    
+}
+
+extension _ReactorActionStatusQueryExpression {
     public static func last<T>(
         _ action: CasePath<Action, T>
     ) -> Self where Result == TaskStatusDescription? {
         Self(rawValue: { reactor in
             reactor.status(ofMostRecent: action)
         })
+    }
+    
+    public static func last(
+        _ action: Action
+    ) -> Self where Result == TaskStatusDescription? {
+        Self(rawValue: { reactor in
+            reactor.status(ofMostRecent: action)
+        })
+    }
+}
+
+@MainActor
+extension Reactor {
+    fileprivate func status(
+        ofMostRecent action: Action
+    ) -> TaskStatusDescription? {
+        _expectNoThrow {
+            if let status = context._actionTasks[customIdentifier: action].last?.statusDescription {
+                return status
+            } else {
+                return context._actionTasks.lastStatus(forCustomTaskIdentifier: action)
+            }
+        }
+    }
+    
+    fileprivate func status<T>(
+        ofMostRecent action: CasePath<Action, T>
+    ) -> TaskStatusDescription? {
+        _expectNoThrow { () -> TaskStatusDescription? in
+            guard let action = try _activeActions(matchedBy: action).last else {
+                return nil
+            }
+            
+            if let status = context._actionTasks[customIdentifier: action].last?.statusDescription {
+                return status
+            } else {
+                return context._actionTasks.lastStatus(forCustomTaskIdentifier: action)
+            }
+        }
+    }
+    
+    fileprivate func _activeActions<T>(
+        matchedBy casePath: CasePath<Action, T>
+    ) throws -> [Action] {
+        try context._actionTasks.tasks(matchedBy: casePath).compactMap {
+            context._actionTasks.customIdentifier(for: $0)
+        }
     }
 }

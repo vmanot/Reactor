@@ -108,7 +108,7 @@ extension View {
     }
 }
 
-extension Reactor where ReactorContext == _ReactorContext {
+extension Reactor where ReactorContext == _ReactorContextDynamicProperty<Self> {
     public func prehook(
         _ action: Action,
         perform task: @escaping () -> AnyTask<Void, Error>

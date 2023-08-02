@@ -6,8 +6,10 @@ import Merge
 import Swift
 import SwiftUIX
 
-public protocol _ReactorContextProtocol {
-    var _taskGraph: _ObservableTaskGraph<AnyHashable> { get }
+public protocol _ReactorContextProtocol<ReactorType>: CancellablesHolder {
+    associatedtype ReactorType: Reactor
+    
+    var _actionTasks: _ObservableTaskGroup<ReactorType.Action> { get }
     var _actionIntercepts: [_ReactorActionIntercept] { get }
 }
 
