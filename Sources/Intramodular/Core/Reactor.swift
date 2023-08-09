@@ -65,7 +65,7 @@ extension TaskButton where Success == Void, Error == Swift.Error {
 @MainActor
 extension Reactor {
     /// Gets the most recently run task for a given action.
-    public func _mostRecentTask(
+    public func _mostRecentlyRunTask(
         for action: Action
     ) -> ActionTask? {
         (context._actionTasks[customIdentifier: action].last?.base).map {
