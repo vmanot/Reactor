@@ -19,17 +19,15 @@ public final class _DefaultReactorContext<R: Reactor>: ObservableObject, _Reacto
     }
 }
 
+private let _Reactor_reactorContext = ObjCAssociationKey<any _ReactorContextProtocol>()
+
 extension Reactor where Self: ObservableObject, Self.ReactorContext == _DefaultReactorContext<Self> {
-    public static var _reactorContextKey: ObjCAssociationKey<Self.ReactorContext> {
-        .init()
-    }
-    
     @MainActor
     public var context: Self.ReactorContext {
         let associatedObjects = ObjCAssociatedObjectView(base: self)
         
-        return associatedObjects[Self._reactorContextKey, default: { () -> Self.ReactorContext in
-            let context = _DefaultReactorContext<Self>()
+        let _result: any _ReactorContextProtocol = associatedObjects[_Reactor_reactorContext, default: { () -> Self.ReactorContext in
+            let context = ReactorContext()
             
             if let objectWillChangePublisher = self.objectWillChange as? ObservableObjectPublisher {
                 context
@@ -40,5 +38,7 @@ extension Reactor where Self: ObservableObject, Self.ReactorContext == _DefaultR
             
             return context
         }()]
+
+        return _result as! ReactorContext
     }
 }
