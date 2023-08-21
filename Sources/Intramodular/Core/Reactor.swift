@@ -24,6 +24,10 @@ public protocol Reactor: Identifiable {
     func dispatch(_: Action) -> AnyTask<Void, Error>
 }
 
+public protocol ReactorObject: Reactor & ObservableObject {
+    
+}
+
 // MARK: - Implementation
 
 extension Reactor {
