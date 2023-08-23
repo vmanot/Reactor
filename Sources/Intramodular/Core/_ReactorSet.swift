@@ -34,6 +34,7 @@ public struct _ReactorSet {
     }
     
     @discardableResult
+    @MainActor
     public func dispatch(_ action: any Hashable) -> AnyTask<Void, Error>! {
         let result = value.values.compactMap({ $0()._opaque_dispatch(action) })
         
@@ -50,6 +51,7 @@ public struct _ReactorSet {
 // MARK: - Auxiliary
 
 extension Reactor {
+    @MainActor
     func _opaque_dispatch(_ action: any Hashable) -> AnyTask<Void, Error>? {
         (action as? Action).map(dispatch)
     }

@@ -37,6 +37,7 @@ struct ReactorActionDispatcher<R: Reactor>: Publisher {
     }
     
     // TODO: Get rid of.
+    @MainActor
     private func _provideOverrides(for task: inout ReactorActionTask<R>) {
         reactor.context.intercepts(for: action)
             .forEach { override in

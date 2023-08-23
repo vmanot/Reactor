@@ -12,6 +12,7 @@ public protocol Reactor: Identifiable {
     
     typealias ActionTask = ReactorActionTask<Self>
     
+    @MainActor
     var context: ReactorContext { get }
     
     /// Produce a task for a given action.
@@ -20,6 +21,7 @@ public protocol Reactor: Identifiable {
     func task(for _: Action) -> ActionTask
     
     /// Dispatch an action.
+    @MainActor
     @discardableResult
     func dispatch(_: Action) -> AnyTask<Void, Error>
 }
@@ -146,7 +148,7 @@ extension Reactor {
             if let status = context._actionTasks[customIdentifier: action].last?.statusDescription {
                 return status
             } else {
-                return context._actionTasks.lastStatus(forCustomTaskIdentifier: action)
+                return nil
             }
         }
     }
@@ -162,7 +164,7 @@ extension Reactor {
             if let status = context._actionTasks[customIdentifier: action].last?.statusDescription {
                 return status
             } else {
-                return context._actionTasks.lastStatus(forCustomTaskIdentifier: action)
+                return nil
             }
         }
     }

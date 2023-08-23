@@ -13,6 +13,7 @@ public protocol ReactorView: View {
     
     var reactor: Reactor { get }
     
+    @MainActor
     func makeBody(reactor: Reactor) -> ReactorViewBody
 }
 
@@ -20,6 +21,7 @@ public protocol ReactorView: View {
 
 extension ReactorView {
     @inlinable
+    @MainActor
     public var body: some View {
         makeBody(reactor: reactor)
             .attach(reactor: reactor)

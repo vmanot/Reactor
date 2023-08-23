@@ -9,12 +9,16 @@ import SwiftUIX
 public protocol _ReactorContextProtocol<ReactorType>: CancellablesHolder {
     associatedtype ReactorType: Reactor
     
+    @MainActor
     var _actionTasks: _ObservableTaskGroup<ReactorType.Action> { get }
+    
+    @MainActor
     var _actionIntercepts: [_ReactorActionIntercept] { get }
 }
 
 extension _ReactorContextProtocol {
     /// The intercepts for a given dispatch item.
+    @MainActor
     public func intercepts(
         for item: any Hashable
     ) -> [_ReactorActionIntercept] {

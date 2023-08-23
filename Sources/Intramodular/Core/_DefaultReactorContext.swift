@@ -3,19 +3,20 @@
 //
 
 import Foundation
-import Merge
+@_spi(Internal) import Merge
 import Runtime
 import SwiftUIX
 
+@MainActor
 public final class _DefaultReactorContext<R: Reactor>: ObservableObject, _ReactorContextProtocol {
     public typealias ReactorType = R
     
-    @PublishedObject public var _actionTasks = _ObservableTaskGroup<R.Action>()
+    @PublishedObject public private(set) var _actionTasks = _ObservableTaskGroup<R.Action>()
     
     public var _actionIntercepts: [_ReactorActionIntercept] = []
     
     public init() {
-        
+        _actionTasks.keepHistory = false
     }
 }
 

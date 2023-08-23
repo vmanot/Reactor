@@ -44,6 +44,7 @@ struct _OverrideHashableViewModifier: ViewModifier {
     }
 }
 
+@MainActor
 extension View {
     public func prehook<A: Hashable>(
         _ action: A,
@@ -108,6 +109,7 @@ extension View {
     }
 }
 
+@MainActor
 extension Reactor where ReactorContext == _ReactorContextDynamicProperty<Self> {
     public func prehook(
         _ action: Action,
