@@ -6,7 +6,7 @@ import Merge
 import Swift
 import SwiftUIX
 
-public protocol _ReactorContextProtocol<ReactorType>: CancellablesHolder {
+public protocol _ReactorContextProtocol<ReactorType>: _CancellablesProviding {
     associatedtype ReactorType: Reactor
     
     @MainActor
