@@ -36,12 +36,12 @@ extension Reactor {
     @discardableResult
     @MainActor
     public func dispatch(_ action: Action) -> AnyTask<Void, Error> {
-        return ReactorActionDispatcher(reactor: self, action: action).dispatch()
+        ReactorActionDispatcher(reactor: self, action: action).dispatch()
     }
     
     @MainActor
-    public func _perform(_ action: Action) async throws {
-        try await ReactorActionDispatcher(reactor: self, action: action).dispatch().value
+    public func perform(_ action: Action) async throws {
+        try await dispatch(action).value
     }
 }
 
