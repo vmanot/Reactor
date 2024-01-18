@@ -2,7 +2,6 @@
 // Copyright (c) Vatsal Manot
 //
 
-import Coordinator
 import Merge
 import SwiftUIX
 
@@ -14,7 +13,7 @@ public protocol ViewReactor: DynamicProperty, Reactor where ReactorContext == _R
     var environment: ReactorContext { get }
     
     // @available(*, deprecated, renamed: "ReactorContext")
-    typealias ReactorEnvironment = _ReactorContextDynamicProperty
+    typealias ReactorEnvironment = _ReactorContextDynamicProperty<Self>
 }
 
 extension ViewReactor {

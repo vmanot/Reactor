@@ -29,15 +29,6 @@ extension ReactorActionTask {
             attemptToFulfill(.failure(CustomStringError(description: description)))
         }
     }
-    
-    public static func trigger<Coordinator: ViewCoordinator>(
-        _ route: Coordinator.Route,
-        in router: Coordinator
-    ) -> Self {
-        .action {
-            router.trigger(route)
-        }
-    }
 }
 
 // MARK: - API
