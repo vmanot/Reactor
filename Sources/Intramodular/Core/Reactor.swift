@@ -144,19 +144,17 @@ extension Reactor {
     fileprivate func status(
         ofMostRecent action: Action
     ) -> TaskStatusDescription? {
-        #try(.optimistic) {
-            if let status = context._actionTasks[customIdentifier: action].last?.statusDescription {
-                return status
-            } else {
-                return nil
-            }
+        if let status = context._actionTasks[customIdentifier: action].last?.statusDescription {
+            return status
+        } else {
+            return nil
         }
     }
     
     fileprivate func status<T>(
         ofMostRecent action: CasePath<Action, T>
     ) -> TaskStatusDescription? {
-        #try(.optimistic) { () -> TaskStatusDescription? in
+        do {
             guard let action = try _activeActions(matchedBy: action).last else {
                 return nil
             }
@@ -166,6 +164,10 @@ extension Reactor {
             } else {
                 return nil
             }
+        } catch {
+            runtimeIssue(error)
+            
+            return nil
         }
     }
     

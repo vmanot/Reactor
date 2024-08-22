@@ -5,6 +5,7 @@
 import Merge
 import Swallow
 
+
 @resultBuilder
 public struct ReactorActionBuilder<R: Reactor> {
     public static func buildBlock(_ action: R.ActionTask) -> R.ActionTask {
