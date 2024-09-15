@@ -30,7 +30,7 @@ extension Reactor {
         @_implicitSelfCapture _ action: @MainActor @escaping () -> Void
     ) -> ActionTask {
         ActionTask.action {
-            withDependencies(from: self) {
+            withTaskDependencies(from: self) {
                  action()
             }
         }
@@ -40,7 +40,7 @@ extension Reactor {
         @_implicitSelfCapture _ action: @MainActor @escaping () async throws -> Void
     ) -> ActionTask where Error == Swift.Error {
         ActionTask.action { @MainActor in
-            try await withDependencies(from: self) {
+            try await withTaskDependencies(from: self) {
                 try await action()
             }
         }
