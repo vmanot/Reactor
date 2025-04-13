@@ -30,8 +30,10 @@ public struct _AttachReactorView<Reactor: ViewReactor, Content: View>: View {
         return content
             .reactor(self.reactor)
             ._observableTaskGroup(self.reactor.context._actionTasks)
-            .onPreferenceChange(_ReactorActionIntercept.PreferenceKey.self) {
-                self.reactor.context._actionIntercepts = $0
+            .onPreferenceChange(_ReactorActionIntercept.PreferenceKey.self) { value in
+                Task { @MainActor in
+                    self.reactor.context._actionIntercepts = value
+                }
             }
     }
 }

@@ -50,7 +50,7 @@ extension TaskButton where Success == Void, Error == Swift.Error {
     public init<R: Reactor>(
         _ reactor: R,
         _ action: R.Action,
-        @ViewBuilder label: @escaping (TaskStatus<Success, Error>) -> Label
+        @ViewBuilder label: @escaping (ObservableTaskStatus<Success, Error>) -> Label
     ) {
         let task = (reactor.context._actionTasks[customIdentifier: action].last?.base).flatMap {
             $0 as? any ObservableTask<Success, Error>
@@ -83,14 +83,14 @@ extension Reactor {
 @MainActor
 extension Reactor {
     public func status(
-        of query: _ReactorActionStatusQueryExpression<Self, TaskStatusDescription?>
-    ) -> TaskStatusDescription? {
+        of query: _ReactorActionStatusQueryExpression<Self, ObservableTaskStatusDescription?>
+    ) -> ObservableTaskStatusDescription? {
         query.rawValue(self)
     }
     
     public func status(
         of action: Action
-    ) -> TaskStatusDescription {
+    ) -> ObservableTaskStatusDescription {
         let tasks = context._actionTasks[customIdentifier: action]
         
         assert(tasks.count <= 1)
@@ -124,7 +124,7 @@ public struct _ReactorActionStatusQueryExpression<R: Reactor, Result>: Sendable 
 extension _ReactorActionStatusQueryExpression {
     public static func last<T>(
         _ action: CasePath<Action, T>
-    ) -> Self where Result == TaskStatusDescription? {
+    ) -> Self where Result == ObservableTaskStatusDescription? {
         Self(rawValue: { reactor in
             reactor.status(ofMostRecent: action)
         })
@@ -132,7 +132,7 @@ extension _ReactorActionStatusQueryExpression {
     
     public static func last(
         _ action: Action
-    ) -> Self where Result == TaskStatusDescription? {
+    ) -> Self where Result == ObservableTaskStatusDescription? {
         Self(rawValue: { reactor in
             reactor.status(ofMostRecent: action)
         })
@@ -143,7 +143,7 @@ extension _ReactorActionStatusQueryExpression {
 extension Reactor {
     fileprivate func status(
         ofMostRecent action: Action
-    ) -> TaskStatusDescription? {
+    ) -> ObservableTaskStatusDescription? {
         if let status = context._actionTasks[customIdentifier: action].last?.statusDescription {
             return status
         } else {
@@ -153,7 +153,7 @@ extension Reactor {
     
     fileprivate func status<T>(
         ofMostRecent action: CasePath<Action, T>
-    ) -> TaskStatusDescription? {
+    ) -> ObservableTaskStatusDescription? {
         do {
             guard let action = try _activeActions(matchedBy: action).last else {
                 return nil
